@@ -1,11 +1,11 @@
 package com.example.android.wesport;
 
 import android.content.Intent;
-import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,25 +14,15 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
 
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,  GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     LocationManager locationManager;
     LocationListener locationListener;
 
-    private final String LOG_TAG ="LocationActivity";
-
-    private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
-    String lat, lon;
-    Location mLastLocation;
+    private GoogleMap mMap;
 
 
     GridView androidGridView;
@@ -48,13 +38,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
         setContentView(R.layout.activity_main);
 
         CustomGridViewActivity adapterViewAndroid = new CustomGridViewActivity(MainActivity.this, gridViewString, gridViewImageId);
@@ -69,58 +52,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-
-
-    }
-        @Override
-        protected void onStart() {
-            super.onStart();
-            // Connect the client.
-            Log.d(LOG_TAG, "onStart fired ..............");
-            mGoogleApiClient.connect();
-
-        }
-
-        @Override
-        protected void onStop() {
-            // Disconnecting the client invalidates it.
-            mGoogleApiClient.disconnect();
-            Log.d(LOG_TAG, "onStop fired ..............");
-
-            super.onStop();
-        }
-
-        @Override
-        public void onConnected(Bundle bundle) {
-
-            mLocationRequest = LocationRequest.create();
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(10); // Update location every second
-
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
-            if (mLastLocation != null) {
-                lat = String.valueOf(mLastLocation.getLatitude());
-                lon = String.valueOf(mLastLocation.getLongitude());
-
-        }}
-
-        @Override
-        public void onConnectionSuspended(int i) {
-            Log.i(LOG_TAG, "GoogleApiClient connection has been suspend");
-        }
-
-        @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
-            Log.i(LOG_TAG, "GoogleApiClient connection has failed");
-        }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.i(LOG_TAG, location.toString());
-        //txtOutput.setText(location.toString());
-
-        //txtOutput.setText(Double.toString(location.getLatitude()));
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         super.onOptionsItemSelected(item);
         if (item.getItemId()==R.id.menu_next) {
-           Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(intent);
         }
         return true;
