@@ -1,10 +1,7 @@
 package com.example.android.wesport;
 
 import android.content.Intent;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,16 +11,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.GoogleMap;
 
-
-public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
-
-    LocationManager locationManager;
-    LocationListener locationListener;
-
-    private GoogleMap mMap;
-
+public class MainActivity extends AppCompatActivity  {
 
     GridView androidGridView;
     String[] gridViewString = {
