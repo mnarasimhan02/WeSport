@@ -2,6 +2,7 @@ package com.example.android.wesport;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -104,7 +105,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             Double mLat = Double.parseDouble(preferences.getString("latitude",""));
             Double mLon = Double.parseDouble(preferences.getString("longtitude",""));
-            String SERVICE_URL="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+mLat+","+mLon+"&radius=5000&type=\"park\"&keyword=\"park\"&key=AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g";
+            Uri.Builder builder = new Uri.Builder();
+            final String BASE_URL =
+                    "https://maps.googleapis.com";
+            final String RADIUS_PARAM = "radius";
+            final String TYPE_PARAM = "type";
+            final String KEY_PARAM = "key";
+
+            Uri builtUri = Uri.parse(BASE_URL)
+                    .buildUpon()
+                    .path("maps/api/place/nearbysearch/json")
+                    .appendQueryParameter("location",String.valueOf(mLat)+","+String.valueOf(mLon))
+                    .appendQueryParameter(RADIUS_PARAM , "5000")
+                    .appendQueryParameter(TYPE_PARAM, "park")
+                    .appendQueryParameter(KEY_PARAM, "API_KEY")
+                    .build();
+            String SERVICE_URL = builtUri.toString();
             String result = "";
             Log.i("SERVICE_URL",SERVICE_URL);
             URL url;
