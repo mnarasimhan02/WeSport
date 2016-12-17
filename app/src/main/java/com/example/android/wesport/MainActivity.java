@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d(TAG, "" + lat);
             Log.d(TAG, "" + lon);
             Log.d(TAG, "calling storeprefs inside onconnected");
-            storeprefs(lat, lon);
+           storeprefs(lat, lon);
         }
     }
 
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String lon = Double.toString(location.getLongitude());
         Log.i(TAG, lat);
         Log.i(TAG, lon);
-        storeprefs(lat,lon);
+       storeprefs(lat,lon);
         // You can now create a LatLng Object for use with maps
         //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -225,14 +225,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onOptionsItemSelected(item);
         if (item.getItemId()==R.id.menu_next) {
             Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-            //intent.putExtra(mCurrentLocation,"Current Location");
             startActivity(intent);
         }
         return true;
     }
 
     void storeprefs(String lat, String lon) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("latitude", lat);
         editor.putString("longtitude", lon);

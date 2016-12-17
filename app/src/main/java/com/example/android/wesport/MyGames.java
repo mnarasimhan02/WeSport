@@ -24,9 +24,7 @@ public class MyGames extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_games);
-
         ListView listView=(ListView) findViewById(R.id.listview);
-
         locations.add(new LatLng(0,0));
         games.add ("My Saved Games...");
         arrayAdapter=new ArrayAdapter(this,android.R.layout.simple_list_item_1,games);

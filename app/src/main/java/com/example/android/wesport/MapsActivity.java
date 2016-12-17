@@ -1,11 +1,15 @@
 package com.example.android.wesport;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,13 +30,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
     private static final String LOG_TAG = "GooglePlaces ";
     //String SERVICE_URL="";
-    private static final String SERVICE_URL ="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=39.1266246,-77.207643&\r" + "radius=5000&keyword=\"park\"&key=AIzaSyA1HjqFETCMi8rOXPtujddpnjpvcQsFYJ4\n";
     //location=39.1266246,-77.207643&radius=500&type=\"park\"&key=AIzaSyDCJelWAYPKAev6dIaAgLIx4e19NGO3UFw\n";
 
     private GoogleMap map;
     private final String TAG = "MapActivity";
+
 
     public static MapsActivity newInstance() {
         MapsActivity fragment = new MapsActivity();
@@ -43,10 +48,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        Log.d(TAG, "inside create Fragment");
         setUpMapIfNeeded();
         DownloadTask task = new DownloadTask();
-        task.execute(SERVICE_URL);
+        task.execute();
     }
 
     private void setUpMapIfNeeded() {
@@ -90,26 +94,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap map) {
         Log.i(LOG_TAG ,"Populate markers for parks");
-        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Double mLat = Double.parseDouble(preferences.getString("latitude",""));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude",""));
-        Log.d(TAG, preferences.getString("latitude",""));
-        Log.d(TAG, preferences.getString("longtitude",""));
-        //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLat,mLon), 5));
-        //map.addMarker(new MarkerOptions().position(new LatLng(mLat,mLon)));
-        //map.setMyLocationEnabled(true);
+
     }
-
-
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
-        protected String doInBackground(String... urls) {
+        protected String doInBackground(String... params) {
+            SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            Double mLat = Double.parseDouble(preferences.getString("latitude",""));
+            Double mLon = Double.parseDouble(preferences.getString("longtitude",""));
+            String SERVICE_URL="https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+mLat+","+mLon+"&radius=5000&type=\"park\"&keyword=\"park\"&key=AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g";
             String result = "";
+            Log.i("SERVICE_URL",SERVICE_URL);
             URL url;
             HttpURLConnection urlConnection = null;
-            final StringBuilder json = new StringBuilder();
             try {
                 // Connect to the web service
                 url = new URL(SERVICE_URL);
@@ -174,5 +173,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             );
         }
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_options, menu);
+        return true;
+    }
+    //respond to menu item selection
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        super.onOptionsItemSelected(item);
+        if (item.getItemId()==R.id.menu_next) {
+            Intent intent = new Intent(getApplicationContext(), MyGames.class);
+            //intent.putExtra(mCurrentLocation,"Current Location");
+            startActivity(intent);
+        }
+        return true;
     }
 }
