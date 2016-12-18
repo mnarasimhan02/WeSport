@@ -1,19 +1,22 @@
 package com.example.android.wesport;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -29,13 +32,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallback,OnMapLongClickListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
-    //String SERVICE_URL="";
-    //location=39.1266246,-77.207643&radius=500&type=\"park\"&key=AIzaSyDCJelWAYPKAev6dIaAgLIx4e19NGO3UFw\n";
-
     private GoogleMap map;
     private final String TAG = "MapActivity";
 
@@ -75,19 +79,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map.getUiSettings().setZoomControlsEnabled(false);
     }
 
-     /*   // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        Log.d(TAG, "outside create Fragment");
-    }
-*/
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -95,8 +89,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap map) {
         Log.i(LOG_TAG ,"Populate markers for parks");
-
+        map.setOnMapLongClickListener(this);
     }
+
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -118,7 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .appendQueryParameter("location",String.valueOf(mLat)+","+String.valueOf(mLon))
                     .appendQueryParameter(RADIUS_PARAM , "5000")
                     .appendQueryParameter(TYPE_PARAM, "park")
-                    .appendQueryParameter(KEY_PARAM, "API_KEY")
+                    .appendQueryParameter(KEY_PARAM, "AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g")
                     .build();
             String SERVICE_URL = builtUri.toString();
             String result = "";
@@ -181,7 +176,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
             double lat = Double.parseDouble(latitude);
             double lon = Double.parseDouble(longitude);
-            //CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             map.addMarker(new MarkerOptions()
                     .title(jsonObj.getString("name"))
@@ -191,17 +185,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /* Get address for new places when user long click's on the map) and show the address*/
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Geocoder geocoder=new Geocoder(getApplicationContext(), Locale.getDefault());
+        String address="";
+        try {
+            List<Address> listAddresses=geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
+            if (listAddresses!=null && listAddresses.size()>0){
+                if (listAddresses.get(0).getThoroughfare()!=null){
+                    if (listAddresses.get(0).getSubThoroughfare()!=null) {
+                        address += listAddresses.get(0).getSubThoroughfare() + " ";
+                    }
+                    address += listAddresses.get(0).getThoroughfare();
+                    Log.d("address",address);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (address == " "){
+            SimpleDateFormat sdf=new SimpleDateFormat("HH:mm yyyyMMdd");
+            address=sdf.format(new Date());
+        }
+        map.addMarker(new MarkerOptions().position(latLng).title(address));
+        MyGames.games.add(address);
+        MyGames.locations.add(latLng);
+        MyGames.arrayAdapter.notifyDataSetChanged();
+        Toast.makeText(this,"Games Saved",Toast.LENGTH_SHORT).show();
+    }
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_options, menu);
+        inflater.inflate(R.menu.maps_menu, menu);
         return true;
     }
     //respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
-        if (item.getItemId()==R.id.menu_next) {
+        if (item.getItemId()==R.id.map_menu) {
             Intent intent = new Intent(getApplicationContext(), MyGames.class);
             //intent.putExtra(mCurrentLocation,"Current Location");
             startActivity(intent);
