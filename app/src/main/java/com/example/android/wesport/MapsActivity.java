@@ -1,4 +1,5 @@
 package com.example.android.wesport;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -33,6 +34,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +45,9 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
     private GoogleMap map;
     private final String TAG = "MapActivity";
 
+   //Variables to store games and locations from marker click
+    ArrayList<String> games =new ArrayList<>();
+    //private ArrayAdapter<String> arrayAdapter;
 
     public static MapsActivity newInstance() {
         MapsActivity fragment = new MapsActivity();
@@ -53,6 +58,7 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+       //Instiantiate view to Save Games
         setUpMapIfNeeded();
         DownloadTask task = new DownloadTask();
         task.execute();
@@ -91,7 +97,6 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         Log.i(LOG_TAG ,"Populate markers for parks");
         map.setOnMapLongClickListener(this);
     }
-
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -148,7 +153,7 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             try {
-                createMarkersFromJson(result.toString());
+                createMarkersFromJson(result);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "Error processing JSON", e);
             }
@@ -188,34 +193,43 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
     /* Get address for new places when user long click's on the map) and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
-        Geocoder geocoder=new Geocoder(getApplicationContext(), Locale.getDefault());
-        String address="";
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        String address = "";
         try {
-            List<Address> listAddresses=geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
-            if (listAddresses!=null && listAddresses.size()>0){
-                if (listAddresses.get(0).getThoroughfare()!=null){
-                    if (listAddresses.get(0).getSubThoroughfare()!=null) {
+            List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            if (listAddresses != null && listAddresses.size() > 0) {
+                if (listAddresses.get(0).getThoroughfare() != null) {
+                    if (listAddresses.get(0).getSubThoroughfare() != null) {
                         address += listAddresses.get(0).getSubThoroughfare() + " ";
                     }
                     address += listAddresses.get(0).getThoroughfare();
-                    Log.d("address",address);
+                    Log.d("address", address);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (address == " "){
-            SimpleDateFormat sdf=new SimpleDateFormat("HH:mm yyyyMMdd");
-            address=sdf.format(new Date());
+        if (address == " ") {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd",Locale.getDefault());
+            address = sdf.format(new Date());
         }
-        map.addMarker(new MarkerOptions().position(latLng).title(address));
-        MyGames.games.add(address);
-        MyGames.locations.add(latLng);
-        MyGames.arrayAdapter.notifyDataSetChanged();
-        Toast.makeText(this,"Games Saved",Toast.LENGTH_SHORT).show();
-    }
-    public boolean onCreateOptionsMenu(Menu menu) {
+       //Add marker to user identified address/locations
+        // map.addMarker(new MarkerOptions().position(latLng).title(address));
+        //Store games into listview
+        Toast.makeText(this, "Game at " + address + " saved under My Games", Toast.LENGTH_SHORT).show();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        games.add(address);
+      //  SharedPreferences.Editor games = prefs.edit();
+        try {
+            prefs.edit().putString("games", ObjectSerializer.serialize(games)).apply();
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.maps_menu, menu);
         return true;
