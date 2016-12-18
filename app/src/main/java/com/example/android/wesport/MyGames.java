@@ -23,10 +23,10 @@ public class MyGames extends AppCompatActivity {
         ListView listView=(ListView) findViewById(R.id.listview);
         locations.add(new LatLng(0,0));
         games.add ("My Saved Games...");
-        if(arrayAdapter.getCount()!=0 && arrayAdapter!=null){
-            ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,games);
+      //  if(arrayAdapter.getCount()!=0){
+        //    arrayAdapter=new ArrayAdapter(this,android.R.layout.simple_list_item_1,games);
         listView.setAdapter(arrayAdapter);
-        }
+      //  }
        /* listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)   {
