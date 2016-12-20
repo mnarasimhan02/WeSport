@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String lon = Double.toString(location.getLongitude());
         Log.i(TAG, lat);
         Log.i(TAG, lon);
-       storeprefs(lat,lon);
+        storeprefs(lat,lon);
         // You can now create a LatLng Object for use with maps
         //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
