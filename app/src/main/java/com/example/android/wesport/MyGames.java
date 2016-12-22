@@ -1,5 +1,6 @@
 package com.example.android.wesport;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -112,6 +113,10 @@ public class MyGames extends AppCompatActivity {
                         } catch (NumberFormatException ex) { // handle your exception
                             ex.printStackTrace();
                         }
+
+                    case 0:
+                        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                        startActivity(intent);
                 }
                 return false;
             }
