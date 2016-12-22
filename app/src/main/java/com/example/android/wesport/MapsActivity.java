@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -39,14 +40,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallback,OnMapLongClickListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
     private GoogleMap map;
     private final String TAG = "MapActivity";
 
-   //Variables to store games and locations from marker click
-    ArrayList<String> games =new ArrayList<>();
+    FragmentManager fm;
+    SupportMapFragment myMapFragment;
+
+    //Variables to store games and locations from marker click
+    ArrayList<String> games = new ArrayList<>();
     //private ArrayAdapter<String> arrayAdapter;
 
     public static MapsActivity newInstance() {
@@ -58,22 +62,23 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-       //Instiantiate view to Save Games
+        //Instiantiate view to Save Games
         setUpMapIfNeeded();
         DownloadTask task = new DownloadTask();
         task.execute();
     }
+
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
         if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
-            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+           // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager()
+            SupportMapFragment sMap = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
-            map.getMapAsync(this);
+            sMap.getMapAsync(this);
             // Check if we were successful in obtaining the map.
             if (map != null) {
                 setUpMap();
@@ -93,8 +98,9 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap map) {
-        Log.i(LOG_TAG ,"Populate markers for parks");
+    public void onMapReady(GoogleMap sMap) {
+        map=sMap;
+        Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
     }
 
@@ -102,9 +108,9 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
 
         @Override
         protected String doInBackground(String... params) {
-            SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            Double mLat = Double.parseDouble(preferences.getString("latitude",""));
-            Double mLon = Double.parseDouble(preferences.getString("longtitude",""));
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
+            Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
             Uri.Builder builder = new Uri.Builder();
             final String BASE_URL =
                     "https://maps.googleapis.com";
@@ -115,14 +121,14 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
             Uri builtUri = Uri.parse(BASE_URL)
                     .buildUpon()
                     .path("maps/api/place/nearbysearch/json")
-                    .appendQueryParameter("location",String.valueOf(mLat)+","+String.valueOf(mLon))
-                    .appendQueryParameter(RADIUS_PARAM , "5000")
+                    .appendQueryParameter("location", String.valueOf(mLat) + "," + String.valueOf(mLon))
+                    .appendQueryParameter(RADIUS_PARAM, "5000")
                     .appendQueryParameter(TYPE_PARAM, "park")
                     .appendQueryParameter(KEY_PARAM, "AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g")
                     .build();
             String SERVICE_URL = builtUri.toString();
             String result = "";
-            Log.i("SERVICE_URL",SERVICE_URL);
+            Log.i("SERVICE_URL", SERVICE_URL);
             URL url;
             HttpURLConnection urlConnection = null;
             try {
@@ -210,16 +216,16 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
             e.printStackTrace();
         }
         if (address == " ") {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd",Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-       //Add marker to user identified address/locations
+        //Add marker to user identified address/locations
         // map.addMarker(new MarkerOptions().position(latLng).title(address));
         //Store games into listview
         Toast.makeText(this, "Game at " + address + " saved under My Games", Toast.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         games.add(address);
-      //  SharedPreferences.Editor games = prefs.edit();
+        //  SharedPreferences.Editor games = prefs.edit();
         try {
             prefs.edit().putString("games", ObjectSerializer.serialize(games)).apply();
 
@@ -234,11 +240,12 @@ public class MapsActivity extends  AppCompatActivity implements OnMapReadyCallba
         inflater.inflate(R.menu.maps_menu, menu);
         return true;
     }
+
     //respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
-        if (item.getItemId()==R.id.map_menu) {
+        if (item.getItemId() == R.id.map_menu) {
             Intent intent = new Intent(getApplicationContext(), MyGames.class);
             //intent.putExtra(mCurrentLocation,"Current Location");
             startActivity(intent);
