@@ -27,7 +27,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -199,13 +198,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Log.i(TAG, "Triggering location changed");
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
-        mapsActivity.setUserMarker(new LatLng(location.getLatitude(),location.getLongitude()));
         Log.i(TAG, lat);
         Log.i(TAG, lon);
         storeprefs(lat,lon);
+    // mapsActivity.setUserMarker(new LatLng(location.getLatitude(),location.getLongitude()));
         // You can now create a LatLng Object for use with maps
         //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

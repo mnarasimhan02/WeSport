@@ -24,6 +24,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -56,6 +57,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     ArrayList<String> games = new ArrayList<>();
     //private ArrayAdapter<String> arrayAdapter;
 
+    public MapsActivity() {
+        // Required empty public constructor
+    }
+
     public static MapsActivity newInstance() {
         MapsActivity fragment = new MapsActivity();
         return fragment;
@@ -74,7 +79,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void setUserMarker(LatLng latLng)
     {
         if (userMarker==null){
+            Log.d("userMarker", "Inside setUsermarker");
             userMarker=new MarkerOptions().position(latLng).title("Current Location");
+            userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             map.addMarker(userMarker);
         }
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
@@ -127,7 +134,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
         //  map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
-
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
+        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        setUserMarker(new LatLng(mLat,mLon));
     }
 
 
@@ -250,7 +260,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Add marker to user identified address/locations
         // map.addMarker(new MarkerOptions().position(latLng).title(address));
         //Store games into listview
-        Toast.makeText(this, "Game at " + address + " saved under My Games", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Game at  " + address + " saved under My Games", Toast.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         games.add(address);
         //  SharedPreferences.Editor games = prefs.edit();
