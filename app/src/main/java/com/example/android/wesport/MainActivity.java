@@ -1,6 +1,5 @@
 package com.example.android.wesport;
 
-import android.Manifest.permission;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private final String TAG = "LocationActivity";
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-
+    private final int PERMISSION_LOCATION=1;
     String lat, lon;
     Location mLastLocation;
     GridView androidGridView;
@@ -65,30 +64,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
         Log.d(TAG, "Test location ..............");
-        //Check for permission
-        checkAppPermission();
         //setup GoogleApiclient
         buildGoogleApiClient();
         Log.d(TAG, "After build api client");
-    }
-    public void checkAppPermission() {
-        if (checkPermission()) {
-            Toast.makeText(this, "Permission already granted.", Toast.LENGTH_LONG).show();
-
-        } else {
-            requestlocPermission();
-            Toast.makeText(this, "Please request permission.", Toast.LENGTH_LONG).show();
-        }
-    }
-    private boolean checkPermission() {
-        int result = ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION);
-        Log.d(TAG, "Test location 2..............");
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestlocPermission() {
-        ActivityCompat.requestPermissions(MainActivity.this, new String[]{ACCESS_FINE_LOCATION}, 1);
-        Log.d(TAG, "requestPermissions..............");
     }
 
     //This method will be called when the user will tap on allow or deny
@@ -98,23 +76,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Log.d(TAG, "onRequestPermissionsResult..............");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 1) {
+        if (requestCode == PERMISSION_LOCATION) {
             //If permission is granted
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Displaying a toast
                 Toast.makeText(this, "Permission granted now to access location", Toast.LENGTH_LONG).show();
-                if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-                    mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                            mGoogleApiClient);
-                }
+                startLocationServices();
             } else {
                 //Displaying another toast if permission is not granted
                 Toast.makeText(this, "Oops you just denied the permission", Toast.LENGTH_LONG).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        showMessageOKCancel("You need to allow access to both the permissions",
+                        showMessageOKCancel("You need to allow access permissions",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -169,9 +142,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            //Execute location service call if user has explicitly granted ACCESS_FINE_LOCATION..
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
+            Log.d(TAG, "Requesting Permissions");
+        } else{
+                startLocationServices();
+            }
+        }
+
+    private void startLocationServices() {
+        Log.d(TAG, "Starting Location Services");
+        try {
             mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mLocationRequest.setInterval(100); // Update location every 10 seconds
@@ -183,11 +165,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 lat = String.valueOf(mLastLocation.getLatitude());
                 lon = String.valueOf(mLastLocation.getLongitude());
             }
-            Log.d(TAG, "" + lat);
-            Log.d(TAG, "" + lon);
-            Log.d(TAG, "calling storeprefs inside onconnected");
-            storeprefs(lat, lon);
+        }catch (SecurityException exception){
+            Log.d(TAG, exception.toString());
         }
+
+        Log.d(TAG, "" + lat);
+        Log.d(TAG, "" + lon);
+        Log.d(TAG, "calling storeprefs inside onconnected");
+        storeprefs(lat, lon);
     }
 
     @Override
@@ -207,6 +192,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
+        Log.i(TAG, "Triggering location changed");
+
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
         Log.i(TAG, lat);

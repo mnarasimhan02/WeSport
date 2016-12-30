@@ -1,8 +1,11 @@
 package com.example.android.wesport;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,6 +75,8 @@ public class SigninActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     onSignedInInitialize(user.getDisplayName());
+                    storeUsername(user.getDisplayName());
+                    //storing username is sharedpref to pass to chatActivity
                 } else {
                     // User is signed out
                     onSignedOutCleanup();
@@ -89,6 +94,14 @@ public class SigninActivity extends AppCompatActivity {
         };
     }
 
+    private void storeUsername(String displayName) {
+            SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            SharedPreferences.Editor editor = prefUser.edit();
+            editor.putString("displayName", displayName);
+            editor.apply();
+            Log.i(TAG, displayName);
+        }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -98,6 +111,7 @@ public class SigninActivity extends AppCompatActivity {
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
+
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();

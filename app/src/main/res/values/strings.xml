@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WeSport</string>
     <string name="title_activity_maps">Map</string>
-    <string name="google_maps_key">AIzaSyBVNTU4-pamgBohtCxqAhjZc-kG7ZGHcWU</string>
+    <string name="google_maps_key">maps_key</string>
     <string name="sign_out">Sign Out</string>
     <string name="send_button_label">Send</string>
 </resources>

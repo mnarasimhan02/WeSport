@@ -187,6 +187,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
             double lat = Double.parseDouble(latitude);
             double lon = Double.parseDouble(longitude);
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon), 12));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             map.addMarker(new MarkerOptions()
                     .title(jsonObj.getString("name"))
