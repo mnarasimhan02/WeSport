@@ -1,13 +1,16 @@
 package com.example.android.wesport;
 
+import android.Manifest.permission;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,10 +48,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final String LOG_TAG = "GooglePlaces ";
     private GoogleMap map;
     private final String TAG = "MapActivity";
+    private SupportMapFragment mainFragment;
+    private MarkerOptions userMarker;
 
     FragmentManager fm;
-    SupportMapFragment myMapFragment;
-
     //Variables to store games and locations from marker click
     ArrayList<String> games = new ArrayList<>();
     //private ArrayAdapter<String> arrayAdapter;
@@ -68,17 +71,26 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         task.execute();
     }
 
+    public void setUserMarker(LatLng latLng)
+    {
+        if (userMarker==null){
+            userMarker=new MarkerOptions().position(latLng).title("Current Location");
+            map.addMarker(userMarker);
+        }
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
+
+    }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
         if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
-           // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+            // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            SupportMapFragment sMap = (SupportMapFragment) getSupportFragmentManager()
+            mainFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
-            sMap.getMapAsync(this);
+            mainFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
             if (map != null) {
                 setUpMap();
@@ -88,6 +100,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
+        if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        map.setMyLocationEnabled(true);
+
     }
 
     /**
@@ -102,7 +126,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map=sMap;
         Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
+        //  map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+
     }
+
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
 
@@ -188,7 +215,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lat = Double.parseDouble(latitude);
             double lon = Double.parseDouble(longitude);
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon), 12));
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+          //  map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             map.addMarker(new MarkerOptions()
                     .title(jsonObj.getString("name"))
                     .position(new LatLng(lat, lon))
@@ -197,7 +224,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /* Get address for new places when user long click's on the map) and show the address*/
+    /* Get address for new places when user long click's on the map and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());

@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private final int PERMISSION_LOCATION=1;
+    private MapsActivity mapsActivity;
+
     String lat, lon;
     Location mLastLocation;
     GridView androidGridView;
@@ -154,10 +157,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void startLocationServices() {
         Log.d(TAG, "Starting Location Services");
         try {
-            mLocationRequest = LocationRequest.create();
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(100); // Update location every 10 seconds
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             Log.d(TAG, "" + mLastLocation);
@@ -165,6 +164,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 lat = String.valueOf(mLastLocation.getLatitude());
                 lon = String.valueOf(mLastLocation.getLongitude());
             }
+            mLocationRequest = LocationRequest.create();
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mLocationRequest.setInterval(100); // Update location every 10 seconds
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }catch (SecurityException exception){
             Log.d(TAG, exception.toString());
         }
@@ -192,10 +195,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
+        Toast.makeText(MainActivity.this,location.toString(),Toast.LENGTH_SHORT).show();
         Log.i(TAG, "Triggering location changed");
-
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
+        mapsActivity.setUserMarker(new LatLng(location.getLatitude(),location.getLongitude()));
         Log.i(TAG, lat);
         Log.i(TAG, lon);
         storeprefs(lat,lon);
@@ -203,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
