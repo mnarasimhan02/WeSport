@@ -3,6 +3,7 @@ package com.example.android.wesport;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -66,8 +67,8 @@ public class MyGames extends AppCompatActivity {
                 SwipeMenuItem deleteItem = new SwipeMenuItem(
                         getApplicationContext());
                 // set item background
-                // deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
-                //         0x3F, 0x25)));
+                deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
+                        0x3F, 0x25)));
                 // set item width
                 deleteItem.setWidth(100);
                 deleteItem.setTitle("del");

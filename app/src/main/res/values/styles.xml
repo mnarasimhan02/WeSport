@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
     </style>
 
     <style name="GreenTheme" parent="FirebaseUI">
@@ -16,6 +17,12 @@
         <item name="colorControlActivated">@color/material_lime_a700</item>
         <item name="colorControlHighlight">@color/material_green_a200</item>
         <item name="android:windowBackground">@color/material_green_50</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
     </style>
+
+    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
 
 </resources>
