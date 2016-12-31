@@ -1,4 +1,5 @@
 package com.example.android.wesport;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -73,7 +74,6 @@ public class ChatActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
         mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
@@ -90,6 +90,9 @@ public class ChatActivity extends AppCompatActivity {
         List<FriendlyMessage> friendlyMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, friendlyMessages);
         mMessageListView.setAdapter(mMessageAdapter);
+
+        userStateChanged(mUserName);
+
         //Attach database listener
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,21 +103,6 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
             }
         });
-        /*mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    onSignedInInitialize(user.getDisplayName());
-                } else {
-                    // User is signed out
-                    onSignedOutCleanup();
-                }
-            }
-        };
-        */
         // Enable Send button when there's text to send
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -140,6 +128,8 @@ public class ChatActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, mUserName);
+                Log.d(TAG, mMessageEditText.getText().toString());
                 FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUserName, null);
                 mMessagesDatabaseReference.push().setValue(friendlyMessage);
 
@@ -166,6 +156,15 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
+    private void userStateChanged(String mUserName) {
+            if (mUserName != null) {
+                // User is signed in
+                onSignedInInitialize(mUserName);
+            } else {
+                // User is signed out
+                onSignedOutCleanup();
+            }
+    }
 
     // Fetch the config to determine the allowed length of messages.
     public void fetchConfig() {
@@ -218,7 +217,9 @@ public class ChatActivity extends AppCompatActivity {
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
                     FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
+                    Log.d(TAG, String.valueOf(friendlyMessage));
                     mMessageAdapter.add(friendlyMessage);
                 }
 

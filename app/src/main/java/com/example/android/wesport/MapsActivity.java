@@ -84,7 +84,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             map.addMarker(userMarker);
         }
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
 
     }
 
@@ -206,7 +206,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     void createMarkersFromJson(String json) throws JSONException {
         // De-serialize the JSON string into an array of park objects
-        map.clear();
+       // map.clear();
         JSONObject jsonObject = new JSONObject(json);
         String parkInfo = jsonObject.getString("results");
         Log.d("parkname", parkInfo);
@@ -224,8 +224,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
             double lat = Double.parseDouble(latitude);
             double lon = Double.parseDouble(longitude);
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon), 12));
-          //  map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+            //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon), 12));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             map.addMarker(new MarkerOptions()
                     .title(jsonObj.getString("name"))
                     .position(new LatLng(lat, lon))
@@ -253,7 +253,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (address == " ") {
+        if (address.equals("")) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
