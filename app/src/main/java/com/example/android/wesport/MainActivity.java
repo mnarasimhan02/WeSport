@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
                 Toast.makeText(MainActivity.this, "GridView Item: " + gridViewString[+i], Toast.LENGTH_LONG).show();
-                supportInvalidateOptionsMenu();
+                invalidateOptionsMenu();
                 //menu.getItem(0).setVisible(true);
             }
         });
@@ -220,12 +220,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return true;
     }
 
-   /* @Override
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.getItem(0).setVisible(false); //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }
-*/
+
     //respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
 
