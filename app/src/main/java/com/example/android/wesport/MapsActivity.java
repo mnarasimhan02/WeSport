@@ -200,6 +200,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (JSONException e) {
                 Log.e(LOG_TAG, "Error processing JSON", e);
             }
+
         }
 
     }
@@ -270,7 +271,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

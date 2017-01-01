@@ -3,5 +3,5 @@
     <item
         android:id="@+id/menu_next"
         app:showAsAction="always"
-        android:title="Next"/>
+        android:title="@string/next"/>
 </menu>

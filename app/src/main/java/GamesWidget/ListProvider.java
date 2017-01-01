@@ -1,4 +1,5 @@
 package gameswidget;
+
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -8,14 +9,12 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
+import com.example.android.wesport.MainActivity;
 import com.example.android.wesport.ObjectSerializer;
 import com.example.android.wesport.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
-
 
 /**
  * If you are familiar with Adapter of ListView,this is the same as adapter
@@ -31,9 +30,11 @@ public class ListProvider implements RemoteViewsFactory {
 
     public ListProvider(Context context, Intent intent) {
         this.context = context;
+        Context applicationContext = MainActivity.getContextOfApplication();
+
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
         try {
             savedGames = (ArrayList<String>) ObjectSerializer.deserialize(prefs.getString("games",
                     ObjectSerializer.serialize(new ArrayList<String>())));

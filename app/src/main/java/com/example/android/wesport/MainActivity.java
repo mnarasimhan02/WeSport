@@ -1,5 +1,6 @@
 package com.example.android.wesport;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest mLocationRequest;
     private final int PERMISSION_LOCATION=1;
     private MapsActivity mapsActivity;
+    private Menu menu;
+    public static Context contextOfApplication;
+
 
     String lat, lon;
     Location mLastLocation;
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        contextOfApplication = getApplicationContext();//required to retreive context in another class
         CustomGridViewActivity adapterViewAndroid = new CustomGridViewActivity(MainActivity.this, gridViewString, gridViewImageId);
         androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
@@ -63,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
                 Toast.makeText(MainActivity.this, "GridView Item: " + gridViewString[+i], Toast.LENGTH_LONG).show();
+                supportInvalidateOptionsMenu();
+                //menu.getItem(0).setVisible(true);
             }
         });
         Log.d(TAG, "Test location ..............");
@@ -149,9 +156,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
             Log.d(TAG, "Requesting Permissions");
         } else{
-                startLocationServices();
-            }
+            startLocationServices();
         }
+    }
 
     private void startLocationServices() {
         Log.d(TAG, "Starting Location Services");
@@ -201,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Log.i(TAG, lat);
         Log.i(TAG, lon);
         storeprefs(lat,lon);
-    // mapsActivity.setUserMarker(new LatLng(location.getLatitude(),location.getLongitude()));
+        // mapsActivity.setUserMarker(new LatLng(location.getLatitude(),location.getLongitude()));
         // You can now create a LatLng Object for use with maps
         //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
     }
@@ -212,6 +219,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         inflater.inflate(R.menu.menu_options, menu);
         return true;
     }
+
+   /* @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.getItem(0).setVisible(false); //  By default no Menu
+        return super.onPrepareOptionsMenu(menu);
+    }
+*/
     //respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -233,5 +247,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         String mLon = prefs.getString("longtitude","");
         Log.i(TAG, mLat);
         Log.i(TAG, mLon);
+    }
+
+    public static Context getContextOfApplication(){
+        return contextOfApplication;
     }
 }
