@@ -1,5 +1,6 @@
 package gameswidget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
+import com.example.android.wesport.MyGames;
 import com.example.android.wesport.R;
 
 public class WidgetProvider extends AppWidgetProvider {
@@ -19,6 +21,8 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
                          int[] appWidgetIds) {
         final int N = appWidgetIds.length;
+        RemoteViews remoteViewsobj = new RemoteViews(context.getPackageName(),
+                R.layout.widget_layout);
 		/*int[] appWidgetIds holds ids of multiple instance of your widget
 		 * on your homescreen*/
         for (int i = 0; i < N; ++i) {
@@ -26,6 +30,14 @@ public class WidgetProvider extends AppWidgetProvider {
                     appWidgetIds[i]);
             appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
         }
+        Intent intent = new Intent(context, MyGames.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViewsobj.setOnClickPendingIntent(R.id.widget_refresh_button, pendingIntent);
+       //Tell the App widget to perform an update on the current app widget
+        appWidgetManager.updateAppWidget(appWidgetIds, remoteViewsobj);
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
@@ -40,7 +52,7 @@ public class WidgetProvider extends AppWidgetProvider {
         //passing app widget id to that RemoteViews Service
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         //setting a unique Uri to the intent
-            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
+        svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
         //setting adapter to listview of the widget
         remoteViews.setRemoteAdapter(appWidgetId, R.id.listViewWidget,
                 svcIntent);
@@ -49,4 +61,14 @@ public class WidgetProvider extends AppWidgetProvider {
         return remoteViews;
     }
 
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+
+        if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+            //do some really cool stuff here
+            context.startService(new Intent(context, WidgetProvider.class));
+
+        }
+    }
 }
