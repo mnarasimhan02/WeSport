@@ -11,6 +11,9 @@
     <color name="material_green_a200">#69F0AE</color>
     <color name="material_lime_a700">#AEEA00</color>
     <color name="material_purple_a700">#AA00FF</color>
-    </resources>
+
+    <color name="card">#fff</color>
+
+</resources>
 
 

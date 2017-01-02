@@ -9,7 +9,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
-import com.example.android.wesport.MainActivity;
 import com.example.android.wesport.ObjectSerializer;
 import com.example.android.wesport.R;
 
@@ -30,11 +29,11 @@ public class ListProvider implements RemoteViewsFactory {
 
     public ListProvider(Context context, Intent intent) {
         this.context = context;
-        Context applicationContext = MainActivity.getContextOfApplication();
+       // Context applicationContext = MainActivity.getContextOfApplication();
 
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         try {
             savedGames = (ArrayList<String>) ObjectSerializer.deserialize(prefs.getString("games",
                     ObjectSerializer.serialize(new ArrayList<String>())));
@@ -48,6 +47,7 @@ public class ListProvider implements RemoteViewsFactory {
     private void populateListItem(ArrayList<String> savedGames) {
         for (int i = 0; i < savedGames.size(); i++) {
             gameswidget.ListItem listItem = new gameswidget.ListItem();
+//            listItem.heading="My Saved Games";
             listItem.content = savedGames.get(i);
             Log.d(savedGames.get(i), "SavedGames");
             listItemList.add(listItem);
@@ -74,9 +74,11 @@ public class ListProvider implements RemoteViewsFactory {
     public RemoteViews getViewAt(int position) {
         final RemoteViews remoteView = new RemoteViews(
                 context.getPackageName(), R.layout.list_row);
+        final RemoteViews remotetxtView = new RemoteViews(
+                context.getPackageName(), R.layout.widget_layout);
+        remotetxtView.setTextViewText(R.id.heading, context.getResources().getString(R.string.savedgames_string));
         gameswidget.ListItem listItem = listItemList.get(position);
         remoteView.setTextViewText(R.id.content, listItem.content);
-
         return remoteView;
     }
 

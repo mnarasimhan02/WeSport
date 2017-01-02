@@ -20,7 +20,7 @@ public class WidgetProvider extends AppWidgetProvider {
                          int[] appWidgetIds) {
         final int N = appWidgetIds.length;
 		/*int[] appWidgetIds holds ids of multiple instance of your widget
-		 * meaning you are placing more than one widgets on your homescreen*/
+		 * on your homescreen*/
         for (int i = 0; i < N; ++i) {
             RemoteViews remoteViews = updateWidgetListView(context,
                     appWidgetIds[i]);
@@ -40,8 +40,7 @@ public class WidgetProvider extends AppWidgetProvider {
         //passing app widget id to that RemoteViews Service
         svcIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         //setting a unique Uri to the intent
-        //don't know its purpose to me right now
-        svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
+            svcIntent.setData(Uri.parse(svcIntent.toUri(Intent.URI_INTENT_SCHEME)));
         //setting adapter to listview of the widget
         remoteViews.setRemoteAdapter(appWidgetId, R.id.listViewWidget,
                 svcIntent);

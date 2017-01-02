@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
                     android:initialLayout="@layout/widget_layout"
-                    android:minHeight="75dip"
-                    android:minWidth="100dip"
+                    android:minHeight="110dip"
+                    android:minWidth="170dip"
                     android:resizeMode="vertical|horizontal"
+                    android:widgetCategory="home_screen|keyguard"
                     android:updatePeriodMillis="1800000"/>

@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest mLocationRequest;
     private final int PERMISSION_LOCATION=1;
     private MapsActivity mapsActivity;
-    private Menu menu;
+    private Menu mMenu;
     public static Context contextOfApplication;
 
 
@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
                 Toast.makeText(MainActivity.this, "GridView Item: " + gridViewString[+i], Toast.LENGTH_LONG).show();
-                invalidateOptionsMenu();
-                //menu.getItem(0).setVisible(true);
+               // invalidateOptionsMenu();
+                mMenu.getItem(0).setVisible(true);
             }
         });
         Log.d(TAG, "Test location ..............");
@@ -222,7 +222,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(false); //  By default no Menu
+        mMenu = menu;
+        mMenu.getItem(0).setVisible(false);
+
+        //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }
 
