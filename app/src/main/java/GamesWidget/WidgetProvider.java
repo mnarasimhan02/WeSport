@@ -6,10 +6,11 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.example.android.wesport.MyGames;
 import com.example.android.wesport.R;
+import com.example.android.wesport.SigninActivity;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -30,13 +31,14 @@ public class WidgetProvider extends AppWidgetProvider {
                     appWidgetIds[i]);
             appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
         }
-        Intent intent = new Intent(context, MyGames.class);
+        Intent intent = new Intent(context, SigninActivity.class);
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-                0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        remoteViewsobj.setOnClickPendingIntent(R.id.widget_refresh_button, pendingIntent);
-       //Tell the App widget to perform an update on the current app widget
+        PendingIntent pendingIntent = PendingIntent.getActivity(context,
+                0, intent, 0);
+        remoteViewsobj.setOnClickPendingIntent(R.id.listViewWidget, pendingIntent);
+        Log.d("Inside intent","inside intent");
+        //Tell the App widget to perform an update on the current app widget
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViewsobj);
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }

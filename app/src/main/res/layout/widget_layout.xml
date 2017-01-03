@@ -4,81 +4,81 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="@dimen/widget_margin">
+    android:layout_margin="@dimen/widget_margin"
+    android:orientation="vertical">
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:orientation="horizontal"
-    android:baselineAligned="false"
-    android:background="@color/colorPrimary">
-
-    <ImageButton
-        android:id="@+id/widget_logo"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:paddingLeft="@dimen/padding_normal"
-        android:paddingStart="@dimen/padding_normal"
-        android:paddingTop="@dimen/spacing_normal"
-        android:paddingBottom="@dimen/spacing_normal"
-        android:paddingRight="@dimen/spacing_normal"
-        android:paddingEnd="@dimen/spacing_normal"
-        android:layout_gravity="center_vertical|start"
-        android:scaleType="fitStart"
-        android:src="@drawable/basketball"
-        android:background="?android:selectableItemBackground"
-        android:contentDescription="@string/app_name" />
-
-    <ImageButton
-        android:id="@+id/widget_refresh_button"
-        android:layout_width="@dimen/action_button_min_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical|end"
-        android:scaleType="center"
-        android:visibility="gone"
-        android:contentDescription="@string/description_refresh"
-        android:background="?android:selectableItemBackground" />
-
-</LinearLayout>
-<FrameLayout
-android:layout_width="match_parent"
-android:layout_height="0dp"
-android:layout_weight="1">
-    <!-- ListView to be shown on widget -->
-    <TextView
-        android:id="@+id/heading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent"
-        android:maxLines="1"
-        android:textSize="14sp"
-        android:textStyle="bold"/>
-
-    <ListView
-        android:id="@+id/listViewWidget"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent"
-        android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:layout_height="48dp"
+        android:background="@color/colorPrimary"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
 
-    <!-- Empty view is show if list items are empty -->
-    <TextView
-        android:id="@+id/empty_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
-        android:cacheColorHint="@android:color/transparent"
-        android:gravity="center"
-        android:text="@string/empty_string"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        android:visibility="gone" />
+        <ImageButton
+            android:id="@+id/widget_logo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical|start"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@string/app_name"
+            android:paddingBottom="@dimen/spacing_normal"
+            android:paddingEnd="@dimen/spacing_normal"
+            android:paddingLeft="@dimen/padding_normal"
+            android:paddingRight="@dimen/spacing_normal"
+            android:paddingStart="@dimen/padding_normal"
+            android:paddingTop="@dimen/spacing_normal"
+            android:scaleType="fitStart"
+            android:src="@drawable/basketball"/>
 
-</FrameLayout>
+        <ImageButton
+            android:id="@+id/widget_refresh_button"
+            android:layout_width="@dimen/action_button_min_width"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical|end"
+            android:background="?android:selectableItemBackground"
+            android:contentDescription="@string/description_refresh"
+            android:scaleType="center"/>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <!-- ListView to be shown on widget -->
+        <TextView
+            android:id="@+id/heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:maxLines="1"
+            android:textSize="14sp"
+            android:textStyle="bold"/>
+
+        <ListView
+            android:id="@+id/listViewWidget"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="@null"
+            android:dividerHeight="0dp"/>
+
+        <!-- Empty view is show if list items are empty -->
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:gravity="center"
+            android:text="@string/empty_string"
+            android:textColor="#ffffff"
+            android:textSize="20sp"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+</LinearLayout>
