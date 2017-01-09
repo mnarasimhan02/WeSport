@@ -38,18 +38,19 @@
             android:value="@integer/google_play_services_version"/>
 
         <activity android:name=".MyGames"/>
-        <!--
-             The API key for Google Maps-based APIs is defined as a string resource.
-             (See the file "res/values/google_maps_api.xml").
-             Note that the API key is linked to the encryption key used to sign the APK.
-             You need a different API key for each encryption key, including the release key that is used to
-             sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/.
-        -->
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCM2iCenU1E93ewX9N7MhwQrxFd2xYbxzE"/>
+       <activity
+            android:name="com.example.android.wesport.CatalogActivity"
+            android:label="@string/app_name"/>
+        <activity
+            android:name="com.example.android.wesport.EditorActivity"
+            android:theme="@style/EditorTheme"/>
+        <provider
+            android:name=".data.GameProvider"
+            android:authorities="com.example.android.wesport"
+            android:exported="false" />
 
         <activity
             android:name=".MapsActivity"

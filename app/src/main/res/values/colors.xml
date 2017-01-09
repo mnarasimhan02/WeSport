@@ -2,8 +2,15 @@
 <resources>
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#388E3C</color>
-    <color name="colorAccent">#69F0AE</color>
-    <color name="colorTitle">#ffffff</color>
+    <color name="colorPrimaryLight">#C8E6C9</color>
+    <color name="colorAccent">#795548</color>
+    <color name="colorTitle">#212121</color>
+    
+    <!-- Primary color for the editor -->
+    <color name="editorColorPrimary">#2D3640</color>
+
+    <!-- Primary dark color for the editor -->
+    <color name="editorColorPrimaryDark">#394450</color>
 
     <color name="material_green_50">#E8F5E9</color>
     <color name="material_green_500">#4CAF50</color>

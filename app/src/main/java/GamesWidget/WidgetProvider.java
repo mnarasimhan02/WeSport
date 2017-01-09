@@ -36,7 +36,7 @@ public class WidgetProvider extends AppWidgetProvider {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
         PendingIntent pendingIntent = PendingIntent.getActivity(context,
                 0, intent, 0);
-        remoteViewsobj.setOnClickPendingIntent(R.id.listViewWidget, pendingIntent);
+        remoteViewsobj.setOnClickPendingIntent(R.id.widget_refresh_button, pendingIntent);
         Log.d("Inside intent","inside intent");
         //Tell the App widget to perform an update on the current app widget
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViewsobj);

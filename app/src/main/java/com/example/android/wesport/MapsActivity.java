@@ -284,7 +284,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.map_menu) {
-            Intent intent = new Intent(getApplicationContext(), MyGames.class);
+            Intent intent = new Intent(getApplicationContext(), CatalogActivity.class);
+            // Intent intent = new Intent(getApplicationContext(), MyGames.class);
             //intent.putExtra(mCurrentLocation,"Current Location");
             startActivity(intent);
         }

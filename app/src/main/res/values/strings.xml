@@ -9,5 +9,91 @@
     <string name="savedgames_string">My Saved Games</string>
     <string name="empty_string">No Saved Games</string>
     <string name="description_refresh">Refresh data</string>
-    205
+
+    <!-- Label for overflow menu option that inserts fake Game data into the app [CHAR LIMIT=20] -->
+    <string name="action_insert_dummy_data">Insert Dummy Data</string>
+
+    <!-- Label for overflow menu option that deletes all Game data in the app [CHAR LIMIT=20] -->
+    <string name="action_delete_all_entries">Delete All Games</string>
+
+    <!-- Title text for the empty view, which describes the empty Game image [CHAR LIMIT=50] -->
+    <string name="empty_view_title_text">Let\'s play together...</string>
+
+    <!-- Subtitle text for the empty view that prompts the user to add a Game [CHAR LIMIT=50] -->
+    <string name="empty_view_subtitle_text">Get started by adding a new Game</string>
+
+    <!-- Title for the activity to add a new Game [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_new_game">Add a Game</string>
+
+    <!-- Title for the activity to edit an existing game [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_edit_game">Edit Game</string>
+
+    <!-- Label for editor menu option to save game and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- Label for editor overflow menu option that deletes the current game [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+    <!-- Toast message in editor when new game has been successfully inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_game_successful">Game saved</string>
+
+    <!-- Toast message in editor when new game has failed to be inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_game_failed">Error with saving Game</string>
+
+    <!-- Toast message in editor when current game was successfully updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_game_successful">Game updated</string>
+
+    <!-- Toast message in editor when current game has failed to be updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_game_failed">Error with updating Game</string>
+
+    <!-- Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+
+    <!-- Dialog button text for the option to discard a user's changes [CHAR LIMIT=20] -->
+    <string name="discard">Discard</string>
+
+    <!-- Dialog button text for the option to keep editing the current game [CHAR LIMIT=20] -->
+    <string name="keep_editing">Keep Editing</string>
+
+    <!-- Toast message in editor when current game was successfully deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_game_successful">Game deleted</string>
+
+    <!-- Toast message in editor when current game has failed to be deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_game_failed">Error with deleting Game</string>
+
+    <!-- Dialog message to ask the user to confirm deleting the current game [CHAR LIMIT=NONE] -->
+    <string name="delete_dialog_msg">Delete this Game?</string>
+
+    <!-- Dialog button text for the option to confirm deleting the current game [CHAR LIMIT=20] -->
+    <string name="delete">Delete</string>
+
+    <!-- Dialog button text for the option to cancel deletion of the current game [CHAR LIMIT=20] -->
+    <string name="cancel">Cancel</string>
+
+    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
+    <string name="game_description">Game Description</string>
+
+    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
+    <string name="game_startdate">Date</string>
+
+    <string name="game_starttime">Start Time</string>
+
+    <string name="game_endtime">End Time</string>
+
+    <string name="category_skilllevel">Skill Level</string>
+
+    <!-- Label for measurement information in the editor [CHAR LIMIT=30] -->
+    <string name="category_notes">Notes</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_game_name">Game Description</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_game_notes">Notes for the Game</string>
+
+    <string name="game_rookie">Rookies</string>
+
+    <string name="game_vet">Veterans</string>
+
+    <string name="game_pro">Pro</string>
 </resources>

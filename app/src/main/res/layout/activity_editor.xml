@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout for the editor -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    tools:context=".EditorActivity">
+
+    <!-- Overview Games -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/game_description"/>
+        <!-- Input fields -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:paddingLeft="4dp"
+            android:orientation="vertical">
+        <!-- Name field -->
+        <EditText
+            android:id="@+id/edit_game_name"
+            style="@style/EditorFieldStyle"
+            android:hint="@string/hint_game_name"
+            android:inputType="textCapWords"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/game_startdate"/>
+
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+        <EditText
+            android:id="@+id/startdate"
+            style="@style/EditorFieldStyle"
+            android:onClick="onDateClicked"
+            android:layout_width="match_parent"
+            android:focusable="false"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/game_starttime"/>
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/start_time"
+            android:layout_width="match_parent"
+            style="@style/EditorFieldStyle"
+            android:onClick="stTimePicker"
+            android:focusable="false"/>
+
+        </LinearLayout>
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/game_endtime"/>
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+        <EditText
+            android:id="@+id/end_time"
+            android:layout_width="match_parent"
+            style="@style/EditorFieldStyle"
+            android:onClick="etTimePicker"
+            android:focusable="false"/>
+
+    </LinearLayout>
+        </LinearLayout>
+
+
+    <!-- Skill-->
+    <LinearLayout
+        android:id="@+id/container_skilllevel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_skilllevel"/>
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+        <!-- Skill drop-down spinner -->
+        <Spinner
+            android:id="@+id/spinner_game"
+            android:layout_height="48dp"
+            android:layout_width="wrap_content"
+            android:paddingRight="16dp"
+            android:spinnerMode="dropdown"/>
+
+    </LinearLayout>
+        </LinearLayout>
+
+    <!-- Notes category -->
+
+    <LinearLayout
+        android:id="@+id/container_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_notes"/>
+
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+        <!-- Notes field -->
+        <EditText
+            android:id="@+id/edit_game_notes"
+            style="@style/EditorFieldStyle"
+            android:hint="@string/hint_game_notes"
+            android:inputType="text"
+            android:selectAllOnFocus="true"/>
+
+    </LinearLayout>
+        </LinearLayout>
+
+</LinearLayout>

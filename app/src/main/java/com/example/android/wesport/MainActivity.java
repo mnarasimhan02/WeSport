@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 mMenu.getItem(0).setVisible(true);
             }
         });
-        Log.d(TAG, "Test location ..............");
         //setup GoogleApiclient
         buildGoogleApiClient();
         Log.d(TAG, "After build api client");
@@ -93,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 startLocationServices();
             } else {
                 //Displaying another toast if permission is not granted
-                Toast.makeText(this, "Oops you just denied the permission", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "You just denied the permission", Toast.LENGTH_LONG).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
                         showMessageOKCancel("You need to allow access permissions",

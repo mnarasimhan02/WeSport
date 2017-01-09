@@ -8,9 +8,10 @@
         android:id="@+id/grid_view_image_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="110dp"
         android:gravity="center"
-        android:numColumns="2" />
+        android:numColumns="2"
+        android:drawSelectorOnTop="true"
+        android:listSelector="@drawable/selector"/>
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
@@ -18,4 +19,5 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
+
 </LinearLayout>
