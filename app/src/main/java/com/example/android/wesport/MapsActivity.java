@@ -4,6 +4,7 @@ import android.Manifest.permission;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -13,12 +14,21 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
@@ -43,13 +53,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener , PlaceSelectionListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
     private GoogleMap map;
     private final String TAG = "MapActivity";
     private SupportMapFragment mainFragment;
     private MarkerOptions userMarker;
+
+    /*Autocomplete Widget*/
+    private TextView mPlaceDetailsText;
+
+    private TextView mPlaceAttribution;
 
     FragmentManager fm;
     //Variables to store games and locations from marker click
@@ -73,6 +88,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpMapIfNeeded();
         DownloadTask task = new DownloadTask();
         task.execute();
+        // Retrieve the PlaceAutocompleteFragment.
+                PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Register a listener to receive callbacks when a place has been selected or an error has
+        // occurred.
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+
+        /*autocompleteFragment.setBoundsBias(new LatLngBounds(
+                new LatLng(-33.880490, 151.184363),
+                new LatLng(-33.858754, 151.229596)));
+        */
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                .build();
+
+        autocompleteFragment.setFilter(typeFilter);
+
+        // Retrieve the TextViews that will display details about the selected place.
+       // mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
+        //mPlaceAttribution = (TextView) findViewById(R.id.place_attribution);
+
     }
 
     public void setUserMarker(LatLng latLng)
@@ -92,7 +129,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // map.
         if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
-            // map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             mainFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
@@ -131,6 +167,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         setUserMarker(new LatLng(mLat,mLon));
     }
+
 
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
@@ -270,5 +307,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(intent);
         }
         return true;
+    }
+
+    /**
+     * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
+     */
+    @Override
+    public void onPlaceSelected(Place place) {
+        Log.i(TAG, "Place Selected: " + place.getName());
+
+        // Format the returned place's details and display them in the TextView.
+       // mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
+         //       place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
+
+        CharSequence attributions = place.getAttributions();
+        if (!TextUtils.isEmpty(attributions)) {
+            mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
+        } else {
+            mPlaceAttribution.setText("");
+        }
+    }
+
+    /**
+     * Helper method to format information about a place nicely.
+     */
+    private Spanned formatPlaceDetails(Resources res, CharSequence name, String id,
+                                              CharSequence address, CharSequence phoneNumber, Uri websiteUri) {
+        Log.e(TAG, res.getString(R.string.place_details, name, id, address, phoneNumber,
+                websiteUri));
+        return Html.fromHtml(res.getString(R.string.place_details, name, id, address, phoneNumber,
+                websiteUri));
+
+    }
+    /**
+     * Callback invoked when PlaceAutocompleteFragment encounters an error.
+     */
+    @Override
+    public void onError(Status status) {
+        Log.e(TAG, "onError: Status = " + status.toString());
+
+        Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
+                Toast.LENGTH_SHORT).show();
     }
 }

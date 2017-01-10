@@ -96,4 +96,20 @@
     <string name="game_vet">Veterans</string>
 
     <string name="game_pro">Pro</string>
+    <!-- Text hint for Autocomplete textview -->
+
+    <string name="selected_place">Last Selected Place:</string>
+    <string name="place_details">
+    <![CDATA[
+        <b>%1$s</b>
+        <br/>
+        <i>Place Id: %2$s</i>
+        <br/>
+        Address: %3$s
+        <br/>
+        Phone: %4$s
+        <br/>
+        Website: %5$s
+    ]]>
+    </string>
 </resources>
