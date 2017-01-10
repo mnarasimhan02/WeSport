@@ -14,7 +14,7 @@ import com.example.android.wesport.data.GameContract.GameEntry;
 /**
  * {@link GameCursorAdapter} is an adapter for a list view
  * that uses a {@link Cursor} of Game data as its data source. This adapter knows
- * how to create list items for each row of pet data in the {@link Cursor}.
+ * how to create list items for each row of game data in the {@link Cursor}.
  */
 public class GameCursorAdapter extends CursorAdapter {
 
@@ -47,11 +47,6 @@ public class GameCursorAdapter extends CursorAdapter {
      * This method binds the game data (in the current row pointed to by cursor) to the given
      * list item layout. For example, the name for the current game can be set on the name TextView
      * in the list item layout.
-     *
-     * @param view    Existing view, returned earlier by newView() method
-     * @param context app context
-     * @param cursor  The cursor from which to get the data. The cursor is already moved to the
-     *                correct row.
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
@@ -64,15 +59,19 @@ public class GameCursorAdapter extends CursorAdapter {
         int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
         int startDateIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_DATE);
         int notesIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NOTES);
+        int locColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_ADDRESS);
+
 
         // Read the game attributes from the Cursor for the current game
         String gameName = cursor.getString(nameColumnIndex);
         String stDate = cursor.getString(startDateIndex);
+        String gameaddress = cursor.getString(locColumnIndex);
+
         String notes = cursor.getString(notesIndex);
 
         // Update the TextViews with the attributes for the current Game
         nameTextView.setText(gameName);
-        startdate.setText(stDate);
+        startdate.setText(stDate+" "+gameaddress);
         summaryTextView.setText(notes);
     }
 }

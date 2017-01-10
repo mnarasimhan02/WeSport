@@ -119,12 +119,21 @@ public final class GameContract {
 
         public final static String COLUMN_GAME_NOTES = "notes";
 
+
+        /**
+         * Storing Username and Location for the Game.
+         */
+        public final static String COLUMN_USER_NAME = "username";
+
+        public final static String COLUMN_GAME_ADDRESS = "address";
+
         /**
          * Possible values for the Skilllevel for the Game.
          */
         public static final int SKILL_ROOKIES = 0;
         public static final int SKILL_VET = 1;
         public static final int SKILL_PRO = 2;
+
 
         /**
          * Returns whether or not the given skill is valid

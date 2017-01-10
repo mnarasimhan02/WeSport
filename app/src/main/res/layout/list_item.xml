@@ -41,4 +41,5 @@
         android:fontFamily="sans-serif"
         android:textAppearance="?android:textAppearanceSmall"
         android:textColor="#AEB6BD"  />
+
 </LinearLayout>

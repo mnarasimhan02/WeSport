@@ -39,7 +39,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -54,7 +53,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     FragmentManager fm;
     //Variables to store games and locations from marker click
-    ArrayList<String> games = new ArrayList<>();
+    String games = "";
     //private ArrayAdapter<String> arrayAdapter;
 
     public MapsActivity() {
@@ -263,14 +262,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Store games into listview
         Toast.makeText(this, "Game at  " + address + " saved under My Games", Toast.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        games.add(address);
+       // games.add(address);
         //  SharedPreferences.Editor games = prefs.edit();
-        try {
-            prefs.edit().putString("games", ObjectSerializer.serialize(games)).apply();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        prefs.edit().putString("games", address).apply();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

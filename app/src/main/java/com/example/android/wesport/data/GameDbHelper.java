@@ -53,11 +53,13 @@ public class GameDbHelper extends SQLiteOpenHelper {
         // Create a String that contains the SQL statement to create the games table
         String SQL_CREATE_GAMES_TABLE =  "CREATE TABLE " + GameEntry.TABLE_NAME + " ("
                 + GameEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + GameEntry.COLUMN_USER_NAME + " TEXT, "
                 + GameEntry.COLUMN_GAME_DESC + " TEXT NOT NULL, "
                 + GameEntry.COLUMN_START_DATE + " TEXT NOT NULL, "
                 + GameEntry.COLUMN_START_TIME + " TEXT, "
                 + GameEntry.COLUMN_END_TIME + " TEXT, "
                 + GameEntry.COLUMN_GAME_SKILL + " INTEGER NOT NULL, "
+                + GameEntry.COLUMN_GAME_ADDRESS + " TEXT, "
                 + GameEntry.COLUMN_GAME_NOTES + " TEXT);";
 
         // Execute the SQL statement

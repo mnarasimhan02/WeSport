@@ -89,13 +89,14 @@ public class CatalogActivity extends AppCompatActivity implements
      */
     private void insertGame() {
         // Create a ContentValues object where column names are the keys,
-        // and Toto's pet attributes are the values.
         ContentValues values = new ContentValues();
+        values.put(GameEntry.COLUMN_USER_NAME, "mnarasimhan");
         values.put(GameEntry.COLUMN_GAME_DESC, "Tennis");
         values.put(GameEntry.COLUMN_START_DATE, "01-01-2013");
         values.put(GameEntry.COLUMN_START_TIME, "12:00");
         values.put(GameEntry.COLUMN_END_TIME, "02:00");
         values.put(GameEntry.COLUMN_GAME_SKILL, GameEntry.COLUMN_GAME_SKILL);
+        values.put(GameEntry.COLUMN_GAME_ADDRESS, "413 w Side Drive, Gaithersburg");
         values.put(GameEntry.COLUMN_GAME_NOTES, "Bring spare racket for the game and pick up john near starbucks");
 
         // Insert a new row for Toto into the provider using the ContentResolver.
@@ -142,11 +143,13 @@ public class CatalogActivity extends AppCompatActivity implements
         // Define a projection that specifies the columns from the table we care about.
         String[] projection = {
                 GameEntry._ID,
+                GameEntry.COLUMN_USER_NAME,
                 GameEntry.COLUMN_GAME_DESC,
                 GameEntry.COLUMN_START_DATE,
                 GameEntry.COLUMN_START_TIME,
                 GameEntry.COLUMN_END_TIME,
                 GameEntry.COLUMN_GAME_SKILL,
+                GameEntry.COLUMN_GAME_ADDRESS,
                 GameEntry.COLUMN_GAME_NOTES
         };
 
