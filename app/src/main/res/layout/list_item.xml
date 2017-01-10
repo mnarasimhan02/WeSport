@@ -11,12 +11,16 @@
      limitations under the License.
 -->
 <!-- Layout for a single list item in the list of games -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="@dimen/activity_margin">
+
 
     <TextView
         android:id="@+id/name"
@@ -42,4 +46,14 @@
         android:textAppearance="?android:textAppearanceSmall"
         android:textColor="#AEB6BD"  />
 
+
 </LinearLayout>
+    <ImageView
+        android:id="@+id/chatimage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_chat"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="false"/>
+    </RelativeLayout>

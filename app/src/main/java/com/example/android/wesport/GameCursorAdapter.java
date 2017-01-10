@@ -2,11 +2,14 @@
 package com.example.android.wesport;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.wesport.data.GameContract.GameEntry;
@@ -18,26 +21,11 @@ import com.example.android.wesport.data.GameContract.GameEntry;
  */
 public class GameCursorAdapter extends CursorAdapter {
 
-    /**
-     * Constructs a new {@link GameCursorAdapter}.
-     *
-     * @param context The context
-     * @param c       The cursor from which to get the data.
-     */
     public GameCursorAdapter(Context context, Cursor c) {
         super(context, c, 0 /* flags */);
     }
 
-    /**
-     * Makes a new blank list item view. No data is set (or bound) to the views yet.
-     *
-     * @param context app context
-     * @param cursor  The cursor from which to get the data. The cursor is already
-     *                moved to the correct position.
-     * @param parent  The parent to which the new view is attached to
-     * @return the newly created list item view.
-     */
-    @Override
+   @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // Inflate a list item view using the layout specified in list_item.xml
         return LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
@@ -48,12 +36,15 @@ public class GameCursorAdapter extends CursorAdapter {
      * list item layout. For example, the name for the current game can be set on the name TextView
      * in the list item layout.
      */
+
+
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView startdate = (TextView) view.findViewById(R.id.startdate);
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
+        ImageView chatview =(ImageView) view.findViewById(R.id.chatimage);
 
         // Find the columns of game attributes that we're interested in
         int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
@@ -73,5 +64,16 @@ public class GameCursorAdapter extends CursorAdapter {
         nameTextView.setText(gameName);
         startdate.setText(stDate+" "+gameaddress);
         summaryTextView.setText(notes);
+
+        chatview.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), ChatActivity.class);
+                v.getContext().startActivity(intent);
+            }
+        });
     }
+
+
 }

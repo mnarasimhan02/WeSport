@@ -107,13 +107,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
         if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         map.setMyLocationEnabled(true);
@@ -225,7 +218,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lat = Double.parseDouble(latitude);
             double lon = Double.parseDouble(longitude);
             //map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lon), 12));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             map.addMarker(new MarkerOptions()
                     .title(jsonObj.getString("name"))
                     .position(new LatLng(lat, lon))
@@ -257,13 +250,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        //Add marker to user identified address/locations
-        // map.addMarker(new MarkerOptions().position(latLng).title(address));
-        //Store games into listview
         Toast.makeText(this, "Game at  " + address + " saved under My Games", Toast.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-       // games.add(address);
-        //  SharedPreferences.Editor games = prefs.edit();
         prefs.edit().putString("games", address).apply();
     }
 
@@ -279,8 +267,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.map_menu) {
             Intent intent = new Intent(getApplicationContext(), CatalogActivity.class);
-            // Intent intent = new Intent(getApplicationContext(), MyGames.class);
-            //intent.putExtra(mCurrentLocation,"Current Location");
             startActivity(intent);
         }
         return true;
