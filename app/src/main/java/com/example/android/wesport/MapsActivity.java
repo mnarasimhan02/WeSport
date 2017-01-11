@@ -32,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -276,12 +277,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
              lat = Double.parseDouble(latitude);
              lon = Double.parseDouble(longitude);
             String parkName = jsonObj.getString("name");
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
-            map.addMarker(new MarkerOptions()
-                    .title(parkName)
-                    .position(new LatLng(lat, lon))
+            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
+            LatLng markerPoint = new LatLng(lat, lon);
+            if(bounds.contains(markerPoint)) {
+                map.addMarker(new MarkerOptions()
+                        .title(parkName)
+                        .position(new LatLng(lat, lon))
 
-            );
+                );
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             // Adding the currently created marker and title position to  arraylist
             pointList.add(new LatLng(lat, lon));
             markerTitle.add(parkName);
