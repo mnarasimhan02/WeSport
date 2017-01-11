@@ -98,7 +98,8 @@
     <string name="game_pro">Pro</string>
     <!-- Text hint for Autocomplete textview -->
 
-    <string name="selected_place">Last Selected Place:</string>
+
+    <string name="search_hint">Search places to play</string>
     <string name="place_details">
     <![CDATA[
         <b>%1$s</b>

@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,6 +59,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final String TAG = "MapActivity";
     private SupportMapFragment mainFragment;
     private MarkerOptions userMarker;
+    private String address = "";
+
 
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
@@ -91,6 +92,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Retrieve the PlaceAutocompleteFragment.
                 PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+                autocompleteFragment.setHint("Find play");
+
 
         // Register a listener to receive callbacks when a place has been selected or an error has
         // occurred.
@@ -105,6 +108,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
 
         autocompleteFragment.setFilter(typeFilter);
+
 
         // Retrieve the TextViews that will display details about the selected place.
        // mPlaceDetailsText = (TextView) findViewById(R.id.place_details);
@@ -268,7 +272,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapLongClick(LatLng latLng) {
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-        String address = "";
         try {
             List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (listAddresses != null && listAddresses.size() > 0) {
@@ -316,16 +319,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlaceSelected(Place place) {
         Log.i(TAG, "Place Selected: " + place.getName());
 
-        // Format the returned place's details and display them in the TextView.
-       // mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
-         //       place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
+        // Format the returned place's details and store  them in the address.
+        //mPlaceDetailsText.setText(formatPlaceDetails(getResources(), place.getName(), place.getId(),
+        //       place.getAddress(), place.getPhoneNumber(), place.getWebsiteUri()));
 
-        CharSequence attributions = place.getAttributions();
+        address = (String) place.getAddress();
+        String address1 = (String) place.getName();
+        Toast.makeText(this, address, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, address1, Toast.LENGTH_LONG).show();
+
+
+        /*CharSequence attributions = place.getAttributions();
         if (!TextUtils.isEmpty(attributions)) {
             mPlaceAttribution.setText(Html.fromHtml(attributions.toString()));
         } else {
             mPlaceAttribution.setText("");
         }
+        */
     }
 
     /**
