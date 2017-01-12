@@ -92,6 +92,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
+        setContentView(R.layout.activity_maps);
+
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
                 pointList = savedInstanceState.getParcelableArrayList("points");
@@ -104,9 +106,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-        setContentView(R.layout.activity_maps);
         //Instiantiate view to Save Games
         setUpMapIfNeeded();
+
+
+
         DownloadTask task = new DownloadTask();
         task.execute();
         // Retrieve the PlaceAutocompleteFragment.
