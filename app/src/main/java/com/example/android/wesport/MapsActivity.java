@@ -93,7 +93,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
         setContentView(R.layout.activity_maps);
-
+        setUpMapIfNeeded();
         if(savedInstanceState!=null){
             if(savedInstanceState.containsKey("points")){
                 pointList = savedInstanceState.getParcelableArrayList("points");
@@ -107,7 +107,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         //Instiantiate view to Save Games
-        setUpMapIfNeeded();
 
 
 
