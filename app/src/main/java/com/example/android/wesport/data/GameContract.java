@@ -144,10 +144,14 @@ public final class GameContract {
             }
             return false;
         }
+        public static String getUserNameFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+        public static String getUserNameandIDFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
+        }
+
     }
 
 
-    }
-
-
-
+}

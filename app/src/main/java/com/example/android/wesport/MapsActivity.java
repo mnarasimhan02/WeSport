@@ -106,8 +106,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-        //Instiantiate view to Save Games
 
+        //Instiantiate view to Save Games
 
 
         DownloadTask task = new DownloadTask();
@@ -131,7 +131,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
 
         autocompleteFragment.setFilter(typeFilter);
-
 
     }
 
@@ -334,7 +333,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         super.onOptionsItemSelected(item);
         if (item.getItemId() == R.id.map_menu) {
-            Intent intent = new Intent(getApplicationContext(), CatalogActivity.class);
+            Intent intent = new Intent(this, CatalogActivity.class);
             startActivity(intent);
         }
         return true;

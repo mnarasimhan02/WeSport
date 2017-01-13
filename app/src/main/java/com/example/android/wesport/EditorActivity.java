@@ -80,6 +80,7 @@ public class EditorActivity extends AppCompatActivity implements
     /* Arraylist to retreive location*/
 
     String gameaddress="";
+    String mUserName="";
     private ArrayAdapter<String> arrayAdapter;
 
 
@@ -110,17 +111,21 @@ public class EditorActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-        // ListView listView=(ListView) findViewById(R.id.listView);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         gameaddress = prefs.getString("games","Your Location");
-        //games.add("My Saved Games...");
-
         Log.d("Editor activity", gameaddress);
+
+        //Get Username from sharedpreferences
+        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+         mUserName = prefUser.getString("displayName","");
+        Log.d("Editor activity", mUserName);
+
 
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new Game or editing an existing one.
         Intent intent = getIntent();
         mCurrentGameUri = intent.getData();
+        Log.d("mCurrentGameUri", String.valueOf(mCurrentGameUri));
 
         // If the intent DOES NOT contain a Game content URI, then we know that we are
         // creating a new game.
@@ -267,6 +272,8 @@ public class EditorActivity extends AppCompatActivity implements
      */
     private void saveGames() {
 
+        String[] selectionArgs = null;
+
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
         String nameString = mNameEditText.getText().toString().trim();
@@ -318,7 +325,12 @@ public class EditorActivity extends AppCompatActivity implements
             // and pass in the new ContentValues. Pass in null for the selection and selection args
             // because mCurrentGameUri will already identify the correct row in the database that
             // we want to modify.
-            int rowsAffected = getContentResolver().update(mCurrentGameUri, values, null, null);
+            // Construct a selection clause that matches the word that the user entered.
+
+            // Use the user name from shared preferences as the (only) selection argument to filter games only for that user.
+            selectionArgs = new String[]{mUserName};
+            int rowsAffected = getContentResolver().update(mCurrentGameUri, values, GameEntry.COLUMN_USER_NAME, selectionArgs);
+            Log.d("rowsAffected", String.valueOf(rowsAffected));
 
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
@@ -442,12 +454,26 @@ public class EditorActivity extends AppCompatActivity implements
                 GameEntry.COLUMN_GAME_NOTES,
         };
 
+
+        // Defines a string to contain the selection clause
+        String selectionClause = null;
+
+        // An array to contain selection arguments
+        String[] selectionArgs = null;
+
+        if (!TextUtils.isEmpty(mUserName)) {
+            // Construct a selection clause that matches the entered username.
+            selectionClause = GameEntry.COLUMN_USER_NAME + " = ?";
+
+            // Use the user name from shared preferences as the (only) selection argument to filter games only for that user.
+            selectionArgs = new String[]{mUserName};
+        }
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
                 mCurrentGameUri,         // Query the content URI for the current game
                 projection,             // Columns to include in the resulting Cursor
-                null,                   // No selection clause
-                null,                   // No selection arguments
+                selectionClause,                   //  selection clause
+                selectionArgs,                   // selection arguments
                 null);                  // Default sort order
     }
 
