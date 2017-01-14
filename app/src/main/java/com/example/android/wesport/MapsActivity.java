@@ -51,13 +51,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.android.wesport.R.id.map;
-
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener , PlaceSelectionListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
-    private GoogleMap googleMap;
+    private GoogleMap map;
     private final String TAG = "MapActivity";
+    private SupportMapFragment mainFragment;
     private MarkerOptions userMarker;
     private String address = "";
 
@@ -96,7 +95,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
 
+
         //Instiantiate view to Save Games
+
 
         DownloadTask task = new DownloadTask();
         task.execute();
@@ -119,42 +120,41 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
 
         autocompleteFragment.setFilter(typeFilter);
-
     }
-
-
 
     public void setUserMarker(LatLng latLng)
     {
         if (userMarker==null){
             userMarker=new MarkerOptions().position(latLng).title("Current Location");
             userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            googleMap.addMarker(userMarker);
+            map.addMarker(userMarker);
         }
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
 
     }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
-        if (googleMap == null) {
+        if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            SupportMapFragment mainFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(map);
+            mainFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
             mainFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
+            if (map != null) {
+                setUpMap();
+            }
         }
     }
 
     private void setUpMap() {
-        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        map.getUiSettings().setZoomControlsEnabled(false);
         if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        googleMap.setMyLocationEnabled(true);
-
+        map.setMyLocationEnabled(true);
     }
 
     /**
@@ -165,16 +165,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap map) {
-        googleMap = map;
-        setUpMap();
+    public void onMapReady(GoogleMap sMap) {
+        map=sMap;
         Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
+        mainFragment.setRetainInstance(true);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         setUserMarker(new LatLng(mLat,mLon));
+       // drawMarkerForconfigChange(Bundle b);
     }
+
 
 
 
@@ -258,16 +260,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             lat = Double.parseDouble(latitude);
             lon = Double.parseDouble(longitude);
             String parkName = jsonObj.getString("name");
-            LatLngBounds bounds = this.googleMap.getProjection().getVisibleRegion().latLngBounds;
+            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
             LatLng markerPoint = new LatLng(lat, lon);
             if(bounds.contains(markerPoint)) {
-                googleMap.addMarker(new MarkerOptions()
+                map.addMarker(new MarkerOptions()
                         .title(parkName)
                         .position(new LatLng(lat, lon))
 
                 );
             }
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             // Adding the currently created marker and title position to  arraylist
             pointList.add(new LatLng(lat, lon));
             markerTitle.add(parkName);
@@ -345,36 +347,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     // A callback method, which is invoked on configuration is changed
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (googleMap != null) {
+        if (map != null) {
             outState.putParcelableArrayList("points", pointList);
             outState.putStringArrayList("title",markerTitle);
             super.onSaveInstanceState(outState);
         }
-
     }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState)
-    {
-        setUpMapIfNeeded();
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.i(TAG, "onRestoreInstanceState");
-        if(savedInstanceState!=null){
-            if(savedInstanceState.containsKey("points")){
-                pointList = savedInstanceState.getParcelableArrayList("points");
-                markerTitle=savedInstanceState.getStringArrayList("title");
-                if(pointList!=null){
-                    for(int i=0;i<pointList.size();i++){
-                            Log.i("latLng", String.valueOf(pointList.get(i)));
-                            Log.i("markerTitle", String.valueOf(markerTitle));
-                            MarkerOptions markerOptions = new MarkerOptions();
-                            markerOptions.position(pointList.get(i));
-                            markerOptions.title(String.valueOf(markerTitle));
-                            googleMap.addMarker(markerOptions);
-                    }
-                }
-            }
-        }
-    }
-
 }

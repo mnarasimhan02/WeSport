@@ -29,7 +29,7 @@ public class ListProvider implements RemoteViewsFactory {
 
     public ListProvider(Context context, Intent intent) {
         this.context = context;
-       // Context applicationContext = MainActivity.getContextOfApplication();
+        // Context applicationContext = MainActivity.getContextOfApplication();
 
         appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
