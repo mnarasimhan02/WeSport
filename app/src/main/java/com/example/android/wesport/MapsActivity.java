@@ -51,12 +51,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.example.android.wesport.R.id.map;
+
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener , PlaceSelectionListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
-    private GoogleMap map;
+    private GoogleMap googleMap;
     private final String TAG = "MapActivity";
-    private SupportMapFragment mainFragment;
     private MarkerOptions userMarker;
     private String address = "";
 
@@ -94,28 +95,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Restoring the markers on configuration changes
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
-        if(savedInstanceState!=null){
-            if(savedInstanceState.containsKey("points")){
-                pointList = savedInstanceState.getParcelableArrayList("points");
-                markerTitle=savedInstanceState.getStringArrayList("title");
-                if(pointList!=null){
-                    for(int i=0;i<pointList.size();i++){
-                        Log.i("points", String.valueOf(pointList.get(i)));
-                        Log.i("title", String.valueOf(markerTitle.get(i)));
-                        drawMarkerForBundle(pointList.get(i),markerTitle.get(i)); }
-                }
-            }
-        }
 
         //Instiantiate view to Save Games
-
 
         DownloadTask task = new DownloadTask();
         task.execute();
         // Retrieve the PlaceAutocompleteFragment.
-                PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-                autocompleteFragment.setHint("Find play");
+        autocompleteFragment.setHint("Find play");
 
 
         // Register a listener to receive callbacks when a place has been selected or an error has
@@ -134,48 +122,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void drawMarkerForBundle(LatLng latLng, String markerTitle) {
-        Log.i("latLng", String.valueOf(latLng));
-        Log.i("markerTitle", String.valueOf(markerTitle));
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title(markerTitle);
-        map.addMarker(markerOptions);
-    }
+
 
     public void setUserMarker(LatLng latLng)
     {
         if (userMarker==null){
             userMarker=new MarkerOptions().position(latLng).title("Current Location");
             userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
-            map.addMarker(userMarker);
+            googleMap.addMarker(userMarker);
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
 
     }
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
-        if (map == null) {
+        if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            mainFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
+            SupportMapFragment mainFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(map);
             mainFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
-            if (map != null) {
-                setUpMap();
-            }
         }
     }
 
     private void setUpMap() {
-        map.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
         if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        map.setMyLocationEnabled(true);
+        googleMap.setMyLocationEnabled(true);
 
     }
 
@@ -187,8 +165,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap sMap) {
-        map=sMap;
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+        setUpMap();
         Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -276,19 +255,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             JSONObject jsonObj = jsonArray.getJSONObject(i);
             latitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lat");
             longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
-             lat = Double.parseDouble(latitude);
-             lon = Double.parseDouble(longitude);
+            lat = Double.parseDouble(latitude);
+            lon = Double.parseDouble(longitude);
             String parkName = jsonObj.getString("name");
-            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
+            LatLngBounds bounds = this.googleMap.getProjection().getVisibleRegion().latLngBounds;
             LatLng markerPoint = new LatLng(lat, lon);
             if(bounds.contains(markerPoint)) {
-                map.addMarker(new MarkerOptions()
+                googleMap.addMarker(new MarkerOptions()
                         .title(parkName)
                         .position(new LatLng(lat, lon))
 
                 );
             }
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             // Adding the currently created marker and title position to  arraylist
             pointList.add(new LatLng(lat, lon));
             markerTitle.add(parkName);
@@ -366,10 +345,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     // A callback method, which is invoked on configuration is changed
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (map != null) {
+        if (googleMap != null) {
             outState.putParcelableArrayList("points", pointList);
             outState.putStringArrayList("title",markerTitle);
             super.onSaveInstanceState(outState);
         }
+
     }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
+        setUpMapIfNeeded();
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.i(TAG, "onRestoreInstanceState");
+        if(savedInstanceState!=null){
+            if(savedInstanceState.containsKey("points")){
+                pointList = savedInstanceState.getParcelableArrayList("points");
+                markerTitle=savedInstanceState.getStringArrayList("title");
+                if(pointList!=null){
+                    for(int i=0;i<pointList.size();i++){
+                            Log.i("latLng", String.valueOf(pointList.get(i)));
+                            Log.i("markerTitle", String.valueOf(markerTitle));
+                            MarkerOptions markerOptions = new MarkerOptions();
+                            markerOptions.position(pointList.get(i));
+                            markerOptions.title(String.valueOf(markerTitle));
+                            googleMap.addMarker(markerOptions);
+                    }
+                }
+            }
+        }
+    }
+
 }
