@@ -5,6 +5,8 @@
     <color name="colorPrimaryLight">#C8E6C9</color>
     <color name="colorAccent">#795548</color>
     <color name="colorTitle">#212121</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
     
     <!-- Primary color for the editor -->
     <color name="editorColorPrimary">#2D3640</color>
@@ -20,6 +22,18 @@
     <color name="material_purple_a700">#AA00FF</color>
 
     <color name="card">#fff</color>
+    <!-- Primary widget colors -->
+
+    <color name="white">#FFFFFF</color>
+    <color name="grey">#cccccc</color>
+    <color name="grey_700">#646464</color>
+    <color name="black">#000000</color>
+
+    <!-- the activated state color -->
+    <color name="activated">#E0E0E0</color>
+
+    <color name="game_notes_text">#607D8B</color>
+
 
 </resources>
 

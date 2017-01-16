@@ -16,17 +16,24 @@
 package com.example.android.wesport.data;
 
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 /**
  * API Contract for the Games app.
  */
-public final class GameContract {
+public final class GameContract{
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
-    private GameContract() {}
+    private GameContract() {
+
+    }
+
 
     /**
      * The "Content authority" is a name for the entire content provider, similar to the
@@ -144,11 +151,12 @@ public final class GameContract {
             }
             return false;
         }
-        public static String getUserNameFromUri(Uri uri) {
-            return uri.getPathSegments().get(1);
-        }
-        public static String getUserNameandIDFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);
+        public static String getUserName(Context context) {
+            //Get Username from sharedpreferences
+            SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(context);
+            Log.d("USERNAME IN CONTract",prefUser.getString("displayName",""));
+            return prefUser.getString("displayName","");
+
         }
 
     }
