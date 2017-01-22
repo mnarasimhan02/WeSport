@@ -30,35 +30,34 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.content.DialogInterface.BUTTON_NEGATIVE;
+import static android.content.DialogInterface.BUTTON_POSITIVE;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
-
     private final String TAG = "LocationActivity";
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private final int PERMISSION_LOCATION=1;
-    private MapsActivity mapsActivity;
     private Menu mMenu;
-    public static Context contextOfApplication;
-
+    public  Context contextOfApplication;
+    private Location mLastLocation;
+    private GridView androidGridView;
 
     String lat, lon;
-    Location mLastLocation;
-    GridView androidGridView;
-    String[] gridViewString = {
-            "Basketball", "Cricket", "Football", "Tennis", "Frisbee", "Pingpong", "Soccer", "Volleyball"
-    };
-    int[] gridViewImageId = {
-            R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
-            R.drawable.frisbee, R.drawable.pingpong, R.drawable.soccer, R.drawable.volleyball
-    };
+
+    String[] gridViewString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        contextOfApplication = getApplicationContext();//required to retreive context in another class
+        gridViewString = getResources().getStringArray(R.array.games_array);
+        int[] gridViewImageId = {
+                R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
+                R.drawable.frisbee, R.drawable.pingpong, R.drawable.soccer, R.drawable.volleyball
+        };
+       // contextOfApplication = getApplicationContext();//required to retreive context in another class
         CustomGridViewActivity adapterViewAndroid = new CustomGridViewActivity(MainActivity.this, gridViewString, gridViewImageId);
         androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
@@ -67,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
-                Toast.makeText(MainActivity.this, "GridView Item: " + gridViewString[+i], Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Chosen Game: " + gridViewString[+i], Toast.LENGTH_LONG).show();
                // invalidateOptionsMenu();
                 mMenu.getItem(0).setVisible(true);
             }
@@ -88,28 +87,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             //If permission is granted
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //Displaying a toast
-                Toast.makeText(this, "Permission granted now to access location", Toast.LENGTH_LONG).show();
+               // Toast.makeText(this, "Permission granted", Toast.LENGTH_LONG).show();
                 startLocationServices();
             } else {
                 //Displaying another toast if permission is not granted
                 Toast.makeText(this, "You just denied the permission", Toast.LENGTH_LONG).show();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        showMessageOKCancel("You need to allow access permissions",
+                        Log.d("shouldShowRequest", String.valueOf(shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)));
+                        showMessageOKCancel("You need to grant permissions",
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                            requestPermissions(new String[]{ACCESS_FINE_LOCATION,},
-                                                    1);
+                                        Log.d("which", String.valueOf(which));
+                                        switch (which) {
+                                            case DialogInterface.BUTTON_NEGATIVE:
+                                                Log.d("inside dialog", String.valueOf(BUTTON_NEGATIVE));
+                                                Toast.makeText(MainActivity.this, "You need to allow permission to run the app", Toast.LENGTH_LONG).show();
+                                                MainActivity.this.finish();
+                                                break;
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                                Log.d("inside dialog", String.valueOf(BUTTON_POSITIVE));
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermissions(new String[]{ACCESS_FINE_LOCATION,},
+                                                        1);
+                                            }
                                         }
                                     }
                                 });
                         return;
                     }
+                    requestPermissions(new String[]{ACCESS_FINE_LOCATION,},
+                            1);
+                    return;
                 }
             }
         }
+
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
@@ -176,10 +190,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }catch (SecurityException exception){
             Log.d(TAG, exception.toString());
         }
-
-        Log.d(TAG, "" + lat);
-        Log.d(TAG, "" + lon);
-        Log.d(TAG, "calling storeprefs inside onconnected");
         storeprefs(lat, lon);
     }
 
@@ -200,16 +210,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        Toast.makeText(MainActivity.this,location.toString(),Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this,"Location changed",Toast.LENGTH_SHORT).show();
         Log.i(TAG, "Triggering location changed");
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
-        Log.i(TAG, lat);
-        Log.i(TAG, lon);
         storeprefs(lat,lon);
-        // mapsActivity.setUserMarker(new LatLng(location.getLatitude(),location.getLongitude()));
-        // You can now create a LatLng Object for use with maps
-        //LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -247,11 +252,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         editor.apply();
         String mLat = prefs.getString("latitude","");
         String mLon = prefs.getString("longtitude","");
-        Log.i(TAG, mLat);
-        Log.i(TAG, mLon);
-    }
-
-    public static Context getContextOfApplication(){
-        return contextOfApplication;
     }
 }

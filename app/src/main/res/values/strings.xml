@@ -10,6 +10,24 @@
     <string name="empty_string">No Saved Games</string>
     <string name="description_refresh">Refresh data</string>
 
+    <!-- Label for Google API Web-services-->
+    <string name="place_api_key">AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g</string>
+    <string name="radius_param">5000</string>
+    <string name="type_param">park</string>
+    <!-- Games array-->
+
+    <string-array name="games_array">
+        <item>Basketball</item>
+        <item>Cricket</item>
+        <item>Football</item>
+        <item>Tennis</item>
+        <item>Frisbee</item>
+        <item>Pingpong</item>
+        <item>Soccer</item>
+        <item>Volleyball</item>
+    </string-array>
+
+
     <!-- Label for overflow menu option that inserts fake Game data into the app [CHAR LIMIT=20] -->
     <string name="action_insert_dummy_data">Insert Dummy Data</string>
 

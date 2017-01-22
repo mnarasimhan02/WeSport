@@ -43,12 +43,15 @@ public class GameCursorAdapter extends CursorAdapter {
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView startdate = (TextView) view.findViewById(R.id.startdate);
+        TextView starttime = (TextView) view.findViewById(R.id.start_time);
+
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
         ImageView chatview =(ImageView) view.findViewById(R.id.chatimage);
 
         // Find the columns of game attributes that we're interested in
         int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
         int startDateIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_DATE);
+        int startTimeIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_TIME);
         int notesIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NOTES);
         int locColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_ADDRESS);
 
@@ -56,13 +59,13 @@ public class GameCursorAdapter extends CursorAdapter {
         // Read the game attributes from the Cursor for the current game
         String gameName = cursor.getString(nameColumnIndex);
         String stDate = cursor.getString(startDateIndex);
+        String stTime = cursor.getString(startTimeIndex);
         String gameaddress = cursor.getString(locColumnIndex);
-
         String notes = cursor.getString(notesIndex);
 
         // Update the TextViews with the attributes for the current Game
         nameTextView.setText(gameName);
-        startdate.setText(stDate+" "+gameaddress);
+        startdate.setText(stDate+ " "+ stTime+ " "+  "at "+gameaddress);
         summaryTextView.setText(notes);
 
         chatview.setOnClickListener(new OnClickListener() {

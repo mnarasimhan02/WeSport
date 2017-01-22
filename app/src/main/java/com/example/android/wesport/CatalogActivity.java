@@ -1,7 +1,6 @@
 package com.example.android.wesport;
 import android.app.LoaderManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -16,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
 import com.example.android.wesport.data.GameContract.GameEntry;
 
 /**
@@ -24,7 +24,7 @@ import com.example.android.wesport.data.GameContract.GameEntry;
 public class CatalogActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for the pet data loader */
+    /** Identifier for  Game data loader */
     private static final int GAME_LOADER = 0;
 
     /** Adapter for the ListView */
@@ -68,41 +68,19 @@ public class CatalogActivity extends AppCompatActivity implements
                 // by appending the "id" (passed as input to this method) onto the
                 // {@link gameentry#CONTENT_URI}.
                 // For example, the URI would be "content://com.example.android.games/games/2"
-                // if the pet with ID 2 was clicked on.
+                // if the game with ID 2 was clicked on.
                 Uri currentGameUri = ContentUris.withAppendedId(GameEntry.CONTENT_URI, id);
 
                 // Set the URI on the data field of the intent
                 intent.setData(currentGameUri);
 
-                // Launch the {@link EditorActivity} to display the data for the current pet.
+                // Launch the {@link EditorActivity} to display the data for the current game.
                 startActivity(intent);
             }
         });
 
         // Kick off the loader
         getLoaderManager().initLoader(GAME_LOADER, null, this);
-    }
-
-    /**
-     * Helper method to insert hardcoded pet data into the database. For debugging purposes only.
-     */
-    private void insertGame() {
-        // Create a ContentValues object where column names are the keys,
-        ContentValues values = new ContentValues();
-        values.put(GameEntry.COLUMN_USER_NAME, "mnarasimhan");
-        values.put(GameEntry.COLUMN_GAME_DESC, "Tennis");
-        values.put(GameEntry.COLUMN_START_DATE, "01-01-2013");
-        values.put(GameEntry.COLUMN_START_TIME, "12:00");
-        values.put(GameEntry.COLUMN_END_TIME, "02:00");
-        values.put(GameEntry.COLUMN_GAME_SKILL, GameEntry.COLUMN_GAME_SKILL);
-        values.put(GameEntry.COLUMN_GAME_ADDRESS, "413 w Side Drive, Gaithersburg");
-        values.put(GameEntry.COLUMN_GAME_NOTES, "Bring spare racket for the game and pick up john near starbucks");
-
-        // Insert a new row for Toto into the provider using the ContentResolver.
-        // Use the {@link GameEntry#CONTENT_URI} to indicate that we want to insert
-        // into the games database table.
-        // Receive the new content URI that will allow us to access Toto's data in the future.
-        Uri newUri = getContentResolver().insert(GameEntry.CONTENT_URI, values);
     }
 
     /**
@@ -125,10 +103,6 @@ public class CatalogActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
-            // Respond to a click on the "Insert dummy data" menu option
-            case R.id.action_insert_dummy_data:
-                insertGame();
-                return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
                 deleteAllGames();

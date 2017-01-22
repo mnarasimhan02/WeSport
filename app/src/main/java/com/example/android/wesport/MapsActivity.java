@@ -94,38 +94,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Restoring the markers on configuration changes
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
-
-        //Instiantiate view to Save Games
-
+        //Instiantiate background task to download places list
 
         DownloadTask task = new DownloadTask();
         task.execute();
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setHint("Find play");
-
+        autocompleteFragment.setHint("Find play places");
 
         // Register a listener to receive callbacks when a place has been selected or an error has
         // occurred.
         autocompleteFragment.setOnPlaceSelectedListener(this);
-
-        /*autocompleteFragment.setBoundsBias(new LatLngBounds(
-                new LatLng(-33.880490, 151.184363),
-                new LatLng(-33.858754, 151.229596)));
-        */
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
                 .build();
-
         autocompleteFragment.setFilter(typeFilter);
     }
 
     public void setUserMarker(LatLng latLng)
     {
         if (userMarker==null){
-            userMarker=new MarkerOptions().position(latLng).title("Current Location");
+            userMarker=new MarkerOptions().position(latLng).title("My Location");
             userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             map.addMarker(userMarker);
         }
@@ -174,10 +167,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         setUserMarker(new LatLng(mLat,mLon));
-       // drawMarkerForconfigChange(Bundle b);
     }
-
-
 
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
@@ -198,9 +188,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .buildUpon()
                     .path("maps/api/place/nearbysearch/json")
                     .appendQueryParameter("location", String.valueOf(mLat) + "," + String.valueOf(mLon))
-                    .appendQueryParameter(RADIUS_PARAM, "5000")
-                    .appendQueryParameter(TYPE_PARAM, "park")
-                    .appendQueryParameter(KEY_PARAM, "AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g")
+                    .appendQueryParameter(RADIUS_PARAM, getString(R.string.radius_param))
+                    .appendQueryParameter(TYPE_PARAM, getString(R.string.type_param))
+                    .appendQueryParameter(KEY_PARAM, getString(R.string.place_api_key))
                     .build();
             String SERVICE_URL = builtUri.toString();
             String result = "";
@@ -263,7 +253,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
             LatLng markerPoint = new LatLng(lat, lon);
             if(bounds.contains(markerPoint)) {
-                map.addMarker(new MarkerOptions()
+                this.map.addMarker(new MarkerOptions()
                         .title(parkName)
                         .position(new LatLng(lat, lon))
 
@@ -313,9 +303,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
-        if (item.getItemId() == R.id.map_menu) {
-            Intent intent = new Intent(this, CatalogActivity.class);
-            startActivity(intent);
+        switch (item.getItemId() ) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            case R.id.map_menu:
+                Intent intent = new Intent(this, CatalogActivity.class);
+                startActivity(intent);
+                break;
         }
         return true;
     }
@@ -328,8 +323,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.i(TAG, "Place Selected: " + place.getName());
 
         // Either address from marker or address from autocomplete should be the location.
-        //address = (String) place.getAddress();
         String address = (String) place.getName();
+        Toast.makeText(this, "Game at  " + address + " saved ", Toast.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }

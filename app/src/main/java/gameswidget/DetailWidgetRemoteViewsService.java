@@ -70,11 +70,6 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                         null,
                         null);
                 Binder.restoreCallingIdentity(identityToken);
-                Log.d("Remote Views Service", String.valueOf(GAME_COLUMNS));
-                Log.d("Remote Views Service", String.valueOf(selection));
-                Log.d("Remote Views Service", String.valueOf(selectionArgs));
-                Log.d("Remote Views Service", String.valueOf(data));
-
             }
 
             @Override

@@ -134,7 +134,6 @@ public class EditorActivity extends AppCompatActivity implements
             setTitle(getString(R.string.editor_activity_title_new_game));
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
-            // (It doesn't make sense to delete a Game that hasn't been created yet.)
             invalidateOptionsMenu();
         } else {
             // Otherwise this is an existing Game, so change app bar to say "Edit Game"
@@ -518,7 +517,6 @@ public class EditorActivity extends AppCompatActivity implements
             mendTime.setText(ettime);
 
             // Skill is a dropdown spinner, so map the constant value from the database
-            // into one of the dropdown options (0 is Unknown, 1 is Male, 2 is Female).
             // Then call setSelection() so that option is displayed on screen as the current selection.
             switch (skill) {
                 case GameEntry.SKILL_VET:
@@ -542,7 +540,7 @@ public class EditorActivity extends AppCompatActivity implements
         mstartDate.setText("");
         mstartTime.setText("");
         mendTime.setText("");
-        mSkillSpinner.setSelection(0); // Select "Unknown" skill
+        mSkillSpinner.setSelection(0);
     }
 
     /**
