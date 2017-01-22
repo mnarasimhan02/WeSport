@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -29,10 +29,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.DialogInterface.BUTTON_NEGATIVE;
-import static android.content.DialogInterface.BUTTON_POSITIVE;
-
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private final String TAG = "LocationActivity";
@@ -43,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public  Context contextOfApplication;
     private Location mLastLocation;
     private GridView androidGridView;
+    private View mLayout;
+
 
     String lat, lon;
 
@@ -53,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         gridViewString = getResources().getStringArray(R.array.games_array);
+        mLayout = findViewById(R.id.android_gridview_example);
+
         int[] gridViewImageId = {
                 R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
                 R.drawable.frisbee, R.drawable.pingpong, R.drawable.soccer, R.drawable.volleyball
@@ -78,52 +78,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     //This method will be called when the user will tap on allow or deny
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        //Checking the request code of our request
-        Log.d(TAG, "onRequestPermissionsResult..............");
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
 
         if (requestCode == PERMISSION_LOCATION) {
-            //If permission is granted
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //Displaying a toast
-               // Toast.makeText(this, "Permission granted", Toast.LENGTH_LONG).show();
-                startLocationServices();
-            } else {
-                //Displaying another toast if permission is not granted
-                Toast.makeText(this, "You just denied the permission", Toast.LENGTH_LONG).show();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                        Log.d("shouldShowRequest", String.valueOf(shouldShowRequestPermissionRationale(android.Manifest.permission.ACCESS_FINE_LOCATION)));
-                        showMessageOKCancel("You need to grant permissions",
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Log.d("which", String.valueOf(which));
-                                        switch (which) {
-                                            case DialogInterface.BUTTON_NEGATIVE:
-                                                Log.d("inside dialog", String.valueOf(BUTTON_NEGATIVE));
-                                                Toast.makeText(MainActivity.this, "You need to allow permission to run the app", Toast.LENGTH_LONG).show();
-                                                MainActivity.this.finish();
-                                                break;
-                                            case DialogInterface.BUTTON_POSITIVE:
-                                                Log.d("inside dialog", String.valueOf(BUTTON_POSITIVE));
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                requestPermissions(new String[]{ACCESS_FINE_LOCATION,},
-                                                        1);
-                                            }
-                                        }
-                                    }
-                                });
-                        return;
-                    }
-                    requestPermissions(new String[]{ACCESS_FINE_LOCATION,},
-                            1);
-                    return;
-                }
-            }
-        }
+            // BEGIN_INCLUDE(permission_result)
+            // Received permission result for camera permission.
+            Log.i(TAG, "Received response for location permission request.");
 
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission has been granted, preview can be displayed
+                Log.i(TAG, "LOCATION permission is granted");
+                Snackbar.make(mLayout, R.string.permision_available_location  ,
+                        Snackbar.LENGTH_SHORT).show();
+            } else {
+                Log.i(TAG, "LOCATION permission was NOT granted.");
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, R.string.close_app,
+                        Snackbar.LENGTH_LONG).show();
+                this.finish();
+
+            }
+            // END_INCLUDE(permission_result)
+
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {

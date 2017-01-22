@@ -9,6 +9,9 @@
     <string name="savedgames_string">My Saved Games</string>
     <string name="empty_string">No Saved Games</string>
     <string name="description_refresh">Refresh data</string>
+    <string name="permision_available_location">Location Permission has been granted. Preview can now be opened.</string>
+    <string name="permissions_not_granted">Permissions were not granted.</string>
+
 
     <!-- Label for Google API Web-services-->
     <string name="place_api_key">AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g</string>
@@ -119,5 +122,6 @@
     <string name="empty_game_list">No Game Information Available</string>
 
     <string name="search_hint">Search places to play</string>
+    <string name="close_app">Location permissions required to run app. App will now close</string>
 
 </resources>
