@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         gridViewString = getResources().getStringArray(R.array.games_array);
         mLayout = findViewById(R.id.android_gridview_example);
 
@@ -92,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.i(TAG, "LOCATION permission is granted");
                 Snackbar.make(mLayout, R.string.permision_available_location  ,
                         Snackbar.LENGTH_SHORT).show();
+                startLocationServices();
             } else {
                 Log.i(TAG, "LOCATION permission was NOT granted.");
                 Snackbar.make(mLayout, R.string.permissions_not_granted,

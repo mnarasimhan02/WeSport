@@ -6,7 +6,7 @@
     <dimen name="spacing_normal">8dp</dimen>
     <dimen name="action_button_min_width">56dp</dimen>
     <dimen name="widget_margin">0dp</dimen>
-        <!-- Margin around the floating action button -->
+    <!-- Margin around the floating action button -->
     <dimen name="fab_margin">16dp</dimen>
 
     <!-- Common margin value used throughout the app -->

@@ -42,6 +42,8 @@ dependencies {
     compile 'com.google.firebase:firebase-config:10.0.1'
     //FIreBase UI
     compile 'com.firebaseui:firebase-ui-auth:1.0.1'
+    //App intro library
+    compile 'com.github.paolorotolo:appintro:4.1.0'
 
 //Display Images
    compile 'com.github.bumptech.glide:glide:3.6.1'

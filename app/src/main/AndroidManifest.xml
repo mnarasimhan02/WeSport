@@ -36,20 +36,24 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"/>
-       <activity
-            android:name="com.example.android.wesport.CatalogActivity"
+
+        <activity
+            android:name=".CatalogActivity"
             android:label="@string/app_name"/>
         <activity
-            android:name="com.example.android.wesport.EditorActivity"
+            android:name=".EditorActivity"
             android:theme="@style/EditorTheme"/>
+
         <provider
             android:name=".data.GameProvider"
             android:authorities="com.example.android.wesport"
-            android:exported="false" />
+            android:exported="false"/>
+
+        <activity android:name="com.example.android.wesport.IntroActivity"
+                  android:label="@string/app_intro" />
 
         <activity
             android:name=".MapsActivity"
@@ -62,25 +66,30 @@
         <activity android:name=".SigninActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <receiver android:name="gameswidget.DetailWidgetProvider" >
+
+        <receiver android:name="gameswidget.DetailWidgetProvider">
             <intent-filter>
 
-                <!-- This widget provider receives broadcast with following action
-    name or simply onUpdate of AppWidgetProvider is called -->
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.example.android.wesport.app.ACTION_DATA_UPDATED" />
+                <!--
+    This widget provider receives broadcast with following action
+    name or simply onUpdate of AppWidgetProvider is called
+                -->
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.example.android.wesport.app.ACTION_DATA_UPDATED"/>
             </intent-filter>
             <!-- linking up xml file of appwidget-provider to AppWidgetProvider -->
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widgetinfo" />
+                android:resource="@xml/widgetinfo"/>
         </receiver>
+
         <service
             android:name="gameswidget.DetailWidgetRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

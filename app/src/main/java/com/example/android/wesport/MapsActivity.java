@@ -169,7 +169,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUserMarker(new LatLng(mLat,mLon));
     }
 
-
     public class DownloadTask extends AsyncTask<String, Void, String> {
 
         @Override
