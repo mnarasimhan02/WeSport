@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
-                Toast.makeText(MainActivity.this, "Chosen Game: " + gridViewString[+i], Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, getString(R.string.chosen_game) + gridViewString[+i], Toast.LENGTH_SHORT).show();
                 chosenGame = gridViewString[+i];
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = chGame.edit();
@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        Toast.makeText(MainActivity.this, "Location changed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, getString(R.string.loc_changed), Toast.LENGTH_SHORT).show();
         Log.i(TAG, "Triggering location changed");
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());

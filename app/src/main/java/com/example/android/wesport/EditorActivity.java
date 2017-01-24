@@ -166,7 +166,6 @@ public class EditorActivity extends AppCompatActivity implements
         mstartTime.setOnTouchListener(mTouchListener);
         mendTime.setOnTouchListener(mTouchListener);
 
-        // setCurrentDateTimeOnView();
         setupSpinner();
     }
 
@@ -187,6 +186,7 @@ public class EditorActivity extends AppCompatActivity implements
                 mDateAndTime.get(Calendar.YEAR),
                 mDateAndTime.get(Calendar.MONTH),
                 mDateAndTime.get(Calendar.DAY_OF_MONTH)).show();
+        DatePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
     }
 
     public void stTimePicker(View v) {
@@ -223,6 +223,7 @@ public class EditorActivity extends AppCompatActivity implements
         mtextview.setText(DateUtils.formatDateTime(this,
                 mDateAndTime.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_TIME));
+
     }
 
     private void updateDateDisplay(TextView mtextview) {
