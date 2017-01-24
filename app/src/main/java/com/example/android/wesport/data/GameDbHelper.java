@@ -28,7 +28,9 @@ public class GameDbHelper extends SQLiteOpenHelper {
 
     public static final String LOG_TAG = GameDbHelper.class.getSimpleName();
 
-    /** Name of the database file */
+    /**
+     * Name of the database file
+     */
     private static final String DATABASE_NAME = "games.db";
 
     /**
@@ -51,7 +53,7 @@ public class GameDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Create a String that contains the SQL statement to create the games table
-        String SQL_CREATE_GAMES_TABLE =  "CREATE TABLE " + GameEntry.TABLE_NAME + " ("
+        String SQL_CREATE_GAMES_TABLE = "CREATE TABLE " + GameEntry.TABLE_NAME + " ("
                 + GameEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + GameEntry.COLUMN_GAME_NAME + " TEXT NOT NULL, "
                 + GameEntry.COLUMN_USER_NAME + " TEXT, "

@@ -14,9 +14,9 @@ import android.widget.TextView;
 
 public class CustomGridViewActivity extends BaseAdapter {
 
-    private Context mContext;
     private final String[] gridViewString;
     private final int[] gridViewImageId;
+    private Context mContext;
 
     public CustomGridViewActivity(Context context, String[] gridViewString, int[] gridViewImageId) {
         mContext = context;
@@ -47,7 +47,7 @@ public class CustomGridViewActivity extends BaseAdapter {
 
         if (convertView == null) {
 
-           // gridViewAndroid = new View(mContext);
+            // gridViewAndroid = new View(mContext);
             gridViewAndroid = inflater.inflate(R.layout.gridview_layout, null);
             TextView textViewAndroid = (TextView) gridViewAndroid.findViewById(R.id.android_gridview_text);
             ImageView imageViewAndroid = (ImageView) gridViewAndroid.findViewById(R.id.android_gridview_image);

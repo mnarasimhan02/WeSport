@@ -47,12 +47,10 @@ import java.util.Map;
 import static com.example.android.wesport.SigninActivity.RC_SIGN_IN;
 
 public class ChatActivity extends AppCompatActivity {
-    private static final String TAG = "SigninActivity";
-
     public static final String ANONYMOUS = "anonymous";
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
     public static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
-
+    private static final String TAG = "SigninActivity";
     private static final int RC_PHOTO_PICKER = 2;
 
     private ListView mMessageListView;
@@ -95,7 +93,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //Get Username from sharedpreferences
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final String mUserName = prefUser.getString("displayName","");
+        final String mUserName = prefUser.getString("displayName", "");
         // Initialize message ListView and its adapter
         List<FriendlyMessage> friendlyMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, friendlyMessages);
@@ -159,7 +157,6 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         };
-
 
 
         // Create Remote Config Setting to enable developer mode.
@@ -259,6 +256,7 @@ public class ChatActivity extends AppCompatActivity {
             mChildEventListener = null;
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -272,18 +270,19 @@ public class ChatActivity extends AppCompatActivity {
             case R.id.sign_out_menu:
                 AuthUI.getInstance()
                         .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                public void onComplete(@NonNull Task<Void> task) {
-                    // user is now signed out
-                    startActivity(new Intent(ChatActivity.this, SigninActivity.class));
-                    finish();
-                }
-            });
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                // user is now signed out
+                                startActivity(new Intent(ChatActivity.this, SigninActivity.class));
+                                finish();
+                            }
+                        });
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
     private void onSignedInInitialize(String username) {
         mUsername = username;
         attachDatabaseReadListener();
@@ -294,6 +293,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessageAdapter.clear();
         detachDatabaseReadListener();
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -344,4 +344,4 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    }
+}

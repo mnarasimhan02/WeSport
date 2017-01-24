@@ -51,31 +51,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener , PlaceSelectionListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
-    private GoogleMap map;
     private final String TAG = "MapActivity";
-    private SupportMapFragment mainFragment;
-    private MarkerOptions userMarker;
-    private String address = "";
-
-    private String selectedGame;
-
-
-    /*Autocomplete Widget*/
-    private TextView mPlaceDetailsText;
-
-    private TextView mPlaceAttribution;
-
-    private double lat , lon;
-
-    private ArrayList<LatLng> pointList = new ArrayList<LatLng>();
-    private ArrayList<String> markerTitle = new ArrayList<String>();
-
     FragmentManager fm;
     //Variables to store games and locations from marker click
     String games = "";
+    private GoogleMap map;
+    private SupportMapFragment mainFragment;
+    private MarkerOptions userMarker;
+    private String address = "";
+    private String selectedGame;
+    /*Autocomplete Widget*/
+    private TextView mPlaceDetailsText;
+    private TextView mPlaceAttribution;
+    private double lat, lon;
+    private ArrayList<LatLng> pointList = new ArrayList<LatLng>();
+    private ArrayList<String> markerTitle = new ArrayList<String>();
 
     public MapsActivity() {
         // Required empty public constructor
@@ -113,14 +106,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         autocompleteFragment.setFilter(typeFilter);
     }
 
-    public void setUserMarker(LatLng latLng)
-    {
-        if (userMarker==null){
-            userMarker=new MarkerOptions().position(latLng).title("My Location");
+    public void setUserMarker(LatLng latLng) {
+        if (userMarker == null) {
+            userMarker = new MarkerOptions().position(latLng).title("My Location");
             userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
             map.addMarker(userMarker);
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
 
     }
 
@@ -157,7 +149,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onMapReady(GoogleMap sMap) {
-        map=sMap;
+        map = sMap;
         Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
@@ -166,7 +158,123 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
-        setUserMarker(new LatLng(mLat,mLon));
+        setUserMarker(new LatLng(mLat, mLon));
+    }
+
+    void createMarkersFromJson(String json) throws JSONException {
+        // De-serialize the JSON string into an array of park objects
+        JSONObject jsonObject = new JSONObject(json);
+        String parkInfo = jsonObject.getString("results");
+        Log.d("parkname", parkInfo);
+        String latitude = "";
+        String longitude = "";
+        JSONArray jsonArray = new JSONArray(parkInfo);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            // Create a marker for each near by park in the JSON data.
+            JSONObject jsonObj = jsonArray.getJSONObject(i);
+            latitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lat");
+            longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
+            lat = Double.parseDouble(latitude);
+            lon = Double.parseDouble(longitude);
+            String parkName = jsonObj.getString("name");
+            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
+            LatLng markerPoint = new LatLng(lat, lon);
+            if (bounds.contains(markerPoint)) {
+                this.map.addMarker(new MarkerOptions()
+                        .title(parkName)
+                        .position(new LatLng(lat, lon))
+
+                );
+            }
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
+            // Adding the currently created marker and title position to  arraylist
+            pointList.add(new LatLng(lat, lon));
+            markerTitle.add(parkName);
+        }
+    }
+
+    /* Get address for new places when user long click's on the map and show the address*/
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            if (listAddresses != null && listAddresses.size() > 0) {
+                if (listAddresses.get(0).getThoroughfare() != null) {
+                    if (listAddresses.get(0).getSubThoroughfare() != null) {
+                        address += listAddresses.get(0).getSubThoroughfare() + " ";
+                    }
+                    address += listAddresses.get(0).getThoroughfare();
+                    Log.d("address", address);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (address.equals("")) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
+            address = sdf.format(new Date());
+        }
+        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        prefs.edit().putString("games", address).apply();
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.maps_menu, menu);
+        return true;
+    }
+
+    //respond to menu item selection
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                break;
+            case R.id.map_menu:
+                Intent intent = new Intent(this, CatalogActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return true;
+    }
+
+    /**
+     * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
+     */
+    @Override
+    public void onPlaceSelected(Place place) {
+        Log.i(TAG, "Place Selected: " + place.getName());
+
+        // Either address from marker or address from autocomplete should be the location.
+        String address = (String) place.getName();
+        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        prefs.edit().putString("games", address).apply();
+    }
+
+    /**
+     * Callback invoked when PlaceAutocompleteFragment encounters an error.
+     */
+    @Override
+    public void onError(Status status) {
+        Log.e(TAG, "onError: Status = " + status.toString());
+
+        Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    // A callback method, which is invoked on configuration is changed
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (map != null) {
+            outState.putParcelableArrayList("points", pointList);
+            outState.putStringArrayList("title", markerTitle);
+            super.onSaveInstanceState(outState);
+        }
     }
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
@@ -231,120 +339,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
 
-    }
-
-    void createMarkersFromJson(String json) throws JSONException {
-        // De-serialize the JSON string into an array of park objects
-        JSONObject jsonObject = new JSONObject(json);
-        String parkInfo = jsonObject.getString("results");
-        Log.d("parkname", parkInfo);
-        String latitude = "";
-        String longitude = "";
-        JSONArray jsonArray = new JSONArray(parkInfo);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            // Create a marker for each near by park in the JSON data.
-            JSONObject jsonObj = jsonArray.getJSONObject(i);
-            latitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lat");
-            longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
-            lat = Double.parseDouble(latitude);
-            lon = Double.parseDouble(longitude);
-            String parkName = jsonObj.getString("name");
-            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
-            LatLng markerPoint = new LatLng(lat, lon);
-            if(bounds.contains(markerPoint)) {
-                this.map.addMarker(new MarkerOptions()
-                        .title(parkName)
-                        .position(new LatLng(lat, lon))
-
-                );
-            }
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
-            // Adding the currently created marker and title position to  arraylist
-            pointList.add(new LatLng(lat, lon));
-            markerTitle.add(parkName);
-        }
-    }
-
-    /* Get address for new places when user long click's on the map and show the address*/
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-        try {
-            List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-            if (listAddresses != null && listAddresses.size() > 0) {
-                if (listAddresses.get(0).getThoroughfare() != null) {
-                    if (listAddresses.get(0).getSubThoroughfare() != null) {
-                        address += listAddresses.get(0).getSubThoroughfare() + " ";
-                    }
-                    address += listAddresses.get(0).getThoroughfare();
-                    Log.d("address", address);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (address.equals("")) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
-            address = sdf.format(new Date());
-        }
-        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        prefs.edit().putString("games", address).apply();
-    }
-
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.maps_menu, menu);
-        return true;
-    }
-
-    //respond to menu item selection
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        super.onOptionsItemSelected(item);
-        switch (item.getItemId() ) {
-            case android.R.id.home:
-                this.finish();
-                break;
-            case R.id.map_menu:
-                Intent intent = new Intent(this, CatalogActivity.class);
-                startActivity(intent);
-                break;
-        }
-        return true;
-    }
-
-    /**
-     * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
-     */
-    @Override
-    public void onPlaceSelected(Place place) {
-        Log.i(TAG, "Place Selected: " + place.getName());
-
-        // Either address from marker or address from autocomplete should be the location.
-        String address = (String) place.getName();
-        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        prefs.edit().putString("games", address).apply();
-    }
-    /**
-     * Callback invoked when PlaceAutocompleteFragment encounters an error.
-     */
-    @Override
-    public void onError(Status status) {
-        Log.e(TAG, "onError: Status = " + status.toString());
-
-        Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
-                Toast.LENGTH_SHORT).show();
-    }
-
-    // A callback method, which is invoked on configuration is changed
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (map != null) {
-            outState.putParcelableArrayList("points", pointList);
-            outState.putStringArrayList("title",markerTitle);
-            super.onSaveInstanceState(outState);
-        }
     }
 }

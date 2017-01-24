@@ -20,7 +20,8 @@ import com.example.android.wesport.data.GameContract.GameEntry;
  */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetRemoteViewsService extends RemoteViewsService {
-    public final String LOG_TAG = DetailWidgetRemoteViewsService.class.getSimpleName();
+    // these indices must match the projection
+    static final int INDEX_GAME_ID = 0;
     private static final String[] GAME_COLUMNS = {
             GameEntry.TABLE_NAME + "." + GameEntry._ID,
             GameEntry.COLUMN_GAME_DESC,
@@ -31,11 +32,9 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             GameEntry.COLUMN_GAME_ADDRESS,
             GameEntry.COLUMN_USER_NAME
     };
-    // these indices must match the projection
-    static final int INDEX_GAME_ID = 0;
-
+    public final String LOG_TAG = DetailWidgetRemoteViewsService.class.getSimpleName();
     Uri gameDataForUri = GameEntry.CONTENT_URI;
-    String selection =   GameEntry.COLUMN_USER_NAME+ "=?" ;
+    String selection = GameEntry.COLUMN_USER_NAME + "=?";
 
     String[] selectionArgs = null;
     String username = "";
@@ -61,8 +60,8 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 // that calls use our process and permission
                 final long identityToken = Binder.clearCallingIdentity();
                 // Get data from the ContentProvider
-                username= GameEntry.getUserName(DetailWidgetRemoteViewsService.this);
-                Log.d("Remote Views Service",username);
+                username = GameEntry.getUserName(DetailWidgetRemoteViewsService.this);
+                Log.d("Remote Views Service", username);
                 selectionArgs = new String[]{username};
                 data = getContentResolver().query(gameDataForUri,
                         GAME_COLUMNS,

@@ -1,4 +1,5 @@
 package com.example.android.wesport;
+
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.CursorLoader;
@@ -24,10 +25,14 @@ import com.example.android.wesport.data.GameContract.GameEntry;
 public class CatalogActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for  Game data loader */
+    /**
+     * Identifier for  Game data loader
+     */
     private static final int GAME_LOADER = 0;
 
-    /** Adapter for the ListView */
+    /**
+     * Adapter for the ListView
+     */
     GameCursorAdapter mCursorAdapter;
 
     @Override

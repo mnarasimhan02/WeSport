@@ -29,17 +29,16 @@ import com.google.android.gms.location.LocationServices;
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private final String TAG = "LocationActivity";
+    private final int PERMISSION_LOCATION = 1;
+    String lat, lon;
+    String[] gridViewString;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private final int PERMISSION_LOCATION=1;
     private Menu mMenu;
     private Location mLastLocation;
     private GridView androidGridView;
     private View mLayout;
     private String chosenGame;
-
-    String lat, lon;
-    String[] gridViewString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
                 R.drawable.frisbee, R.drawable.pingpong, R.drawable.soccer, R.drawable.volleyball
         };
-       // contextOfApplication = getApplicationContext();//required to retreive context in another class
+        // contextOfApplication = getApplicationContext();//required to retreive context in another class
         CustomGridViewActivity adapterViewAndroid = new CustomGridViewActivity(MainActivity.this, gridViewString, gridViewImageId);
         androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
@@ -67,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 chosenGame = gridViewString[+i];
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = chGame.edit();
-                editor.putString("chosenGame",chosenGame).apply();
-               // invalidateOptionsMenu();
+                editor.putString("chosenGame", chosenGame).apply();
+                // invalidateOptionsMenu();
                 mMenu.getItem(0).setVisible(true);
             }
         });
@@ -91,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Camera permission has been granted, preview can be displayed
                 Log.i(TAG, "LOCATION permission is granted");
-                Snackbar.make(mLayout, R.string.permision_available_location  ,
+                Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_SHORT).show();
                 startLocationServices();
             } else {
@@ -143,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
             Log.d(TAG, "Requesting Permissions");
-        } else{
+        } else {
             startLocationServices();
         }
     }
@@ -162,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mLocationRequest.setInterval(100); // Update location every 10 seconds
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }catch (SecurityException exception){
+        } catch (SecurityException exception) {
             Log.d(TAG, exception.toString());
         }
         storeprefs(lat, lon);
@@ -177,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.i(TAG, "GoogleApiClient connection has failed");
     }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -185,11 +185,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        Toast.makeText(MainActivity.this,"Location changed",Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Location changed", Toast.LENGTH_SHORT).show();
         Log.i(TAG, "Triggering location changed");
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
-        storeprefs(lat,lon);
+        storeprefs(lat, lon);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
-        if (item.getItemId()==R.id.menu_next) {
+        if (item.getItemId() == R.id.menu_next) {
             Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(intent);
         }

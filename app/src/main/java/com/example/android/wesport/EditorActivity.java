@@ -42,60 +42,53 @@ import java.util.Calendar;
  * Allows user to create a new game or edit an existing one.
  */
 public class EditorActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>  {
+        LoaderManager.LoaderCallbacks<Cursor> {
 
-    /** Identifier for the game data loader */
+    /**
+     * Identifier for the game data loader
+     */
     private static final int EXISTING_GAME_LOADER = 0;
-
-    /** Content URI for the existing game (null if it's a new game) */
-    private Uri mCurrentGameUri;
-
-    /** EditText field to enter the game's name */
-    private EditText mNameEditText;
-
-    /** EditText field to enter the game's notes */
-    private EditText mnotesEditText;
-
-    /** EditText field to enter the game skill */
-    private Spinner mSkillSpinner;
-
-
     public EditText mstartDate;
     public EditText mstartTime;
     public EditText mendTime;
     Calendar mDateAndTime = Calendar.getInstance();
+    /**
+     * Content URI for the existing game (null if it's a new game)
+     */
+    private Uri mCurrentGameUri;
+    /**
+     * EditText field to enter the game's name
+     */
+    private EditText mNameEditText;
+    /**
+     * EditText field to enter the game's notes
+     */
+    private EditText mnotesEditText;
+    /**
+     * EditText field to enter the game skill
+     */
+    private Spinner mSkillSpinner;
 
     // declare  the variables to Show/Set the date and time when Time and  Date Picker Dialog first appears
-
-    private int mYear, mMonth, mDay,mHour,mMinute;
+    private int mYear, mMonth, mDay, mHour, mMinute;
 
     /**
      * Skill for the Game. The possible valid values are in the GameContract.java file:
      */
     private int mSkill = GameEntry.SKILL_ROOKIES;
 
-    /** Boolean flag that keeps track of whether the game has been edited (true) or not (false) */
+    /**
+     * Boolean flag that keeps track of whether the game has been edited (true) or not (false)
+     */
     private boolean mGameHasChanged = false;
 
     /* String to retreive address, chosengame and username*/
 
-    private String gameaddress="";
+    private String gameaddress = "";
 
-    private String selectedGame="";
+    private String selectedGame = "";
 
-    private String mUserName="";
-
-    public EditorActivity()
-    {
-        // Assign current Date and Time Values to Variables
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-        mHour = c.get(Calendar.HOUR_OF_DAY);
-        mMinute = c.get(Calendar.MINUTE);
-    }
-
+    private String mUserName = "";
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mGameHasChanged boolean to true.
@@ -108,6 +101,16 @@ public class EditorActivity extends AppCompatActivity implements
         }
     };
 
+    public EditorActivity() {
+        // Assign current Date and Time Values to Variables
+        final Calendar c = Calendar.getInstance();
+        mYear = c.get(Calendar.YEAR);
+        mMonth = c.get(Calendar.MONTH);
+        mDay = c.get(Calendar.DAY_OF_MONTH);
+        mHour = c.get(Calendar.HOUR_OF_DAY);
+        mMinute = c.get(Calendar.MINUTE);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,12 +119,12 @@ public class EditorActivity extends AppCompatActivity implements
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        gameaddress = prefs.getString("games","Your Location");
-        selectedGame = chGame.getString("chosenGame","Other");
+        gameaddress = prefs.getString("games", "Your Location");
+        selectedGame = chGame.getString("chosenGame", "Other");
 
         //Get Username from sharedpreferences
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        mUserName = prefUser.getString("displayName","");
+        mUserName = prefUser.getString("displayName", "");
         Log.d("Editor activity", mUserName);
 
         // Examine the intent that was used to launch this activity,
@@ -285,7 +288,7 @@ public class EditorActivity extends AppCompatActivity implements
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
         if (mCurrentGameUri == null &&
-                TextUtils.isEmpty(nameString)  &&
+                TextUtils.isEmpty(nameString) &&
                 TextUtils.isEmpty(notesString) && mSkill == GameEntry.SKILL_ROOKIES) {
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.

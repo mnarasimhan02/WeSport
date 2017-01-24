@@ -25,14 +25,7 @@ import android.provider.BaseColumns;
 /**
  * API Contract for the Games app.
  */
-public final class GameContract{
-
-    // To prevent someone from accidentally instantiating the contract class,
-    // give it an empty constructor.
-    private GameContract() {
-
-    }
-
+public final class GameContract {
 
     /**
      * The "Content authority" is a name for the entire content provider, similar to the
@@ -41,13 +34,11 @@ public final class GameContract{
      * device.
      */
     public static final String CONTENT_AUTHORITY = "com.example.android.wesport";
-
     /**
      * Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
      * the content provider.
      */
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-
     /**
      * Possible path (appended to base content URI for possible URI's)
      * For instance, content://com.example.android.games/games/ is a valid path for
@@ -56,13 +47,21 @@ public final class GameContract{
      */
     public static final String PATH_GAMES = "games";
 
+    // To prevent someone from accidentally instantiating the contract class,
+    // give it an empty constructor.
+    private GameContract() {
+
+    }
+
     /**
      * Inner class that defines constant values for the games database table.
      * Each entry in the table represents a single game.
      */
     public static final class GameEntry implements BaseColumns {
 
-        /** The content URI to access the game data in the provider */
+        /**
+         * The content URI to access the game data in the provider
+         */
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_GAMES);
 
         /**
@@ -77,54 +76,56 @@ public final class GameContract{
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_GAMES;
 
-        /** Name of database table for games */
+        /**
+         * Name of database table for games
+         */
         public final static String TABLE_NAME = "games";
 
         /**
          * Unique ID number for the game (only for use in the database table).
-         *
+         * <p>
          * Type: INTEGER
          */
         public final static String _ID = BaseColumns._ID;
 
         /**
          * Game Nam
-         *
+         * <p>
          * Type: TEXT
          */
-        public final static String COLUMN_GAME_NAME ="gamename";
+        public final static String COLUMN_GAME_NAME = "gamename";
 
         /**
          * Game Description
-         *
+         * <p>
          * Type: TEXT
          */
-        public final static String COLUMN_GAME_DESC ="name";
+        public final static String COLUMN_GAME_DESC = "name";
 
         /**
          * Game startdate
-         *
+         * <p>
          * Type: TEXT
          */
-        public final static String COLUMN_START_DATE ="startdate";
+        public final static String COLUMN_START_DATE = "startdate";
 
         /**
          * Game starttime
-         *
+         * <p>
          * Type: TEXT
          */
-        public final static String COLUMN_START_TIME ="starttime";
+        public final static String COLUMN_START_TIME = "starttime";
 
         /**
          * Game endtime
-         *
+         * <p>
          * Type: TEXT
          */
-        public final static String COLUMN_END_TIME ="endtime";
+        public final static String COLUMN_END_TIME = "endtime";
 
         /**
          * skill for the game.
-         *
+         * <p>
          * Type: INTEGER
          */
 
@@ -157,10 +158,11 @@ public final class GameContract{
             }
             return false;
         }
+
         public static String getUserName(Context context) {
             //Get Username from sharedpreferences
             SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(context);
-            return prefUser.getString("displayName","user");
+            return prefUser.getString("displayName", "user");
         }
 
     }

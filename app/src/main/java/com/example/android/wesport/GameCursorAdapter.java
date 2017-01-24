@@ -26,7 +26,7 @@ public class GameCursorAdapter extends CursorAdapter {
         super(context, c, 0 /* flags */);
     }
 
-   @Override
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // Inflate a list item view using the layout specified in list_item.xml
         return LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
@@ -47,7 +47,7 @@ public class GameCursorAdapter extends CursorAdapter {
         TextView starttime = (TextView) view.findViewById(R.id.start_time);
 
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
-        ImageView chatview =(ImageView) view.findViewById(R.id.chatimage);
+        ImageView chatview = (ImageView) view.findViewById(R.id.chatimage);
 
         // Find the columns of game attributes that we're interested in
         int descColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
@@ -67,8 +67,8 @@ public class GameCursorAdapter extends CursorAdapter {
         String notes = cursor.getString(notesIndex);
 
         // Update the TextViews with the attributes for the current Game
-        nameTextView.setText(selectedGame+"\n"+ gameDesc);
-        startdate.setText(stDate+ " "+ stTime+ " "+  "at "+gameaddress);
+        nameTextView.setText(selectedGame + "\n" + gameDesc);
+        startdate.setText(stDate + " " + stTime + " " + "at " + gameaddress);
         summaryTextView.setText(notes);
 
         chatview.setOnClickListener(new OnClickListener() {

@@ -31,13 +31,19 @@ import com.example.android.wesport.data.GameContract.GameEntry;
  */
 public class GameProvider extends ContentProvider {
 
-    /** Tag for the log messages */
+    /**
+     * Tag for the log messages
+     */
     public static final String LOG_TAG = GameProvider.class.getSimpleName();
 
-    /** URI matcher code for the content URI for the games table */
+    /**
+     * URI matcher code for the content URI for the games table
+     */
     private static final int GAMES = 100;
 
-    /** URI matcher code for the content URI for a single game in the games table */
+    /**
+     * URI matcher code for the content URI for a single game in the games table
+     */
     private static final int GAME_ID = 101;
 
     /**
@@ -68,7 +74,9 @@ public class GameProvider extends ContentProvider {
         sUriMatcher.addURI(GameContract.CONTENT_AUTHORITY, GameContract.PATH_GAMES + "/#", GAME_ID);
     }
 
-    /** Database helper object */
+    /**
+     * Database helper object
+     */
     private GameDbHelper mDbHelper;
 
     @Override
@@ -106,7 +114,7 @@ public class GameProvider extends ContentProvider {
                 // arguments that will fill in the "?". Since we have 1 question mark in the
                 // selection, we have 1 String in the selection arguments' String array.
                 selection = GameEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 
                 // This will perform a query on the games table where the _id equals 3 to return a
                 // Cursor containing that row of the table.
@@ -183,7 +191,7 @@ public class GameProvider extends ContentProvider {
                 // so we know which row to update. Selection will be "_id=?" and selection
                 // arguments will be a String array containing the actual ID.
                 selection = GameEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 return updateGame(uri, contentValues, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
@@ -258,7 +266,7 @@ public class GameProvider extends ContentProvider {
             case GAME_ID:
                 // Delete a single row given by the ID in the URI
                 selection = GameEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 rowsDeleted = database.delete(GameEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:

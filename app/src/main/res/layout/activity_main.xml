@@ -3,8 +3,7 @@
     android:id="@+id/android_gridview_example"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
     <GridView
         android:id="@+id/grid_view_image_text"
         android:layout_width="match_parent"

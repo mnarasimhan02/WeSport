@@ -18,7 +18,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -28,9 +27,9 @@ import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
 public class SigninActivity extends AppCompatActivity {
 
-    private static final String TAG = "SigninActivity";
     public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN = 1;
+    private static final String TAG = "SigninActivity";
     private static final int RC_PHOTO_PICKER = 2;
 
     //private MessageAdapter mMessageAdapter;
@@ -40,7 +39,6 @@ public class SigninActivity extends AppCompatActivity {
 
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
-    private ChildEventListener mChildEventListener;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseStorage mFirebaseStorage;
@@ -84,7 +82,7 @@ public class SigninActivity extends AppCompatActivity {
         t.start();
         setContentView(R.layout.activity_main);
         mUsername = ANONYMOUS;
-        mFirebaseDatabase=FirebaseDatabase.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
         // Initialize Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -129,12 +127,12 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private void storeUsername(String displayName) {
-            SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            SharedPreferences.Editor editor = prefUser.edit();
-            editor.putString("displayName", displayName);
-            editor.apply();
-            Log.i(TAG, displayName);
-        }
+        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = prefUser.edit();
+        editor.putString("displayName", displayName);
+        editor.apply();
+        Log.i(TAG, displayName);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -151,8 +149,7 @@ public class SigninActivity extends AppCompatActivity {
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
                 finish();
             }
-        }
-        else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+        } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
             Uri selectedImageUri = data.getData();
             // Get a reference to store file at chat_photos/<FILENAME>
             StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
@@ -171,6 +168,7 @@ public class SigninActivity extends AppCompatActivity {
                     });
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -183,7 +181,7 @@ public class SigninActivity extends AppCompatActivity {
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-      //  mMessageAdapter.clear();
+        //  mMessageAdapter.clear();
         // detachDatabaseReadListener();
     }
 
