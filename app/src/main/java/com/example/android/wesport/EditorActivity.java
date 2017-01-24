@@ -35,7 +35,11 @@ import android.widget.Toast;
 
 import com.example.android.wesport.data.GameContract.GameEntry;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import static com.example.android.wesport.R.id.start_time;
 
 
 /**
@@ -153,7 +157,7 @@ public class EditorActivity extends AppCompatActivity implements
         mnotesEditText = (EditText) findViewById(R.id.edit_game_notes);
         mSkillSpinner = (Spinner) findViewById(R.id.spinner_game);
         mstartDate = (EditText) findViewById(R.id.startdate);
-        mstartTime = (EditText) findViewById(R.id.start_time);
+        mstartTime = (EditText) findViewById(start_time);
         mendTime = (EditText) findViewById(R.id.end_time);
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
@@ -182,11 +186,12 @@ public class EditorActivity extends AppCompatActivity implements
             }
         };
 
-        new DatePickerDialog(EditorActivity.this, mDateListener,
+        DatePickerDialog startDate = new DatePickerDialog(EditorActivity.this, mDateListener,
                 mDateAndTime.get(Calendar.YEAR),
                 mDateAndTime.get(Calendar.MONTH),
-                mDateAndTime.get(Calendar.DAY_OF_MONTH)).show();
-        DatePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                mDateAndTime.get(Calendar.DAY_OF_MONTH));
+        startDate.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        startDate.show();
     }
 
     public void stTimePicker(View v) {
@@ -217,18 +222,42 @@ public class EditorActivity extends AppCompatActivity implements
         new TimePickerDialog(EditorActivity.this, mTimeListener,
                 mDateAndTime.get(Calendar.HOUR_OF_DAY),
                 mDateAndTime.get(Calendar.MINUTE), false).show();
-    }
-
-    private void updateTimeDisplay(TextView mtextview) {
-        mtextview.setText(DateUtils.formatDateTime(this,
-                mDateAndTime.getTimeInMillis(),
-                DateUtils.FORMAT_SHOW_TIME));
 
     }
 
-    private void updateDateDisplay(TextView mtextview) {
-        mtextview.setText(DateUtils.formatDateTime(this,
-                mDateAndTime.getTimeInMillis(), 0));
+    public void updateTimeDisplay(TextView mtextview) {
+        mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
+
+        if (!TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString()) && !mendTime.getText().toString().isEmpty() )
+
+        {
+            Toast.makeText(this, getString(R.string.date_compare_string), Toast.LENGTH_SHORT).show();
+            mendTime.setText("");
+        }
+
+    }
+
+    public void updateDateDisplay(TextView mtextview) {
+        mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), 0));
+    }
+
+    public boolean TimeValidator(String time1, String time2) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        boolean b = false;
+        try {
+            java.util.Date startTime = sdf.parse(time1);
+            java.util.Date endTime = sdf.parse(time2);
+
+            // Function to check whether a time is after an another time
+            b = endTime.after(startTime);
+            Log.d("boolean", String.valueOf(b));
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return b;
     }
 
     /**
@@ -289,10 +318,12 @@ public class EditorActivity extends AppCompatActivity implements
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
         if (mCurrentGameUri == null &&
-                TextUtils.isEmpty(nameString) &&
-                TextUtils.isEmpty(notesString) && mSkill == GameEntry.SKILL_ROOKIES) {
+                (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(sdString))&&
+                 mSkill == GameEntry.SKILL_ROOKIES) {
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.
+            Toast.makeText(this, getString(R.string.editor_insert_game_params),
+                    Toast.LENGTH_SHORT).show();
             return;
         }
 

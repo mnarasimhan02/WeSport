@@ -251,7 +251,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, selectedGame + " game at  " + address + " saved ", Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
