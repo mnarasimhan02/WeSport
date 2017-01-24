@@ -116,6 +116,7 @@ public class CatalogActivity extends AppCompatActivity implements
         // Define a projection that specifies the columns from the table we care about.
         String[] projection = {
                 GameEntry._ID,
+                GameEntry.COLUMN_GAME_NAME,
                 GameEntry.COLUMN_USER_NAME,
                 GameEntry.COLUMN_GAME_DESC,
                 GameEntry.COLUMN_START_DATE,

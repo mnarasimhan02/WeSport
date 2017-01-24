@@ -60,9 +60,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MarkerOptions userMarker;
     private String address = "";
 
-    //Key values for storing activity state
-    private static final String KEY_CAMERA_POSITION = "camera_position";
-    private static final String KEY_LOCATION = "location";
+    private String selectedGame;
 
 
     /*Autocomplete Widget*/
@@ -107,7 +105,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         autocompleteFragment.setHint("Find play places");
 
         // Register a listener to receive callbacks when a place has been selected or an error has
-        // occurred.
+        // occurred and set Filter to retreive only places with precise address
         autocompleteFragment.setOnPlaceSelectedListener(this);
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
@@ -166,6 +164,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat,mLon));
     }
 
@@ -287,7 +287,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Toast.makeText(this, "Game at  " + address + " saved ", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -323,7 +323,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Toast.makeText(this, "Game at  " + address + " saved ", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }

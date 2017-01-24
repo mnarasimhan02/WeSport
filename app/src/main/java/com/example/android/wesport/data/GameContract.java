@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 /**
  * API Contract for the Games app.
@@ -89,6 +88,13 @@ public final class GameContract{
         public final static String _ID = BaseColumns._ID;
 
         /**
+         * Game Nam
+         *
+         * Type: TEXT
+         */
+        public final static String COLUMN_GAME_NAME ="gamename";
+
+        /**
          * Game Description
          *
          * Type: TEXT
@@ -154,9 +160,7 @@ public final class GameContract{
         public static String getUserName(Context context) {
             //Get Username from sharedpreferences
             SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(context);
-            Log.d("USERNAME IN CONTract",prefUser.getString("displayName",""));
-            return prefUser.getString("displayName","");
-
+            return prefUser.getString("displayName","user");
         }
 
     }

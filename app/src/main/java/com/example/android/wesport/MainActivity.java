@@ -1,7 +1,5 @@
 package com.example.android.wesport;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -36,14 +33,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LocationRequest mLocationRequest;
     private final int PERMISSION_LOCATION=1;
     private Menu mMenu;
-    public  Context contextOfApplication;
     private Location mLastLocation;
     private GridView androidGridView;
     private View mLayout;
-
+    private String chosenGame;
 
     String lat, lon;
-
     String[] gridViewString;
 
     @Override
@@ -69,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
                 Toast.makeText(MainActivity.this, "Chosen Game: " + gridViewString[+i], Toast.LENGTH_LONG).show();
+                chosenGame = gridViewString[+i];
+                SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor editor = chGame.edit();
+                editor.putString("chosenGame",chosenGame).apply();
                // invalidateOptionsMenu();
                 mMenu.getItem(0).setVisible(true);
             }
@@ -109,15 +108,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(MainActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -232,10 +222,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     void storeprefs(String lat, String lon) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("latitude", lat);
-        editor.putString("longtitude", lon);
-        editor.apply();
-        String mLat = prefs.getString("latitude","");
-        String mLon = prefs.getString("longtitude","");
+        editor.putString("latitude", lat).apply();
+        editor.putString("longtitude", lon).apply();
     }
 }

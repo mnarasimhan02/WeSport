@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.android.wesport.data.GameContract.GameEntry;
 
+
 /**
  * {@link GameCursorAdapter} is an adapter for a list view
  * that uses a {@link Cursor} of Game data as its data source. This adapter knows
@@ -49,7 +50,8 @@ public class GameCursorAdapter extends CursorAdapter {
         ImageView chatview =(ImageView) view.findViewById(R.id.chatimage);
 
         // Find the columns of game attributes that we're interested in
-        int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
+        int descColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
+        int gamenameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NAME);
         int startDateIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_DATE);
         int startTimeIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_TIME);
         int notesIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NOTES);
@@ -57,14 +59,15 @@ public class GameCursorAdapter extends CursorAdapter {
 
 
         // Read the game attributes from the Cursor for the current game
-        String gameName = cursor.getString(nameColumnIndex);
+        String gameDesc = cursor.getString(descColumnIndex);
+        String selectedGame = cursor.getString(gamenameColumnIndex);
         String stDate = cursor.getString(startDateIndex);
         String stTime = cursor.getString(startTimeIndex);
         String gameaddress = cursor.getString(locColumnIndex);
         String notes = cursor.getString(notesIndex);
 
         // Update the TextViews with the attributes for the current Game
-        nameTextView.setText(gameName);
+        nameTextView.setText(selectedGame+"\n"+ gameDesc);
         startdate.setText(stDate+ " "+ stTime+ " "+  "at "+gameaddress);
         summaryTextView.setText(notes);
 

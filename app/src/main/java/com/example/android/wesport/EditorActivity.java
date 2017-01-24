@@ -77,12 +77,13 @@ public class EditorActivity extends AppCompatActivity implements
     /** Boolean flag that keeps track of whether the game has been edited (true) or not (false) */
     private boolean mGameHasChanged = false;
 
-    /* Arraylist to retreive location*/
+    /* String to retreive address, chosengame and username*/
 
-    String gameaddress="";
-    String mUserName="";
-    private ArrayAdapter<String> arrayAdapter;
+    private String gameaddress="";
 
+    private String selectedGame="";
+
+    private String mUserName="";
 
     public EditorActivity()
     {
@@ -111,22 +112,22 @@ public class EditorActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+        //Get Location and Selected Game from sharedpreferences
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         gameaddress = prefs.getString("games","Your Location");
-        Log.d("Editor activity", gameaddress);
+        selectedGame = chGame.getString("chosenGame","Other");
 
         //Get Username from sharedpreferences
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-         mUserName = prefUser.getString("displayName","");
+        mUserName = prefUser.getString("displayName","");
         Log.d("Editor activity", mUserName);
-
 
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new Game or editing an existing one.
         Intent intent = getIntent();
         mCurrentGameUri = intent.getData();
-        Log.d("mCurrentGameUri", String.valueOf(mCurrentGameUri));
-
         // If the intent DOES NOT contain a Game content URI, then we know that we are
         // creating a new game.
         if (mCurrentGameUri == null) {
@@ -294,7 +295,8 @@ public class EditorActivity extends AppCompatActivity implements
         // Create a ContentValues object where column names are the keys,
         // and game attributes from the editor are the values.
         ContentValues values = new ContentValues();
-        values.put(GameEntry.COLUMN_USER_NAME, "Its me");
+        values.put(GameEntry.COLUMN_USER_NAME, mUserName);
+        values.put(GameEntry.COLUMN_GAME_NAME, selectedGame);
         values.put(GameEntry.COLUMN_GAME_DESC, nameString);
         values.put(GameEntry.COLUMN_START_DATE, String.valueOf(sdString));
         values.put(GameEntry.COLUMN_START_TIME, String.valueOf(sttring));
@@ -444,6 +446,7 @@ public class EditorActivity extends AppCompatActivity implements
         String[] projection = {
                 GameEntry._ID,
                 GameEntry.COLUMN_USER_NAME,
+                GameEntry.COLUMN_GAME_NAME,
                 GameEntry.COLUMN_GAME_DESC,
                 GameEntry.COLUMN_START_DATE,
                 GameEntry.COLUMN_START_TIME,
@@ -488,7 +491,8 @@ public class EditorActivity extends AppCompatActivity implements
         if (cursor.moveToFirst()) {
             // Find the columns of game attributes that we're interested in
             int usernameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_USER_NAME);
-            int nameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
+            int gamenameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NAME);
+            int descColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
             int startDateColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_DATE);
             int startTimeColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_TIME);
             int endTimeColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_END_TIME);
@@ -499,7 +503,8 @@ public class EditorActivity extends AppCompatActivity implements
 
             // Extract out the value from the Cursor for the given column index
             String username = cursor.getString(usernameColumnIndex);
-            String name = cursor.getString(nameColumnIndex);
+            String gamename = cursor.getString(gamenameColumnIndex);
+            String desc = cursor.getString(descColumnIndex);
             String stdate = cursor.getString(startDateColumnIndex);
             String sttime = cursor.getString(startTimeColumnIndex);
             String ettime = cursor.getString(endTimeColumnIndex);
@@ -510,7 +515,7 @@ public class EditorActivity extends AppCompatActivity implements
             Log.d("Editor activity", location);
             // Update the views on the screen with the values from the database
 
-            mNameEditText.setText(name);
+            mNameEditText.setText(desc);
             mnotesEditText.setText(notes);
             mstartDate.setText(stdate);
             mstartTime.setText(sttime);
