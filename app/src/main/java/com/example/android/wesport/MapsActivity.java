@@ -267,15 +267,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Toast.LENGTH_SHORT).show();
     }
 
-    // A callback method, which is invoked on configuration is changed
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (map != null) {
-            outState.putParcelableArrayList("points", pointList);
-            outState.putStringArrayList("title", markerTitle);
-            super.onSaveInstanceState(outState);
-        }
-    }
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
 

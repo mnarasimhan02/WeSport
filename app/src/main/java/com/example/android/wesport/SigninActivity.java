@@ -35,7 +35,7 @@ public class SigninActivity extends AppCompatActivity {
     //private MessageAdapter mMessageAdapter;
     private ProgressBar mProgressBar;
 
-    private String mUsername;
+    private String mUsername, loginUser;
 
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
@@ -105,8 +105,13 @@ public class SigninActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    onSignedInInitialize(user.getDisplayName());
-                    storeUsername(user.getDisplayName());
+                    if (user.getDisplayName()!= null){
+                        loginUser = onSignedInInitialize(user.getDisplayName());
+                    } else{
+                        loginUser = onSignedInInitialize("Email user");
+                    }
+                    storeUsername(loginUser);
+                    Log.d("displayname", loginUser);
                     //storing username is sharedpref to pass to chatActivity
                 } else {
                     // User is signed out
@@ -203,13 +208,18 @@ public class SigninActivity extends AppCompatActivity {
         }
     }
 
-    private void onSignedInInitialize(String username) {
-        mUsername = username;
-        // attachDatabaseReadListener();
+    private String onSignedInInitialize(String username) {
+        if (username != null) {
+            mUsername = username;
+            // attachDatabaseReadListener();
+        } else {
+            mUsername = "Email Sign";
+        }
+        return username;
     }
 
     private void onSignedOutCleanup() {
-        mUsername = ANONYMOUS;
+        //mUsername = ANONYMOUS;
         //mMessageAdapter.clear();
         //detachDatabaseReadListener();
     }
