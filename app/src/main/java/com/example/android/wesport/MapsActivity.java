@@ -46,11 +46,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+@SuppressWarnings("ALL")
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
@@ -67,8 +67,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView mPlaceDetailsText;
     private TextView mPlaceAttribution;
     private double lat, lon;
-    private ArrayList<LatLng> pointList = new ArrayList<LatLng>();
-    private ArrayList<String> markerTitle = new ArrayList<String>();
+
 
     public MapsActivity() {
         // Required empty public constructor
@@ -183,13 +182,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 this.map.addMarker(new MarkerOptions()
                         .title(parkName)
                         .position(new LatLng(lat, lon))
-
                 );
             }
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
             // Adding the currently created marker and title position to  arraylist
-            pointList.add(new LatLng(lat, lon));
-            markerTitle.add(parkName);
+
         }
     }
 

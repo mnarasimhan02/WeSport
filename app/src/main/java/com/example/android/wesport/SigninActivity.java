@@ -25,6 +25,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
+@SuppressWarnings("ALL")
 public class SigninActivity extends AppCompatActivity {
 
     public static final String ANONYMOUS = "anonymous";
@@ -104,7 +105,10 @@ public class SigninActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
                     // User is signed in
+                    //Launch an intent to create mainactivity
                     if (user.getDisplayName()!= null){
                         loginUser = onSignedInInitialize(user.getDisplayName());
                     } else{

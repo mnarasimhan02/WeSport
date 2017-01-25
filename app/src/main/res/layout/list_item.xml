@@ -55,5 +55,6 @@
         android:src="@drawable/ic_chat"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:adjustViewBounds="false"/>
+        android:adjustViewBounds="false"
+        android:contentDescription="@string/accessibility_chatbox"/>
     </RelativeLayout>

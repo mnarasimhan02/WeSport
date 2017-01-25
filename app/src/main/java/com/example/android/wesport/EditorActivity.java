@@ -1,4 +1,3 @@
-
 package com.example.android.wesport;
 
 import android.app.AlertDialog;
@@ -243,7 +242,7 @@ public class EditorActivity extends AppCompatActivity implements
 
     public boolean TimeValidator(String time1, String time2) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
         boolean b = false;
         try {
             java.util.Date startTime = sdf.parse(time1);
@@ -319,7 +318,7 @@ public class EditorActivity extends AppCompatActivity implements
         // and check if all the fields in the editor are blank
         if (mCurrentGameUri == null &&
                 (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(sdString))&&
-                 mSkill == GameEntry.SKILL_ROOKIES) {
+                mSkill == GameEntry.SKILL_ROOKIES) {
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             Toast.makeText(this, getString(R.string.editor_insert_game_params),

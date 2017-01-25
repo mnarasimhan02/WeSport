@@ -1,9 +1,6 @@
 package com.example.android.wesport;
 
-/**
- * Created by MaheshN on 12/8/16.
- */
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +36,7 @@ public class CustomGridViewActivity extends BaseAdapter {
         return 0;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View getView(int i, View convertView, ViewGroup parent) {
         View gridViewAndroid;

@@ -20,6 +20,7 @@ import com.example.android.wesport.data.GameContract.GameEntry;
  * that uses a {@link Cursor} of Game data as its data source. This adapter knows
  * how to create list items for each row of game data in the {@link Cursor}.
  */
+@SuppressWarnings("ALL")
 public class GameCursorAdapter extends CursorAdapter {
 
     public GameCursorAdapter(Context context, Cursor c) {

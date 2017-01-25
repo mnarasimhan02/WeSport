@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 
+@SuppressWarnings("ALL")
 public class IntroActivity extends AppIntro {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

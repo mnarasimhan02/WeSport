@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">WeSport</string>
     <string name="app_intro">Introduction</string>
 
@@ -15,6 +15,7 @@
     <!-- Menu items-->
     <string name="action_settings">Settings</string>
     <string name="next_menu">Next</string>
+
 
     <!-- Intro slides headings-->
 
@@ -62,7 +63,7 @@
     <string name="action_delete_all_entries">Delete All Games</string>
 
     <!-- Title text for the empty view, which describes the empty Game image [CHAR LIMIT=50] -->
-    <string name="empty_view_title_text">Let\'s play together...</string>
+    <string name="empty_view_title_text" tools:ignore="TypographyEllipsis">Let\'s play together...</string>
 
     <!-- Subtitle text for the empty view that prompts the user to add a Game [CHAR LIMIT=50] -->
     <string name="empty_view_subtitle_text">Get started by adding a new Game</string>
@@ -155,6 +156,15 @@
     <string name="signin_string">Signed in! </string>
     <string name="signin_cancel">Sign in canceled</string>
     <string name="editor_insert_game_params">Game description and Start date both are required</string>
+
+    <!-- accessibility strings-->
+
+    <string name="accessibility_image">upload image</string>
+    <string name="accessibility_grid">select games from grid</string>
+    <string name="accessibility_widget">widget image</string>
+    <string name="accessibility_emptygame">empty game</string>
+    <string name="accessibility_photopicker">photo picker image</string>
+    <string name="accessibility_chatbox">image for chatroom</string>
 
 
 </resources>

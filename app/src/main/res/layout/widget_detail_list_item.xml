@@ -12,16 +12,18 @@
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
         android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        tools:ignore="PrivateResource">
 
         <ImageView
             android:id="@+id/widget_icon"
             android:layout_gravity="center"
             android:layout_width="@dimen/list_icon"
             android:layout_height="@dimen/list_icon"
-            android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"
             android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"
-            tools:src="@drawable/basketball"/>
+            tools:src="@drawable/basketball"
+            android:contentDescription="@string/accessibility_widget"
+            tools:ignore="PrivateResource"/>
 
         <LinearLayout
             android:layout_height="wrap_content"
@@ -35,7 +37,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 android:textColor="@color/primary_text"
-                android:text="Today, May 21"/>
+                android:text="Today, May 21"
+                tools:ignore="HardcodedText"/>
 
             <TextView
                 android:id="@+id/widget_description"
@@ -51,24 +54,25 @@
             android:layout_width="@dimen/forecast_widget_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="right"
-            android:layout_marginRight="@dimen/forecast_temperature_space"
+            android:gravity="end"
             android:layout_marginEnd="@dimen/forecast_temperature_space"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/forecast_widget_text_size"
-            tools:text="5:00 AM"/>
+            tools:text="5:00 AM"
+            tools:ignore="SpUsage"/>
 
         <TextView
             android:id="@+id/widget_end_time"
             android:layout_width="@dimen/forecast_widget_text_width"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="right"
+            android:gravity="end"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/game_notes_text"
             android:textSize="@dimen/forecast_widget_text_size"
-            tools:text="7:00 AM"/>
+            tools:text="7:00 AM"
+            tools:ignore="SpUsage"/>
 
     </LinearLayout>
 </FrameLayout>

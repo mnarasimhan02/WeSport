@@ -1,15 +1,15 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_activated="true" android:state_focused="false"
           android:drawable="@color/activated"/>
 
     <item android:state_window_focused="false" android:drawable="@color/white" />
 
     <!-- Even though these two point to the same resource, have two states so the drawable will invalidate itself when coming out of pressed state. -->
-    <item android:state_focused="true"  android:state_enabled="false" android:state_pressed="true" android:drawable="@drawable/abc_list_selector_holo_light" />
-    <item android:state_focused="true"  android:state_enabled="false"                              android:drawable="@drawable/abc_list_selector_holo_light" />
-    <item android:state_focused="true"                                android:state_pressed="true" android:drawable="@drawable/abc_list_selector_holo_light" />
-    <item android:state_focused="false"                               android:state_pressed="true" android:drawable="@drawable/abc_list_selector_holo_light" />
-    <item android:state_focused="true"                                                             android:drawable="@drawable/abc_list_selector_holo_light" />
+    <item android:state_focused="true" android:state_enabled="false" android:state_pressed="true" android:drawable="@drawable/abc_list_selector_holo_light" tools:ignore="PrivateResource"/>
+    <item android:state_focused="true" android:state_enabled="false" android:drawable="@drawable/abc_list_selector_holo_light" tools:ignore="PrivateResource"/>
+    <item android:state_focused="true" android:state_pressed="true" android:drawable="@drawable/abc_list_selector_holo_light" tools:ignore="PrivateResource"/>
+    <item android:state_focused="false" android:state_pressed="true" android:drawable="@drawable/abc_list_selector_holo_light" tools:ignore="PrivateResource"/>
+    <item android:state_focused="true" android:drawable="@drawable/abc_list_selector_holo_light" tools:ignore="PrivateResource"/>
 
     <!-- Default, "just hangin' out" state.  This is part of
          ActionBarCompat -->

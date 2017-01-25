@@ -9,7 +9,8 @@
         android:id="@+id/widget"
         android:layout_width="match_parent"
         android:layout_height="@dimen/abc_action_bar_default_height_material"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorPrimary"
+        tools:ignore="PrivateResource">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
