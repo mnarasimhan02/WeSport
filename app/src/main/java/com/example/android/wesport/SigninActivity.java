@@ -105,17 +105,16 @@ public class SigninActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
+                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //startActivity(intent);
                     // User is signed in
                     //Launch an intent to create mainactivity
                     if (user.getDisplayName()!= null){
                         loginUser = onSignedInInitialize(user.getDisplayName());
                     } else{
-                        loginUser = onSignedInInitialize("Email user");
+                        loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
                     storeUsername(loginUser);
-                    Log.d("displayname", loginUser);
                     //storing username is sharedpref to pass to chatActivity
                 } else {
                     // User is signed out
@@ -149,13 +148,13 @@ public class SigninActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.signin_string), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
-                Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.signin_cancel), Toast.LENGTH_SHORT).show();
                 finish();
             }
         } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {

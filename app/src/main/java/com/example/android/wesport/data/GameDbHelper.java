@@ -24,9 +24,7 @@ import com.example.android.wesport.data.GameContract.GameEntry;
 /**
  * Database helper for Games app. Manages database creation and version management.
  */
-public class GameDbHelper extends SQLiteOpenHelper {
-
-    public static final String LOG_TAG = GameDbHelper.class.getSimpleName();
+class GameDbHelper extends SQLiteOpenHelper {
 
     /**
      * Name of the database file

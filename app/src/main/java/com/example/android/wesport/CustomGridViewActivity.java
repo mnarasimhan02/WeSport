@@ -9,11 +9,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class CustomGridViewActivity extends BaseAdapter {
+class CustomGridViewActivity extends BaseAdapter {
 
     private final String[] gridViewString;
     private final int[] gridViewImageId;
-    private Context mContext;
+    private final Context mContext;
 
     public CustomGridViewActivity(Context context, String[] gridViewString, int[] gridViewImageId) {
         mContext = context;

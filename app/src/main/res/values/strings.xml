@@ -13,7 +13,6 @@
 
 
     <!-- Menu items-->
-    <string name="action_settings">Settings</string>
     <string name="next_menu">Next</string>
 
 
@@ -40,7 +39,7 @@
 
     <!-- Label for Google API Web-services-->
     <string name="place_api_key">AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g</string>
-    <string name="radius_param">5000</string>
+    <string name="radius_param">3000</string>
     <string name="type_param">park</string>
     <!-- Games array-->
 
@@ -57,7 +56,6 @@
 
 
     <!-- Label for overflow menu option that inserts fake Game data into the app [CHAR LIMIT=20] -->
-    <string name="action_insert_dummy_data">Insert Dummy Data</string>
 
     <!-- Label for overflow menu option that deletes all Game data in the app [CHAR LIMIT=20] -->
     <string name="action_delete_all_entries">Delete All Games</string>
@@ -146,8 +144,6 @@
 
     <string name="empty_game_list">No Game Information Available</string>
 
-    <string name="search_hint">Search places to play</string>
-
     <string name="date_compare_string">End time should be after Start Time</string>
 
 
@@ -155,6 +151,8 @@
 
     <string name="signin_string">Signed in! </string>
     <string name="signin_cancel">Sign in canceled</string>
+    <string name="email_user">Email user</string>
+
     <string name="editor_insert_game_params">Game description and Start date both are required</string>
 
     <!-- accessibility strings-->

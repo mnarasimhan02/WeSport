@@ -33,7 +33,7 @@ public class CatalogActivity extends AppCompatActivity implements
     /**
      * Adapter for the ListView
      */
-    GameCursorAdapter mCursorAdapter;
+    private GameCursorAdapter mCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

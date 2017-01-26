@@ -125,7 +125,6 @@
 
     <!-- Skill-->
     <LinearLayout
-        android:id="@+id/container_skilllevel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -156,7 +155,6 @@
     <!-- Notes category -->
 
     <LinearLayout
-        android:id="@+id/container_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">

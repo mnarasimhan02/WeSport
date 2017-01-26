@@ -44,6 +44,7 @@ import static com.example.android.wesport.R.id.start_time;
 /**
  * Allows user to create a new game or edit an existing one.
  */
+@SuppressWarnings("UnusedParameters")
 public class EditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -51,10 +52,10 @@ public class EditorActivity extends AppCompatActivity implements
      * Identifier for the game data loader
      */
     private static final int EXISTING_GAME_LOADER = 0;
-    public EditText mstartDate;
-    public EditText mstartTime;
-    public EditText mendTime;
-    Calendar mDateAndTime = Calendar.getInstance();
+    private EditText mstartDate;
+    private EditText mstartTime;
+    private EditText mendTime;
+    private final Calendar mDateAndTime = Calendar.getInstance();
     /**
      * Content URI for the existing game (null if it's a new game)
      */
@@ -71,9 +72,6 @@ public class EditorActivity extends AppCompatActivity implements
      * EditText field to enter the game skill
      */
     private Spinner mSkillSpinner;
-
-    // declare  the variables to Show/Set the date and time when Time and  Date Picker Dialog first appears
-    private int mYear, mMonth, mDay, mHour, mMinute;
 
     /**
      * Skill for the Game. The possible valid values are in the GameContract.java file:
@@ -96,7 +94,7 @@ public class EditorActivity extends AppCompatActivity implements
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mGameHasChanged boolean to true.
      */
-    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             mGameHasChanged = true;
@@ -104,14 +102,15 @@ public class EditorActivity extends AppCompatActivity implements
         }
     };
 
+    @SuppressWarnings("UnusedAssignment")
     public EditorActivity() {
         // Assign current Date and Time Values to Variables
         final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-        mHour = c.get(Calendar.HOUR_OF_DAY);
-        mMinute = c.get(Calendar.MINUTE);
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+        int mHour = c.get(Calendar.HOUR_OF_DAY);
+        int mMinute = c.get(Calendar.MINUTE);
     }
 
     @Override
@@ -224,7 +223,7 @@ public class EditorActivity extends AppCompatActivity implements
 
     }
 
-    public void updateTimeDisplay(TextView mtextview) {
+    private void updateTimeDisplay(TextView mtextview) {
         mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
 
         if (!TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString()) && !mendTime.getText().toString().isEmpty() )
@@ -236,11 +235,11 @@ public class EditorActivity extends AppCompatActivity implements
 
     }
 
-    public void updateDateDisplay(TextView mtextview) {
+    private void updateDateDisplay(TextView mtextview) {
         mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), 0));
     }
 
-    public boolean TimeValidator(String time1, String time2) {
+    private boolean TimeValidator(String time1, String time2) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", java.util.Locale.getDefault());
         boolean b = false;
@@ -304,7 +303,7 @@ public class EditorActivity extends AppCompatActivity implements
      */
     private void saveGames() {
 
-        String[] selectionArgs = null;
+        String[] selectionArgs;
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
@@ -513,6 +512,7 @@ public class EditorActivity extends AppCompatActivity implements
                 null);                  // Default sort order
     }
 
+    @SuppressWarnings("UnusedAssignment")
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // Bail early if the cursor is null or there is less than 1 row in the cursor

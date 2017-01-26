@@ -2,6 +2,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'wesport_keystore'
+            keyPassword 'Hotmail123'
+            storeFile file('/Users/MaheshN/AndroidStudioProjects/WeSport/keystore.jks')
+            storePassword 'Hotmail123'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
@@ -16,16 +24,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:cardview-v7:25.1.0'
     compile 'com.android.support:gridlayout-v7:25.1.0'
@@ -46,9 +54,7 @@ dependencies {
     compile 'com.firebaseui:firebase-ui-auth:1.0.1'
     //App intro library
     compile 'com.github.paolorotolo:appintro:4.1.0'
-
-//Display Images
+    //Display Images
     compile 'com.github.bumptech.glide:glide:3.6.1'
-
 }
 apply plugin: 'com.google.gms.google-services'

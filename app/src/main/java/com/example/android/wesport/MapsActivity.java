@@ -108,10 +108,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void setUserMarker(LatLng latLng) {
         if (userMarker == null) {
             userMarker = new MarkerOptions().position(latLng).title("My Location");
-            userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+            userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             map.addMarker(userMarker);
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.5f));
 
     }
 
@@ -184,11 +184,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .position(new LatLng(lat, lon))
                 );
             }
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
-            // Adding the currently created marker and title position to  arraylist
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.5f));
+            //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
 
         }
     }
+
 
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
@@ -212,7 +213,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Toast.makeText(this, selectedGame + " Game at  " + address + " saved ", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, selectedGame + " game at  " + address + " saved ", Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }

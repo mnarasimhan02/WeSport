@@ -47,29 +47,24 @@ import java.util.Map;
 import static com.example.android.wesport.SigninActivity.RC_SIGN_IN;
 
 public class ChatActivity extends AppCompatActivity {
-    public static final String ANONYMOUS = "anonymous";
-    public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
-    public static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
+    private static final String ANONYMOUS = "anonymous";
+    private static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
+    private static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
     private static final String TAG = "SigninActivity";
     private static final int RC_PHOTO_PICKER = 2;
 
-    private ListView mMessageListView;
     private MessageAdapter mMessageAdapter;
-    private ImageButton mPhotoPickerButton;
     private EditText mMessageEditText;
     private Button mSendButton;
 
     private String mUsername;
 
-    // Firebase instance variables
-    private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private StorageReference mChatPhotosStorageReference;
     private FirebaseRemoteConfig mFirebaseRemoteConfig;
-    private FirebaseStorage mFirebaseStorage;
 
 
     @Override
@@ -78,16 +73,16 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
         // Initialize Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseStorage = FirebaseStorage.getInstance();
+        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
 
         // Initialize references to views
-        mMessageListView = (ListView) findViewById(R.id.messageListView);
-        mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
+        ListView mMessageListView = (ListView) findViewById(R.id.messageListView);
+        ImageButton mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
         mSendButton = (Button) findViewById(R.id.sendButton);
 
@@ -179,7 +174,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
     // Fetch the config to determine the allowed length of messages.
-    public void fetchConfig() {
+    private void fetchConfig() {
         long cacheExpiration = 3600; // 1 hour in seconds
         // If developer mode is enabled reduce cacheExpiration to 0 so that each fetch goes to the
         // server. This should not be used in release builds.
@@ -320,6 +315,7 @@ public class ChatActivity extends AppCompatActivity {
                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
 
                             // Set the download URL to the message box, so that the user can send it to the database
+                            assert downloadUrl != null;
                             FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
                             mMessagesDatabaseReference.push().setValue(friendlyMessage);
                         }

@@ -21,7 +21,7 @@ import com.example.android.wesport.data.GameContract.GameEntry;
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DetailWidgetRemoteViewsService extends RemoteViewsService {
     // these indices must match the projection
-    static final int INDEX_GAME_ID = 0;
+    private static final int INDEX_GAME_ID = 0;
     private static final String[] GAME_COLUMNS = {
             GameEntry.TABLE_NAME + "." + GameEntry._ID,
             GameEntry.COLUMN_GAME_DESC,
@@ -32,12 +32,11 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             GameEntry.COLUMN_GAME_ADDRESS,
             GameEntry.COLUMN_USER_NAME
     };
-    public final String LOG_TAG = DetailWidgetRemoteViewsService.class.getSimpleName();
-    Uri gameDataForUri = GameEntry.CONTENT_URI;
-    String selection = GameEntry.COLUMN_USER_NAME + "=?";
+    private final Uri gameDataForUri = GameEntry.CONTENT_URI;
 
-    String[] selectionArgs = null;
-    String username = "";
+    @SuppressWarnings("unused")
+    private String[] selectionArgs = null;
+    private String username = "";
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
@@ -84,6 +83,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 return data == null ? 0 : data.getCount();
             }
 
+            @SuppressWarnings("UnusedAssignment")
             @Override
             public RemoteViews getViewAt(int position) {
                 if (position == AdapterView.INVALID_POSITION ||
@@ -109,7 +109,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 Log.d("Remote Views Service", String.valueOf(gameName));
 
                 String gameaddress = data.getString(locColumnIndex);
-//                String notes = data.getString(notesIndex);
+//              String notes = data.getString(notesIndex);
                 Log.d("gameName", gameName);
                 Log.d("gameaddress", gameaddress);
 

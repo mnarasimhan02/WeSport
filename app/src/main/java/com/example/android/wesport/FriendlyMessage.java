@@ -1,5 +1,6 @@
 package com.example.android.wesport;
 
+@SuppressWarnings("unused")
 public class FriendlyMessage {
 
     private String text;

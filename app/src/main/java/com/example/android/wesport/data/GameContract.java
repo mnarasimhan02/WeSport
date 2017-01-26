@@ -38,7 +38,7 @@ public final class GameContract {
      * Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
      * the content provider.
      */
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     /**
      * Possible path (appended to base content URI for possible URI's)
      * For instance, content://com.example.android.games/games/ is a valid path for
@@ -153,10 +153,7 @@ public final class GameContract {
          * Returns whether or not the given skill is valid
          */
         public static boolean isValidskill(int skill) {
-            if (skill == SKILL_ROOKIES || skill == SKILL_VET || skill == SKILL_PRO) {
-                return true;
-            }
-            return false;
+            return skill == SKILL_ROOKIES || skill == SKILL_VET || skill == SKILL_PRO;
         }
 
         public static String getUserName(Context context) {

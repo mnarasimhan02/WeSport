@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">#388E3C</color>
     <color name="colorPrimaryLight">#C8E6C9</color>
     <color name="colorAccent">#795548</color>
-    <color name="colorTitle">#212121</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
     
@@ -21,13 +20,9 @@
     <color name="material_lime_a700">#AEEA00</color>
     <color name="material_purple_a700">#AA00FF</color>
 
-    <color name="card">#fff</color>
     <!-- Primary widget colors -->
 
     <color name="white">#FFFFFF</color>
-    <color name="grey">#cccccc</color>
-    <color name="grey_700">#646464</color>
-    <color name="black">#000000</color>
 
     <!-- the activated state color -->
     <color name="activated">#E0E0E0</color>

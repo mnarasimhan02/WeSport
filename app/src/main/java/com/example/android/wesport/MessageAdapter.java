@@ -2,6 +2,7 @@ package com.example.android.wesport;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -12,13 +13,15 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class MessageAdapter extends ArrayAdapter<FriendlyMessage> {
+@SuppressWarnings("SameParameterValue")
+class MessageAdapter extends ArrayAdapter<FriendlyMessage> {
     public MessageAdapter(Context context, int resource, List<FriendlyMessage> objects) {
         super(context, resource, objects);
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         if (convertView == null) {
             convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.item_message, parent, false);
         }
@@ -29,6 +32,7 @@ public class MessageAdapter extends ArrayAdapter<FriendlyMessage> {
 
         FriendlyMessage message = getItem(position);
 
+        assert message != null;
         boolean isPhoto = message.getPhotoUrl() != null;
         if (isPhoto) {
             messageTextView.setVisibility(View.GONE);
