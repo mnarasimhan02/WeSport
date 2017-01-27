@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        config {
+        release {
             keyAlias 'wesport_keystore'
             keyPassword 'Hotmail123'
             storeFile file('/Users/MaheshN/AndroidStudioProjects/WeSport/keystore.jks')
@@ -24,7 +24,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            signingConfig signingConfigs.release
         }
     }
 }

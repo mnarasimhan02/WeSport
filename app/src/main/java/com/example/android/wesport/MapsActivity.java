@@ -164,7 +164,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // De-serialize the JSON string into an array of park objects
         JSONObject jsonObject = new JSONObject(json);
         String parkInfo = jsonObject.getString("results");
-        Log.d("parkname", parkInfo);
         String latitude = "";
         String longitude = "";
         JSONArray jsonArray = new JSONArray(parkInfo);

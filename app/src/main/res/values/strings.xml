@@ -37,10 +37,11 @@
     <string name="permissions_not_granted">Permissions were not granted.</string>
     <string name="close_app">Location permissions required to run app. App will now close</string>
 
-    <!-- Label for Google API Web-services-->
+    <!-- Label for Google API Web-services and Google Maps key-->
     <string name="place_api_key">AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g</string>
     <string name="radius_param">3000</string>
     <string name="type_param">park</string>
+    <string name="google_maps_key">AIzaSyCM2iCenU1E93ewX9N7MhwQrxFd2xYbxzE</string>
     <!-- Games array-->
 
     <string-array name="games_array">
