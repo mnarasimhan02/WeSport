@@ -41,7 +41,7 @@
     <string name="place_api_key">AIzaSyCgAtXv1F6IYFp-b64WjX7acDMKCeW5_3g</string>
     <string name="radius_param">3000</string>
     <string name="type_param">park</string>
-    <string name="google_maps_key">AIzaSyCM2iCenU1E93ewX9N7MhwQrxFd2xYbxzE</string>
+    <string name="google_maps_key">AIzaSyDA46yF5M0ckiGe19gFjXlbCUiUK7u6g38</string>
     <!-- Games array-->
 
     <string-array name="games_array">

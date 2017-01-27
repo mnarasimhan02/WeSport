@@ -13,27 +13,10 @@
           "package_name": "com.example.android.wesport"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "152784246045-30tca6gt1u38uv3potqrj7jqotq1ucjo.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.android.wesport",
-            "certificate_hash": "0ED09802BE73F247B54C4F0708E61660C8CDB8D0"
-          }
-        },
-        {
-          "client_id": "152784246045-fmrrm67ka4tqkdq241huskf3v2binmbg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.android.wesport",
-            "certificate_hash": "0A2B3E602EF680FB540AB8CC0E208CA486CD2110"
-          }
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCM2iCenU1E93ewX9N7MhwQrxFd2xYbxzE"
+          "current_key": "AIzaSyBHrTvuUcJOTzgi3gAFg9LUl9hCjeO3fFc"
         }
       ],
       "services": {
@@ -41,7 +24,7 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
+          "status": 1,
           "other_platform_oauth_client": []
         },
         "ads_service": {
