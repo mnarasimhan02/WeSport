@@ -1,22 +1,27 @@
 {
   "project_info": {
-    "project_number": "152784246045",
-    "firebase_url": "https://wesport-1481399632187.firebaseio.com",
-    "project_id": "wesport-1481399632187",
-    "storage_bucket": "wesport-1481399632187.appspot.com"
+    "project_number": "1096682850687",
+    "firebase_url": "https://wesport-d7a20.firebaseio.com",
+    "project_id": "wesport-d7a20",
+    "storage_bucket": "wesport-d7a20.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:152784246045:android:a96f9846db2ce8fd",
+        "mobilesdk_app_id": "1:1096682850687:android:a96f9846db2ce8fd",
         "android_client_info": {
           "package_name": "com.example.android.wesport"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1096682850687-u8hltmopqtadgmj7m9nqh7l3sb30cr3j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyBHrTvuUcJOTzgi3gAFg9LUl9hCjeO3fFc"
+          "current_key": "AIzaSyBh7uyEqtMhRyWbYixWEJFiP-VpbR5sElo"
         }
       ],
       "services": {
@@ -24,8 +29,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096682850687-u8hltmopqtadgmj7m9nqh7l3sb30cr3j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
