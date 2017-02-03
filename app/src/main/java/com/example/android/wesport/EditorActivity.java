@@ -127,7 +127,6 @@ public class EditorActivity extends AppCompatActivity implements
         //Get Username from sharedpreferences
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mUserName = prefUser.getString("displayName", "");
-        Log.d("Editor activity", mUserName);
 
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new Game or editing an existing one.
@@ -249,7 +248,6 @@ public class EditorActivity extends AppCompatActivity implements
 
             // Function to check whether a time is after an another time
             b = endTime.after(startTime);
-            Log.d("boolean", String.valueOf(b));
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -364,7 +362,6 @@ public class EditorActivity extends AppCompatActivity implements
             // Use the user name from shared preferences as the (only) selection argument to filter games only for that user.
             selectionArgs = new String[]{mUserName};
             int rowsAffected = getContentResolver().update(mCurrentGameUri, values, GameEntry.COLUMN_USER_NAME, selectionArgs);
-            Log.d("rowsAffected", String.valueOf(rowsAffected));
 
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
@@ -546,7 +543,6 @@ public class EditorActivity extends AppCompatActivity implements
             String notes = cursor.getString(notesColumnIndex);
             String location = cursor.getString(locColumnIndex);
 
-            Log.d("Editor activity", location);
             // Update the views on the screen with the values from the database
 
             mNameEditText.setText(desc);

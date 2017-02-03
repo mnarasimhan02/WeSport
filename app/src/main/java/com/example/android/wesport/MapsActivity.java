@@ -202,7 +202,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         address += listAddresses.get(0).getSubThoroughfare() + " ";
                     }
                     address += listAddresses.get(0).getThoroughfare();
-                    Log.d("address", address);
                 }
             }
         } catch (IOException e) {

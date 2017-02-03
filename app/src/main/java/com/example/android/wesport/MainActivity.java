@@ -30,13 +30,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private final String TAG = "LocationActivity";
     private final int PERMISSION_LOCATION = 1;
-    String lat, lon;
-    String[] gridViewString;
+    private String lat;
+    private String lon;
+    private String[] gridViewString;
     private GoogleApiClient mGoogleApiClient;
-    private LocationRequest mLocationRequest;
     private Menu mMenu;
     private Location mLastLocation;
-    private GridView androidGridView;
     private View mLayout;
     private String chosenGame;
 
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         };
         // contextOfApplication = getApplicationContext();//required to retreive context in another class
         CustomGridViewActivity adapterViewAndroid = new CustomGridViewActivity(MainActivity.this, gridViewString, gridViewImageId);
-        androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
+        GridView androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
         androidGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         //setup GoogleApiclient
         buildGoogleApiClient();
-        Log.d(TAG, "After build api client");
     }
 
     //This method will be called when the user will tap on allow or deny
@@ -109,21 +107,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    protected synchronized void buildGoogleApiClient() {
+    private synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-        Log.d(TAG, "GoogleAPIclient init ..............");
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         // Connect the client.
-        Log.d(TAG, "onStart fired ..............");
         mGoogleApiClient.connect();
 
     }
@@ -132,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     protected void onStop() {
         // Disconnecting the client invalidates it.
         mGoogleApiClient.disconnect();
-        Log.d(TAG, "onStop fired ..............");
         super.onStop();
     }
 
@@ -141,28 +135,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
-            Log.d(TAG, "Requesting Permissions");
         } else {
             startLocationServices();
         }
     }
 
     private void startLocationServices() {
-        Log.d(TAG, "Starting Location Services");
         try {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
-            Log.d(TAG, "" + mLastLocation);
             if (mLastLocation != null) {
                 lat = String.valueOf(mLastLocation.getLatitude());
                 lon = String.valueOf(mLastLocation.getLongitude());
             }
-            mLocationRequest = LocationRequest.create();
+            LocationRequest mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             mLocationRequest.setInterval(100); // Update location every 10 seconds
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
-            Log.d(TAG, exception.toString());
         }
         storeprefs(lat, lon);
     }
@@ -173,10 +163,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.i(TAG, "GoogleApiClient connection has failed");
     }
 
+    @SuppressWarnings("EmptyMethod")
     @Override
     protected void onPause() {
         super.onPause();
@@ -219,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return true;
     }
 
-    void storeprefs(String lat, String lon) {
+    private void storeprefs(String lat, String lon) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("latitude", lat).apply();

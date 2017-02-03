@@ -129,8 +129,6 @@ public class ChatActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, mUserName);
-                Log.d(TAG, mMessageEditText.getText().toString());
                 FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUserName, null);
                 mMessagesDatabaseReference.push().setValue(friendlyMessage);
 
@@ -214,7 +212,6 @@ public class ChatActivity extends AppCompatActivity {
     private void applyRetrievedLengthLimit() {
         Long friendly_msg_length = mFirebaseRemoteConfig.getLong(FRIENDLY_MSG_LENGTH_KEY);
         mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
-        Log.d(TAG, FRIENDLY_MSG_LENGTH_KEY + " = " + friendly_msg_length);
     }
 
     //used for reading data from Firebase
@@ -225,7 +222,6 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-                    Log.d(TAG, String.valueOf(friendlyMessage));
                     mMessageAdapter.add(friendlyMessage);
                 }
 

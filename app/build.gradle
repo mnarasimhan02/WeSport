@@ -1,6 +1,8 @@
 //noinspection GradleCompatible
+//noinspection GradleCompatible
 apply plugin: 'com.android.application'
 
+//noinspection GroovyMissingReturnStatement
 android {
     signingConfigs {
         release {
