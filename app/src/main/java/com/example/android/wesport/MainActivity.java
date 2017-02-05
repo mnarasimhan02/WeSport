@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
                 R.drawable.frisbee, R.drawable.pingpong, R.drawable.soccer, R.drawable.volleyball
         };
-        // contextOfApplication = getApplicationContext();//required to retreive context in another class
         CustomGridViewActivity adapterViewAndroid = new CustomGridViewActivity(MainActivity.this, gridViewString, gridViewImageId);
         GridView androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
@@ -72,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         });
         //setup GoogleApiclient
         buildGoogleApiClient();
+
     }
 
     //This method will be called when the user will tap on allow or deny
@@ -81,18 +80,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         if (requestCode == PERMISSION_LOCATION) {
             // BEGIN_INCLUDE(permission_result)
-            // Received permission result for camera permission.
-            Log.i(TAG, "Received response for location permission request.");
+            // Received permission result for location permission.
 
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Camera permission has been granted, preview can be displayed
-                Log.i(TAG, "LOCATION permission is granted");
                 Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_SHORT).show();
                 startLocationServices();
             } else {
-                Log.i(TAG, "LOCATION permission was NOT granted.");
                 Snackbar.make(mLayout, R.string.permissions_not_granted,
                         Snackbar.LENGTH_SHORT).show();
                 Snackbar.make(mLayout, R.string.close_app,
@@ -137,6 +133,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
         } else {
             startLocationServices();
+            //Instiantiate background task to download places list
+            new DownloadTask(this).execute();
         }
     }
 
@@ -150,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
             LocationRequest mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(100); // Update location every 10 seconds
+            mLocationRequest.setInterval(1000); // Update location every 10 seconds
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
         }
@@ -159,12 +157,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.i(TAG, "GoogleApiClient connection has been suspend");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.i(TAG, "GoogleApiClient connection has failed");
     }
 
     @SuppressWarnings("EmptyMethod")
@@ -177,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onLocationChanged(Location location) {
         // New location has now been determined
         Toast.makeText(MainActivity.this, getString(R.string.loc_changed), Toast.LENGTH_SHORT).show();
-        Log.i(TAG, "Triggering location changed");
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
         storeprefs(lat, lon);

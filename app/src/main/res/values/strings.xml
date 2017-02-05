@@ -15,6 +15,10 @@
     <!-- Menu items-->
     <string name="next_menu">Next</string>
 
+    <!-- Autocomplete hint-->
+
+    <string name="autocomplete_hint">Find play places</string>
+    <string name="usermarker_title">My Location</string>
 
     <!-- Intro slides headings-->
 
@@ -158,12 +162,19 @@
 
     <!-- accessibility strings-->
 
+    <string name="place_error"> No address found. Please type exact address </string>
+    <string name="save_game"> game at  </string>
+    <string name="save_game_text"> saved  </string>
+
+
+
+    <!-- Log messages-->
+
     <string name="accessibility_image">upload image</string>
     <string name="accessibility_grid">select games from grid</string>
     <string name="accessibility_widget">widget image</string>
     <string name="accessibility_emptygame">empty game</string>
     <string name="accessibility_photopicker">photo picker image</string>
     <string name="accessibility_chatbox">image for chatroom</string>
-
 
 </resources>

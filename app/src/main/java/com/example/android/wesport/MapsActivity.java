@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
@@ -32,7 +30,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -40,11 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -63,6 +55,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MarkerOptions userMarker;
     private String address = "";
     private String selectedGame;
+    private String resultAPI;
+
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
     private TextView mPlaceAttribution;
@@ -87,14 +81,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        //Instiantiate background task to download places list
-
-        DownloadTask task = new DownloadTask();
-        task.execute();
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setHint("Find play places");
+        autocompleteFragment.setHint(getString(R.string.autocomplete_hint));
 
         // Register a listener to receive callbacks when a place has been selected or an error has
         // occurred and set Filter to retreive only places with precise address
@@ -107,11 +97,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void setUserMarker(LatLng latLng) {
         if (userMarker == null) {
-            userMarker = new MarkerOptions().position(latLng).title("My Location");
-            userMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            userMarker = new MarkerOptions().position(latLng).title(getString(R.string.usermarker_title));
+            userMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_marker));
             map.addMarker(userMarker);
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.5f));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13f));
 
     }
 
@@ -149,7 +139,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap sMap) {
         map = sMap;
-        Log.i(LOG_TAG, "Populate markers for parks");
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -158,6 +147,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
+        SharedPreferences downloadapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        resultAPI = downloadapi.getString("result", "https://maps.google.com");
+        try {
+            createMarkersFromJson(resultAPI);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     void createMarkersFromJson(String json) throws JSONException {
@@ -175,19 +171,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             lat = Double.parseDouble(latitude);
             lon = Double.parseDouble(longitude);
             String parkName = jsonObj.getString("name");
-            LatLngBounds bounds = this.map.getProjection().getVisibleRegion().latLngBounds;
-            LatLng markerPoint = new LatLng(lat, lon);
-            if (bounds.contains(markerPoint)) {
-                this.map.addMarker(new MarkerOptions()
-                        .title(parkName)
-                        .position(new LatLng(lat, lon))
-                );
+            map.addMarker(new MarkerOptions()
+                            .title(parkName)
+                            .position(new LatLng(lat, lon))
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
             }
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.5f));
-            //map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12));
-
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.9f));
         }
-    }
 
 
     /* Get address for new places when user long click's on the map and show the address*/
@@ -211,7 +201,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Toast.makeText(this, selectedGame + " game at  " + address + " saved ", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, selectedGame + getString(R.string.save_game)+ address + getString(R.string.save_game_text), Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -243,11 +233,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onPlaceSelected(Place place) {
-        Log.i(TAG, "Place Selected: " + place.getName());
-
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Toast.makeText(this, selectedGame + " game at  " + address + " saved ", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, selectedGame + getString(R.string.save_game)+ address + getString(R.string.save_game_text), Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -257,74 +245,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onError(Status status) {
-        Log.e(TAG, "onError: Status = " + status.toString());
-
-        Toast.makeText(this, "Place selection failed: " + status.getStatusMessage(),
+        Toast.makeText(this, getString(R.string.place_error) + status.getStatusMessage(),
                 Toast.LENGTH_SHORT).show();
     }
-
-
-    public class DownloadTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
-            Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
-            Uri.Builder builder = new Uri.Builder();
-            final String BASE_URL =
-                    "https://maps.googleapis.com";
-            final String RADIUS_PARAM = "radius";
-            final String TYPE_PARAM = "type";
-            final String KEY_PARAM = "key";
-
-            Uri builtUri = Uri.parse(BASE_URL)
-                    .buildUpon()
-                    .path("maps/api/place/nearbysearch/json")
-                    .appendQueryParameter("location", String.valueOf(mLat) + "," + String.valueOf(mLon))
-                    .appendQueryParameter(RADIUS_PARAM, getString(R.string.radius_param))
-                    .appendQueryParameter(TYPE_PARAM, getString(R.string.type_param))
-                    .appendQueryParameter(KEY_PARAM, getString(R.string.place_api_key))
-                    .build();
-            String SERVICE_URL = builtUri.toString();
-            String result = "";
-            Log.i("SERVICE_URL", SERVICE_URL);
-            URL url;
-            HttpURLConnection urlConnection = null;
-            try {
-                // Connect to the web service
-                url = new URL(SERVICE_URL);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream in = urlConnection.getInputStream();
-                InputStreamReader reader = new InputStreamReader(in);
-                // Read the JSON data into the StringBuilder
-                int data = reader.read();
-                while (data != -1) {
-                    char current = (char) data;
-                    result += current;
-                    data = reader.read();
-                }
-                return result;
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        // Create markers for the city data.
-        // Must run this on the UI thread since it's a UI operation.
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            try {
-                createMarkersFromJson(result);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Error processing JSON", e);
-            }
-
-        }
-
-    }
-}
+   }

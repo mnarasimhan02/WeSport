@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -196,7 +195,6 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // An error occurred when fetching the config.
-                        Log.w(TAG, "Error fetching config", e);
 
                         // Update the EditText length limit with
                         // the newly retrieved values from Remote Config.
