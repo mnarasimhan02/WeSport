@@ -14,11 +14,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,7 +30,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.example.android.wesport.data.GameContract.GameEntry;
 
@@ -56,6 +55,8 @@ public class EditorActivity extends AppCompatActivity implements
     private EditText mstartTime;
     private EditText mendTime;
     private final Calendar mDateAndTime = Calendar.getInstance();
+    private View mLayout;
+
     /**
      * Content URI for the existing game (null if it's a new game)
      */
@@ -117,6 +118,8 @@ public class EditorActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+        mLayout = findViewById(android.R.id.content);
+
         //Get Location and Selected Game from sharedpreferences
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -228,7 +231,8 @@ public class EditorActivity extends AppCompatActivity implements
         if (!TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString()) && !mendTime.getText().toString().isEmpty() )
 
         {
-            Toast.makeText(this, getString(R.string.date_compare_string), Toast.LENGTH_SHORT).show();
+            Snackbar.make(mLayout, getString(R.string.date_compare_string),
+                    Snackbar.LENGTH_LONG).show();
             mendTime.setText("");
         }
 
@@ -318,8 +322,8 @@ public class EditorActivity extends AppCompatActivity implements
                 mSkill == GameEntry.SKILL_ROOKIES) {
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.
-            Toast.makeText(this, getString(R.string.editor_insert_game_params),
-                    Toast.LENGTH_SHORT).show();
+            Snackbar.make(mLayout, getString(R.string.editor_insert_game_params),
+                    Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -345,12 +349,12 @@ public class EditorActivity extends AppCompatActivity implements
             // Show a toast message depending on whether or not the insertion was successful.
             if (newUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, getString(R.string.editor_insert_game_failed),
-                        Toast.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, getString(R.string.editor_insert_game_failed),
+                        Snackbar.LENGTH_LONG).show();
             } else {
                 // Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_insert_game_successful),
-                        Toast.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, getString(R.string.editor_insert_game_successful),
+                        Snackbar.LENGTH_LONG).show();
             }
         } else {
             // Otherwise this is an EXISTING game, so update the game with content URI: mCurrentGameUri
@@ -366,13 +370,13 @@ public class EditorActivity extends AppCompatActivity implements
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, getString(R.string.editor_update_game_failed),
-                        Toast.LENGTH_SHORT).show();
-            } else {
+                Snackbar.make(mLayout,  getString(R.string.editor_update_game_failed),
+                        Snackbar.LENGTH_LONG).show();
+             } else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_update_game_successful),
-                        Toast.LENGTH_SHORT).show();
-            }
+                Snackbar.make(mLayout,  getString(R.string.editor_update_game_failed),
+                        Snackbar.LENGTH_LONG).show();
+             }
         }
     }
 
@@ -650,13 +654,13 @@ public class EditorActivity extends AppCompatActivity implements
             // Show a toast message depending on whether or not the delete was successful.
             if (rowsDeleted == 0) {
                 // If no rows were deleted, then there was an error with the delete.
-                Toast.makeText(this, getString(R.string.editor_delete_game_failed),
-                        Toast.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, getString(R.string.editor_delete_game_failed),
+                        Snackbar.LENGTH_LONG).show();
             } else {
                 // Otherwise, the delete was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_delete_game_successful),
-                        Toast.LENGTH_SHORT).show();
-            }
+                Snackbar.make(mLayout, getString(R.string.editor_delete_game_failed),
+                        Snackbar.LENGTH_LONG).show();
+           }
         }
 
         // Close the activity

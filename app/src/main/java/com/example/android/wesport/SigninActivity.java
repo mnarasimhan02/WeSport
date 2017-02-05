@@ -6,13 +6,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,7 +45,7 @@ public class SigninActivity extends AppCompatActivity {
     private FirebaseStorage mFirebaseStorage;
     private DatabaseReference mMessagesDatabaseReference;
     private StorageReference mChatPhotosStorageReference;
-
+    private View mLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +82,7 @@ public class SigninActivity extends AppCompatActivity {
         // Start the thread
         t.start();
         setContentView(R.layout.activity_main);
+        mLayout = findViewById(android.R.id.content);
         mUsername = ANONYMOUS;
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         // Initialize Firebase components
@@ -105,8 +106,8 @@ public class SigninActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    //startActivity(intent);
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
                     // User is signed in
                     //Launch an intent to create mainactivity
                     if (user.getDisplayName()!= null){
@@ -139,7 +140,6 @@ public class SigninActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefUser.edit();
         editor.putString("displayName", displayName);
         editor.apply();
-        Log.i(TAG, displayName);
     }
 
     @Override
@@ -148,13 +148,16 @@ public class SigninActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
-                Toast.makeText(this, getString(R.string.signin_string), Toast.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, getString(R.string.signin_string),
+                        Snackbar.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
-                Toast.makeText(this, getString(R.string.signin_cancel), Toast.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, getString(R.string.signin_cancel),
+                        Snackbar.LENGTH_LONG).show();
+
                 finish();
             }
         } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {

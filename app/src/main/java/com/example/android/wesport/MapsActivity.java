@@ -8,15 +8,15 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
@@ -56,6 +56,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String address = "";
     private String selectedGame;
     private String resultAPI;
+    private View mLayout;
+
 
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
@@ -80,6 +82,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpMapIfNeeded();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        mLayout = findViewById(android.R.id.content);
 
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
@@ -101,7 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             userMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_marker));
             map.addMarker(userMarker);
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13f));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.9f));
 
     }
 
@@ -183,6 +186,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
+        address="";
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
@@ -201,7 +205,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Toast.makeText(this, selectedGame + getString(R.string.save_game)+ address + getString(R.string.save_game_text), Toast.LENGTH_LONG).show();
+        Snackbar.make(mLayout, selectedGame + " "+ getString(R.string.save_game)+ " "+ address + "  " + getString(R.string.save_game_text),
+                Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -235,7 +240,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlaceSelected(Place place) {
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Toast.makeText(this, selectedGame + getString(R.string.save_game)+ address + getString(R.string.save_game_text), Toast.LENGTH_LONG).show();
+        Snackbar.make(mLayout, selectedGame + " "+ getString(R.string.save_game)+ " "+ address + "  " + getString(R.string.save_game_text),
+                Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -245,7 +251,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onError(Status status) {
-        Toast.makeText(this, getString(R.string.place_error) + status.getStatusMessage(),
-                Toast.LENGTH_SHORT).show();
+        Snackbar.make(mLayout, getString(R.string.place_error) + status.getStatusMessage(),
+                Snackbar.LENGTH_LONG).show();
     }
    }

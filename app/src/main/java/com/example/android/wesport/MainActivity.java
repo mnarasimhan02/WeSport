@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 
         gridViewString = getResources().getStringArray(R.array.games_array);
-        mLayout = findViewById(R.id.android_gridview_example);
+        mLayout = findViewById(android.R.id.content);
 
         int[] gridViewImageId = {
                 R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
@@ -59,7 +58,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
-                Toast.makeText(MainActivity.this, getString(R.string.chosen_game) + gridViewString[+i], Toast.LENGTH_SHORT).show();
+                Snackbar.make(mLayout, getString(R.string.chosen_game) + " "+gridViewString[+i],
+                        Snackbar.LENGTH_LONG).show();
                 chosenGame = gridViewString[+i];
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = chGame.edit();
@@ -86,11 +86,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Camera permission has been granted, preview can be displayed
                 Snackbar.make(mLayout, R.string.permision_available_location,
-                        Snackbar.LENGTH_SHORT).show();
+                        Snackbar.LENGTH_LONG).show();
                 startLocationServices();
             } else {
                 Snackbar.make(mLayout, R.string.permissions_not_granted,
-                        Snackbar.LENGTH_SHORT).show();
+                        Snackbar.LENGTH_LONG).show();
                 Snackbar.make(mLayout, R.string.close_app,
                         Snackbar.LENGTH_LONG).show();
                 this.finish();
@@ -172,7 +172,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        Toast.makeText(MainActivity.this, getString(R.string.loc_changed), Toast.LENGTH_SHORT).show();
+        Snackbar.make(mLayout, getString(R.string.loc_changed),
+                Snackbar.LENGTH_LONG).show();
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
         storeprefs(lat, lon);

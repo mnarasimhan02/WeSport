@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +44,6 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                 .appendQueryParameter(KEY_PARAM, context.getString((R.string.place_api_key)))
                 .build();
         String SERVICE_URL = builtUri.toString();
-        Log.d("SERVICE_URL",SERVICE_URL);
         String result = "";
         URL url;
         HttpURLConnection urlConnection = null;

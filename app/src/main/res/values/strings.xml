@@ -8,8 +8,8 @@
 
     <!-- GridView selection items-->
 
-    <string name="chosen_game">Chosen game:  </string>
-    <string name="loc_changed">Location changed</string>
+    <string name="chosen_game">chosen game:  </string>
+    <string name="loc_changed">location changed</string>
 
 
     <!-- Menu items-->
@@ -17,8 +17,8 @@
 
     <!-- Autocomplete hint-->
 
-    <string name="autocomplete_hint">Find play places</string>
-    <string name="usermarker_title">My Location</string>
+    <string name="autocomplete_hint">find play places</string>
+    <string name="usermarker_title">my location</string>
 
     <!-- Intro slides headings-->
 
@@ -162,10 +162,9 @@
 
     <!-- accessibility strings-->
 
-    <string name="place_error"> No address found. Please type exact address </string>
+    <string name="place_error"> Zero results. Please type exact address </string>
     <string name="save_game"> game at  </string>
     <string name="save_game_text"> saved  </string>
-
 
 
     <!-- Log messages-->
