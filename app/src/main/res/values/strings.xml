@@ -8,8 +8,8 @@
 
     <!-- GridView selection items-->
 
-    <string name="chosen_game">chosen game:  </string>
-    <string name="loc_changed">location changed</string>
+    <string name="chosen_game">Chosen game:  </string>
+    <string name="loc_changed">Location changed</string>
 
 
     <!-- Menu items-->
@@ -49,14 +49,14 @@
     <!-- Games array-->
 
     <string-array name="games_array">
-        <item> basketball</item>
-        <item> cricket</item>
-        <item> football</item>
-        <item> tennis</item>
-        <item> frisbee</item>
-        <item> pingpong</item>
-        <item> soccer</item>
-        <item> volleyball</item>
+        <item> Basketball</item>
+        <item> Cricket</item>
+        <item> Football</item>
+        <item> Tennis</item>
+        <item> Frisbee</item>
+        <item> Pingpong</item>
+        <item> Soccer</item>
+        <item> Volleyball</item>
     </string-array>
 
 

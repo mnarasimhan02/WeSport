@@ -13,8 +13,8 @@ import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.example.android.wesport.CatalogActivity;
+import com.example.android.wesport.EditorActivity;
 import com.example.android.wesport.R;
-import com.example.android.wesport.SigninActivity;
 
 /**
  * Provider for a scrollable weather detail widget
@@ -25,9 +25,8 @@ public class DetailWidgetProvider extends AppWidgetProvider {
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_detail);
-
             // Create an Intent to launch MainActivity
-            Intent intent = new Intent(context, SigninActivity.class);
+            Intent intent = new Intent(context, EditorActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
