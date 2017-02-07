@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
             LocationRequest mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(1000); // Update location every 10 seconds
+            mLocationRequest.setInterval(100000); // Update location every 100 seconds
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
         }
@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
-        Snackbar.make(mLayout, getString(R.string.loc_changed),
-                Snackbar.LENGTH_LONG).show();
+       // Snackbar.make(mLayout, getString(R.string.loc_changed),
+        //        Snackbar.LENGTH_LONG).show();
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
         storeprefs(lat, lon);

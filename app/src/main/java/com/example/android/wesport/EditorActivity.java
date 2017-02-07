@@ -19,7 +19,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -37,8 +36,8 @@ import com.example.android.wesport.data.GameContract.GameEntry;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import static com.example.android.wesport.R.id.start_time;
 
@@ -230,12 +229,9 @@ public class EditorActivity extends AppCompatActivity implements
 
     private void updateTimeDisplay(TextView mtextview) {
         mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
-
         if (!TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
                 && !mendTime.getText().toString().isEmpty() )
-
         {
-
             Snackbar.make(mLayout, getString(R.string.date_compare_string),
                     Snackbar.LENGTH_LONG).show();
             mendTime.setText("");
@@ -248,29 +244,30 @@ public class EditorActivity extends AppCompatActivity implements
     }
 
     private boolean TimeValidator(String time1, String time2) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat("kk:mm",  Locale.US);
-        sdf.setTimeZone(TimeZone.getTimeZone("EST"));
-
-
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a",  Locale.US);
         boolean b = false;
         try {
-            java.util.Date startTime = sdf.parse(time1);
-            java.util.Date endTime = sdf.parse(time2);
+            Date startTime = sdf.parse(time1);
+            Date endTime = sdf.parse(time2);
+            long difference = endTime.getTime() - startTime.getTime();
 
-            Log.d("starttime", String.valueOf(startTime));
-            Log.d("mendTime", String.valueOf(endTime));
-            Log.d("compareTo", String.valueOf(endTime.compareTo(startTime)));
-            Log.d("after", String.valueOf(endTime.after(startTime)));
-
-
-            // Function to check whether a time is after an another time
-            b = endTime.after(startTime);
+            if (difference<0) {
+                difference = (endTime.getTime() - startTime.getTime()) + (endTime.getTime() - startTime.getTime());
+            }
+            int days = (int) (difference / (1000 * 60 * 60 * 24));
+            int hours = (int) ((difference - (1000*60*60*24*days)) / (1000*60*60));
+            int min = (int) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
+            //boolean mindiff = (min < 0 ? false : true);
+            if (hours<0 || min<0) {
+                b = false;
+            }
+            else {
+                b = true;
+            }
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
         return b;
     }
 

@@ -42,7 +42,7 @@
     <string name="close_app">Location permissions required to run app. App will now close</string>
 
     <!-- Label for Google API Web-services and Google Maps key-->
-    <string name="place_api_key">AIzaSyAx-mOGxdHRPq_qvUcu44FK4kzA4naRFAc</string>
+    <string name="place_api_key">AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE</string>
     <string name="radius_param">3000</string>
     <string name="type_param">park</string>
     <string name="google_maps_key">AIzaSyA6VmyUcYdESQJJbATsA316c7S854W6a8U</string>
