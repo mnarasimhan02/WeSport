@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -106,15 +107,16 @@ public class SigninActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    // User is signed in
-                    //Launch an intent to create mainactivity
-                    if (user.getDisplayName()!= null){
+                    if (user.getDisplayName() != null) {
                         loginUser = onSignedInInitialize(user.getDisplayName());
-                    } else{
+                    } else {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                    Log.d("loginUser", String.valueOf(loginUser));
+                    // User is signed in
+                    //Launch an intent to create mainactivity
                     storeUsername(loginUser);
                     //storing username is sharedpref to pass to chatActivity
                 } else {
@@ -152,12 +154,10 @@ public class SigninActivity extends AppCompatActivity {
                         Snackbar.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
-
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Snackbar.make(mLayout, getString(R.string.signin_cancel),
                         Snackbar.LENGTH_LONG).show();
-
                 finish();
             }
         } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
@@ -192,8 +192,6 @@ public class SigninActivity extends AppCompatActivity {
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-        //  mMessageAdapter.clear();
-        // detachDatabaseReadListener();
     }
 
     @Override
@@ -225,9 +223,7 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private void onSignedOutCleanup() {
-        //mUsername = ANONYMOUS;
-        //mMessageAdapter.clear();
-        //detachDatabaseReadListener();
+
     }
 
 
