@@ -13,7 +13,6 @@ import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.example.android.wesport.CatalogActivity;
-import com.example.android.wesport.EditorActivity;
 import com.example.android.wesport.R;
 
 /**
@@ -26,7 +25,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_detail);
             // Create an Intent to launch MainActivity
-            Intent intent = new Intent(context, EditorActivity.class);
+            Intent intent = new Intent(context, CatalogActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 

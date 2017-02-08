@@ -157,6 +157,7 @@
     <string name="signin_string">Signed in! </string>
     <string name="signin_cancel">Sign in canceled</string>
     <string name="email_user">Email user</string>
+    <string name="email_sign">Email Sign</string>
 
     <string name="editor_insert_game_params">Game description and Start date both are required</string>
 
@@ -175,5 +176,6 @@
     <string name="accessibility_emptygame">empty game</string>
     <string name="accessibility_photopicker">photo picker image</string>
     <string name="accessibility_chatbox">image for chatroom</string>
+    <string name="sensor_param">false</string>
 
 </resources>

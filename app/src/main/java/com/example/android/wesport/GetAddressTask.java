@@ -14,13 +14,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class DownloadTask extends AsyncTask<String, Void, String> {
+public class GetAddressTask extends AsyncTask<String, Void, String> {
 
     private Context context;
 
     //save the context recievied via constructor in a local variable
 
-    public DownloadTask(Context context){
+    public GetAddressTask(Context context){
         this.context=context;
     }
     @Override
@@ -30,18 +30,15 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         Uri.Builder builder = new Uri.Builder();
         final String BASE_URL =
-                "https://maps.googleapis.com";
-        final String RADIUS_PARAM = "radius";
-        final String TYPE_PARAM = "type";
-        final String KEY_PARAM = "key";
+                "http://maps.googleapis.com";
+        final String SENSOR_PARAM = "sensor";
+
 
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
-                .path("maps/api/place/nearbysearch/json")
-                .appendQueryParameter("location", String.valueOf(mLat) + "," + String.valueOf(mLon))
-                .appendQueryParameter(RADIUS_PARAM, context.getString((R.string.radius_param)))
-                .appendQueryParameter(TYPE_PARAM, context.getString((R.string.type_param)))
-                .appendQueryParameter(KEY_PARAM, context.getString((R.string.place_api_key)))
+                .path("maps/api/geocode/json")
+                .appendQueryParameter("latlng", String.valueOf(mLat) + "," + String.valueOf(mLon))
+                .appendQueryParameter(SENSOR_PARAM, context.getString((R.string.sensor_param)))
                 .build();
         String SERVICE_URL = builtUri.toString();
         String result = "";
@@ -60,8 +57,8 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
                 result += current;
                 data = reader.read();
             }
-            SharedPreferences downloadapi = PreferenceManager.getDefaultSharedPreferences(context);
-            downloadapi.edit().putString("result", String.valueOf(result)).apply();
+            SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(context);
+            addressapi.edit().putString("addressresult", String.valueOf(result)).apply();
             return result;
         } catch (MalformedURLException e) {
             e.printStackTrace();

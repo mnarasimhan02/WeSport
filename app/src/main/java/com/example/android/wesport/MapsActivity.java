@@ -4,8 +4,6 @@ import android.Manifest.permission;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -37,10 +35,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 @SuppressWarnings("ALL")
@@ -176,33 +172,60 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             lon = Double.parseDouble(longitude);
             String parkName = jsonObj.getString("name");
             map.addMarker(new MarkerOptions()
-                            .title(parkName)
-                            .position(new LatLng(lat, lon))
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-            }
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.9f));
+                    .title(parkName)
+                    .position(new LatLng(lat, lon))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
         }
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.9f));
+    }
 
 
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
-        address="";
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        address = "";
+        SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        resultAPI = addressapi.getString("addressresult", "https://maps.google.com");
         try {
-            List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-            Log.d("listAddresses", String.valueOf(listAddresses));
-            if (listAddresses != null && listAddresses.size() > 0) {
-                if (listAddresses.get(0).getThoroughfare() != null) {
-                    if (listAddresses.get(0).getSubThoroughfare() != null) {
-                        address += listAddresses.get(0).getSubThoroughfare() + " ";
+            createAddressFromJson(resultAPI);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }    }
+
+
+    void createAddressFromJson(String json) throws JSONException {
+        // De-serialize the JSON string into an array of address objects
+        JSONObject jsonObject = new JSONObject(json);
+        String addressInfo = jsonObject.getString("results");
+        String latitude = "";
+        String longitude = "";
+        String stNumber = "";
+        String stRoute = "";
+        String stAddress="";
+        JSONArray jsonArray = new JSONArray(addressInfo);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            // Create a marker for each near by park in the JSON data.
+            JSONObject jsonObj = jsonArray.getJSONObject(i);
+            JSONArray addressComp = jsonObject.getJSONArray("results").getJSONObject(0).getJSONArray("address_components");
+            for (int a = 0; a < addressComp.length(); a++) {
+                JSONObject component = addressComp.getJSONObject(a);
+                JSONArray types = component.getJSONArray("types");
+                for (int j = 0; j < types.length(); j++) {
+                    String type = types.getString(j);
+                    if (type.equals("locality")) {
+                        stAddress =(component.getString("short_name"));
+                        Log.d("stAddress",stAddress);
+                    } else if (type.equals("street_number")) {
+                        stNumber = component.getString("short_name");
+                        Log.d("stNumber",stNumber);
+                    } else if (type.equals("route")) {
+                        stRoute = component.getString("short_name");
+                        Log.d("stRoute",stRoute);
+
                     }
-                    address += listAddresses.get(0).getThoroughfare();
-                    Log.d("address",address);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            address=stNumber+","+stRoute;
         }
         if (address.equals("")) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
@@ -214,7 +237,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         prefs.edit().putString("games", address).apply();
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+      public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.maps_menu, menu);
         return true;
@@ -257,4 +280,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Snackbar.make(mLayout, getString(R.string.place_error) + status.getStatusMessage(),
                 Snackbar.LENGTH_LONG).show();
     }
-   }
+}

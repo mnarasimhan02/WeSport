@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -121,8 +120,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 String etTime = data.getString(endTimeIndex);
                 String gameaddress = data.getString(locColumnIndex);
 //              String notes = data.getString(notesIndex);
-                Log.d("gameName", selectedGame);
-                Log.d("gameaddress", gameaddress);
+
                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     setRemoteContentDescription(views, gameName);
                 }

@@ -136,8 +136,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
         } else {
             startLocationServices();
-            //Instiantiate background task to download places list
+            //Instiantiate background task to download places list and address list for respective locations
             new DownloadTask(this).execute();
+            new GetAddressTask(this).execute();
         }
     }
 

@@ -210,7 +210,7 @@ public class SigninActivity extends AppCompatActivity {
             mUsername = username;
             // attachDatabaseReadListener();
         } else {
-            mUsername = "Email Sign";
+            mUsername = getString(R.string.email_sign);
         }
         return username;
     }
