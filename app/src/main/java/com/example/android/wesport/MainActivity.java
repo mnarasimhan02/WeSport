@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         gridViewString = getResources().getStringArray(R.array.games_array);
         mLayout = findViewById(android.R.id.content);
 
@@ -85,7 +84,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Camera permission has been granted, preview can be displayed
+            Log.d("PERMISSION_LOCATION", String.valueOf(PERMISSION_LOCATION));
+                // Location permission has been granted, preview can be displayed
                 Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_LONG).show();
                 startLocationServices();
@@ -114,10 +114,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     protected void onStart() {
-        super.onStart();
         // Connect the client.
+        Log.d("Flag","onStart");
         mGoogleApiClient.connect();
-
+        super.onStart();
     }
 
     @Override
@@ -131,7 +131,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnected(Bundle bundle) {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            Log.d("permission","permission");
+            Log.d("SelfPermission flag", String.valueOf((ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED)));
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
         } else {
             startLocationServices();
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
             LocationRequest mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(100000); // Update location every 100 seconds
+            mLocationRequest.setInterval(10000); // Update location every 10 seconds
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
         }

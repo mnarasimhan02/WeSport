@@ -229,8 +229,9 @@ public class EditorActivity extends AppCompatActivity implements
 
     private void updateTimeDisplay(TextView mtextview) {
         mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
-        if (!TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
-                && !mendTime.getText().toString().isEmpty() )
+        if ( !mendTime.getText().toString().isEmpty() &&
+                !TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
+               )
         {
             Snackbar.make(mLayout, getString(R.string.date_compare_string),
                     Snackbar.LENGTH_LONG).show();

@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -112,20 +111,17 @@ public class SigninActivity extends AppCompatActivity {
                     } else {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    Log.d("loginUser", String.valueOf(loginUser));
+                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //startActivity(intent);
                     // User is signed in
                     //Launch an intent to create mainactivity
                     storeUsername(loginUser);
                     //storing username is sharedpref to pass to chatActivity
                 } else {
                     // User is signed out
-                    onSignedOutCleanup();
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(!BuildConfig.DEBUG)
                                     .setProviders(
                                             AuthUI.EMAIL_PROVIDER,
                                             AuthUI.GOOGLE_PROVIDER)
@@ -220,10 +216,6 @@ public class SigninActivity extends AppCompatActivity {
             mUsername = "Email Sign";
         }
         return username;
-    }
-
-    private void onSignedOutCleanup() {
-
     }
 
 

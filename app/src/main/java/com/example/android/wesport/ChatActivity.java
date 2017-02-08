@@ -329,8 +329,8 @@ public class ChatActivity extends AppCompatActivity {
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-        mMessageAdapter.clear();
         detachDatabaseReadListener();
+        mMessageAdapter.clear();
     }
 
 

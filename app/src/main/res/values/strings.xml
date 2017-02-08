@@ -149,7 +149,7 @@
 
     <string name="empty_game_list">No Game Information Available</string>
 
-    <string name="date_compare_string">End time should be after Start Time</string>
+    <string name="date_compare_string">End time should be after Start time</string>
 
 
     <!-- chat activity strings-->
