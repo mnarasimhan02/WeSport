@@ -10,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -141,6 +140,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map = sMap;
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
+        //Instiantiate background task to download places list and address list for respective locations
+        new DownloadTask(this).execute();
+        new GetAddressTask(this).execute();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
@@ -214,14 +216,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String type = types.getString(j);
                     if (type.equals("locality")) {
                         stAddress =(component.getString("short_name"));
-                        Log.d("stAddress",stAddress);
                     } else if (type.equals("street_number")) {
                         stNumber = component.getString("short_name");
-                        Log.d("stNumber",stNumber);
                     } else if (type.equals("route")) {
                         stRoute = component.getString("short_name");
-                        Log.d("stRoute",stRoute);
-
                     }
                 }
             }

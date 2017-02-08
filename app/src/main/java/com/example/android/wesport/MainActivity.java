@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -84,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d("PERMISSION_LOCATION", String.valueOf(PERMISSION_LOCATION));
                 // Location permission has been granted, preview can be displayed
                 Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_LONG).show();
@@ -115,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         // Connect the client.
-        Log.d("Flag","onStart");
         mGoogleApiClient.connect();
         super.onStart();
     }
@@ -131,14 +128,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnected(Bundle bundle) {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            Log.d("SelfPermission flag", String.valueOf((ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED)));
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
         } else {
             startLocationServices();
-            //Instiantiate background task to download places list and address list for respective locations
-            new DownloadTask(this).execute();
-            new GetAddressTask(this).execute();
+
         }
     }
 

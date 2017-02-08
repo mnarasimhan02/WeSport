@@ -8,7 +8,7 @@ android {
         release {
             keyAlias 'wesport_keystore'
             keyPassword 'Hotmail123'
-            storeFile file('/Users/MaheshN/AndroidStudioProjects/WeSport/keystore.jks')
+            storeFile file("$rootDir/keystore.jks")
             storePassword 'Hotmail123'
         }
     }
