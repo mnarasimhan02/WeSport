@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -190,12 +191,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+            Log.d("listAddresses", String.valueOf(listAddresses));
             if (listAddresses != null && listAddresses.size() > 0) {
                 if (listAddresses.get(0).getThoroughfare() != null) {
                     if (listAddresses.get(0).getSubThoroughfare() != null) {
                         address += listAddresses.get(0).getSubThoroughfare() + " ";
                     }
                     address += listAddresses.get(0).getThoroughfare();
+                    Log.d("address",address);
                 }
             }
         } catch (IOException e) {

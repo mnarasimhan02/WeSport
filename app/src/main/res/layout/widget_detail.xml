@@ -29,7 +29,7 @@
         <ListView
             android:id="@+id/widget_list"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="match_parent"
             android:divider="@null"
             android:dividerHeight="0dp"
             tools:listitem="@layout/widget_detail_list_item"/>
@@ -37,7 +37,7 @@
         <TextView
             android:id="@+id/widget_empty"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="match_parent"
             android:fontFamily="sans-serif-condensed"
             android:gravity="center"
             android:text="@string/empty_game_list"

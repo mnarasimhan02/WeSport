@@ -3,6 +3,7 @@ package gameswidget;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -11,8 +12,15 @@ import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
 import com.example.android.wesport.R;
 import com.example.android.wesport.data.GameContract.GameEntry;
+
+import java.util.concurrent.ExecutionException;
+
+import static com.example.android.wesport.R.id.widget_icon;
+import static com.example.android.wesport.data.GameContract.GameEntry.COLUMN_GAME_NAME;
 
 
 /**
@@ -26,6 +34,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
             GameEntry.TABLE_NAME + "." + GameEntry._ID,
             GameEntry.COLUMN_GAME_DESC,
             GameEntry.COLUMN_START_DATE,
+            GameEntry.COLUMN_GAME_NAME,
             GameEntry.COLUMN_START_TIME,
             GameEntry.COLUMN_END_TIME,
             GameEntry.COLUMN_GAME_SKILL,
@@ -60,7 +69,6 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 final long identityToken = Binder.clearCallingIdentity();
                 // Get data from the ContentProvider
                 username = GameEntry.getUserName(DetailWidgetRemoteViewsService.this);
-                Log.d("Remote Views Service", username);
                 selectionArgs = new String[]{username};
                 data = getContentResolver().query(gameDataForUri,
                         GAME_COLUMNS,
@@ -95,28 +103,61 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
                 // Find the columns of game attributes that we're interested in
                 int nameColumnIndex = data.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
+                int gamenameColumnIndex = data.getColumnIndex(COLUMN_GAME_NAME);
                 int startDateIndex = data.getColumnIndex(GameEntry.COLUMN_START_DATE);
                 int startTimeIndex = data.getColumnIndex(GameEntry.COLUMN_START_TIME);
                 int endTimeIndex = data.getColumnIndex(GameEntry.COLUMN_END_TIME);
                 int notesIndex = data.getColumnIndex(GameEntry.COLUMN_GAME_NOTES);
                 int locColumnIndex = data.getColumnIndex(GameEntry.COLUMN_GAME_ADDRESS);
 
+                Bitmap widgetImage = null;
+                Bitmap glideImage = null;
+
                 // Read the game attributes from the Cursor for the current game
+                String selectedGame = data.getString(gamenameColumnIndex);
                 String gameName = data.getString(nameColumnIndex);
                 String stDate = data.getString(startDateIndex);
                 String stTime = data.getString(startTimeIndex);
                 String etTime = data.getString(endTimeIndex);
-                Log.d("Remote Views Service", String.valueOf(gameName));
-
                 String gameaddress = data.getString(locColumnIndex);
 //              String notes = data.getString(notesIndex);
-                Log.d("gameName", gameName);
+                Log.d("gameName", selectedGame);
                 Log.d("gameaddress", gameaddress);
-
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
                     setRemoteContentDescription(views, gameName);
                 }
+
+                Uri gameImageURI=null;
+                if (selectedGame.equals("Basketball")) {
+                     gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/basketball");
+                }
+                    else if (selectedGame.equals("Cricket")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/cricket");                //}
+                    } else if (selectedGame.equals("Football")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/football");                //}
+                    } else if (selectedGame.equals("Tennis")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/tennis");                //}
+                    } else if (selectedGame.equals("Frisbee")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/frisbee");                //}
+                    } else if (selectedGame.equals("Pingpong")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/pingpong");                //}
+                    } else if (selectedGame.equals("Soccer")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/soccer");                //}
+                    } else if (selectedGame.equals("Volleyball")) {
+                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/volleyball");                //}
+                    }
+                    try {
+                        glideImage = Glide.with(DetailWidgetRemoteViewsService.this)
+                                .load(gameImageURI)
+                                .asBitmap()
+                                .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
+                    } catch (InterruptedException | ExecutionException e) {
+                    }
+
+                if (glideImage != null) {
+                    views.setImageViewBitmap(R.id.widget_icon, glideImage);
+                }
+
                 views.setTextViewText(R.id.widget_date, stDate);
                 views.setTextViewText(R.id.widget_description, gameName);
                 views.setTextViewText(R.id.widget_start_time, stTime);
@@ -129,7 +170,7 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
 
             @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
             private void setRemoteContentDescription(RemoteViews views, String description) {
-                views.setContentDescription(R.id.widget_icon, description);
+                views.setContentDescription(widget_icon, description);
             }
 
             @Override
