@@ -111,10 +111,7 @@ public class SigninActivity extends AppCompatActivity {
                     } else {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
-                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    //startActivity(intent);
                     // User is signed in
-                    //Launch an intent to create mainactivity
                     storeUsername(loginUser);
                     //storing username is sharedpref to pass to chatActivity
                 } else {
