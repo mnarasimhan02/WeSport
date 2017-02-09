@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,10 +31,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -51,7 +48,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MarkerOptions userMarker;
     private String address = "";
     private String selectedGame;
-    private String resultAPI;
+    private String addressResult;
     private View mLayout;
 
 
@@ -140,74 +137,48 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map = sMap;
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
-
         //Instiantiate background task to download places list and address list for respective locations
-        new DownloadTask(this,map).execute();
-        new GetAddressTask(this).execute();
+        new DownloadTask(this, map).execute();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
-        SharedPreferences downloadapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        resultAPI = downloadapi.getString("result", "https://maps.google.com");
     }
 
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
-        address = "";
+        Double marLat = latLng.latitude;
+        Double marLon = latLng.longitude;
+        Log.d("marLat", String.valueOf(marLat));
+        Log.d("marLon", String.valueOf(marLon));
+        new GetAddressTask(this,marLat,marLon).execute();
         SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        resultAPI = addressapi.getString("addressresult", "https://maps.google.com");
+        addressResult = addressapi.getString("address", "unknown address");
+        Log.d("addressresult",addressResult);
         try {
-            createAddressFromJson(resultAPI);
-        } catch (JSONException e) {
+            createAddressFromJson(addressResult);
+        } catch (Exception e) {
             e.printStackTrace();
-        }    }
-
-
-    void createAddressFromJson(String json) throws JSONException {
-        // De-serialize the JSON string into an array of address objects
-        JSONObject jsonObject = new JSONObject(json);
-        String addressInfo = jsonObject.getString("results");
-        String latitude = "";
-        String longitude = "";
-        String stNumber = "";
-        String stRoute = "";
-        String stAddress="";
-        JSONArray jsonArray = new JSONArray(addressInfo);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            // Create a marker for each near by park in the JSON data.
-            JSONObject jsonObj = jsonArray.getJSONObject(i);
-            JSONArray addressComp = jsonObject.getJSONArray("results").getJSONObject(i).getJSONArray("address_components");
-            for (int a = 0; a < addressComp.length(); a++) {
-                JSONObject component = addressComp.getJSONObject(a);
-                JSONArray types = component.getJSONArray("types");
-                for (int j = 0; j < types.length(); j++) {
-                    String type = types.getString(j);
-                    if (type.equals("locality")) {
-                        stAddress =(component.getString("short_name"));
-                    } else if (type.equals("street_number")) {
-                        stNumber = component.getString("short_name");
-                    } else if (type.equals("route")) {
-                        stRoute = component.getString("short_name");
-                    }
-                }
-            }
-            address=stNumber+","+stRoute;
         }
+    }
+
+    void createAddressFromJson(String json) {
+        // De-serialize the JSON string into an array of address objects
+        address=json;
         if (address.equals("")) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Snackbar.make(mLayout, selectedGame + " "+ getString(R.string.save_game)+ " "+ address + "  " + getString(R.string.save_game_text),
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
 
-      public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.maps_menu, menu);
         return true;
@@ -236,7 +207,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlaceSelected(Place place) {
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Snackbar.make(mLayout, selectedGame + " "+ getString(R.string.save_game)+ " "+ address + "  " + getString(R.string.save_game_text),
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();

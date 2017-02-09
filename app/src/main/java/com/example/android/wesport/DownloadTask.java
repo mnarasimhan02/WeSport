@@ -95,7 +95,6 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
             String latitude = "";
             String longitude = "";
             double lat=0, lon = 0;
-
             JSONArray jsonArray = new JSONArray(parkInfo);
             for (int i = 0; i < jsonArray.length(); i++) {
                 // Create a marker for each near by park in the JSON data.

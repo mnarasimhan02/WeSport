@@ -5,6 +5,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,23 +22,24 @@ import java.net.URL;
 public class GetAddressTask extends AsyncTask<String, Void, String> {
 
     private Context context;
+    double mLat;
+    double mLon;
+    private String address;
 
     //save the context recievied via constructor in a local variable
 
-    public GetAddressTask(Context context){
-        this.context=context;
+    public GetAddressTask(Context context, double marLat, double marLon) {
+        this.context = context;
+        mLat = marLat;
+        mLon = marLon;
     }
+
     @Override
     protected String doInBackground(String... params) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         Uri.Builder builder = new Uri.Builder();
         final String BASE_URL =
                 "http://maps.googleapis.com";
         final String SENSOR_PARAM = "sensor";
-
-
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
                 .path("maps/api/geocode/json")
@@ -41,6 +47,7 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                 .appendQueryParameter(SENSOR_PARAM, context.getString((R.string.sensor_param)))
                 .build();
         String SERVICE_URL = builtUri.toString();
+        Log.d("SERVICE_URL", SERVICE_URL);
         String result = "";
         URL url;
         HttpURLConnection urlConnection = null;
@@ -57,9 +64,7 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                 result += current;
                 data = reader.read();
             }
-            SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(context);
-            addressapi.edit().putString("addressresult", String.valueOf(result)).apply();
-            return result;
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -68,4 +73,32 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
+    @Override
+    protected void onPostExecute(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            String stNumber = "";
+            String stRoute = "";
+            JSONArray arrayResult = jsonObject.getJSONArray("results");
+            JSONArray arrComponent = arrayResult.getJSONObject(0).getJSONArray("address_components");
+            for (int i = 0; i < arrComponent.length(); i++) {
+                JSONArray arrType = arrComponent.getJSONObject(i).getJSONArray("types");
+                for (int j = 0; j < arrType.length(); j++) {
+                    if (arrType.getString(j).equals("street_number")) {
+                        stNumber = arrComponent.getJSONObject(i).getString("short_name");
+                        Log.d("street_number", stNumber);
+                    }
+                    if (arrType.getString(j).equals("route")) {
+                        stRoute = arrComponent.getJSONObject(i).getString("short_name");
+                        Log.d("route", stRoute);
+                    }
+                }
+                address = stNumber + " , " + stRoute;
+                SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(context);
+                addressapi.edit().putString("address", String.valueOf(address)).apply();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }
