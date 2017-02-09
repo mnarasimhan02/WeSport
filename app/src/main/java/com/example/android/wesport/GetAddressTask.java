@@ -94,7 +94,6 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                     }
                 }
                 address = stNumber + " , " + stRoute;
-                Log.d("address",address);
                 EventBus.getDefault().post(address);
             }
         } catch (JSONException e) {

@@ -93,7 +93,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
                 .build();
         autocompleteFragment.setFilter(typeFilter);
-        EventBus.getDefault().register(this); // this == your class instance
+
+        if(!EventBus.getDefault().hasSubscriberForEvent(GetAddressTask.class)) {
+            EventBus.getDefault().register(this);
+        }
 
     }
 
@@ -153,12 +156,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUserMarker(new LatLng(mLat, mLon));
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    // This method will be called when a GetAddressTask is posted
-    public void onEvent(GetAddressTask event){
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)    // This method will be called when a GetAddressTask is posted
+    public void onEvent(String address){
         // your implementation
         // De-serialize the JSON string into an array of address objects
-        if (event.address.equals("")) {
+        if (address.equals("")) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
@@ -223,5 +225,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onError(Status status) {
         Snackbar.make(mLayout, getString(R.string.place_error) + status.getStatusMessage(),
                 Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 }
