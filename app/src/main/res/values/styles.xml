@@ -9,17 +9,30 @@
         <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
     </style>
 
-    <style name="GreenTheme" parent="FirebaseUI">
+
+    <style name="GreenTheme" parent="AppTheme">
         <item name="colorPrimary">@color/material_green_500</item>
         <item name="colorPrimaryDark">@color/material_green_700</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@drawable/bg_login</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="colorControlNormal">@color/colorAccent</item>
         <item name="colorControlActivated">@color/colorAccent</item>
         <item name="colorControlHighlight">@color/colorAccent</item>
-        <item name="android:windowBackground">@drawable/bg_login</item>
-        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
     </style>
 
+    <style name="FirebaseUI.Button" parent="@style/GreenTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_gravity">right</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+
+
+    </style>
 
     <!-- Theme of the editor -->
     <style name="EditorTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -53,5 +66,15 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
+    <style name="FirebaseUI.Text.TextInputLayout" parent="@style/FirebaseUI.EditText" />
 
+    <style name="FirebaseUI.Text.HintText" parent="@style/FirebaseUI.EditText" />
+
+    <style name="FirebaseUI.ImageView.VisibilityToggle" parent="@style/FirebaseUI.EditText">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="FirebaseUI.Text.Link" parent="FirebaseUI.EditText" />
+
+    <style name="FirebaseUI.Text.BodyText" parent="FirebaseUI.EditText" />
 </resources>

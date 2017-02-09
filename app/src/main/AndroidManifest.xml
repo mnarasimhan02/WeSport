@@ -63,7 +63,8 @@
 
         <activity
             android:name="com.example.android.wesport.IntroActivity"
-            android:label="@string/app_intro"/>
+            android:label="@string/app_intro"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".MapsActivity"
@@ -73,7 +74,8 @@
                 android:value="com.example.android.wesport.MainActivity"/>
         </activity>
         <activity android:name=".ChatActivity"/>
-        <activity android:name=".SigninActivity">
+        <activity android:name=".SigninActivity"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
