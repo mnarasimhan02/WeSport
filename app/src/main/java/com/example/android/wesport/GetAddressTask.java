@@ -1,12 +1,11 @@
 package com.example.android.wesport;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +23,7 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
     private Context context;
     double mLat;
     double mLon;
-    private String address;
+    public String address;
 
     //save the context recievied via constructor in a local variable
 
@@ -32,6 +31,10 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         this.context = context;
         mLat = marLat;
         mLon = marLon;
+    }
+
+    public GetAddressTask(String address) {
+        this.address=address;
     }
 
     @Override
@@ -72,7 +75,6 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         }
         return null;
     }
-
     @Override
     protected void onPostExecute(String json) {
         try {
@@ -94,8 +96,9 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                     }
                 }
                 address = stNumber + " , " + stRoute;
-                SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(context);
-                addressapi.edit().putString("address", String.valueOf(address)).apply();
+                EventBus.getDefault().post(address);
+                //        SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(context);
+                //addressapi.edit().putString("address", String.valueOf(address)).apply();
             }
         } catch (JSONException e) {
             e.printStackTrace();

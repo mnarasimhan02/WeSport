@@ -31,6 +31,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -89,6 +93,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
                 .build();
         autocompleteFragment.setFilter(typeFilter);
+        EventBus.getDefault().register(this); // this == your class instance
+
     }
 
     public void setUserMarker(LatLng latLng) {
@@ -145,6 +151,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
+
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    // This method will be called when a GetAddressTask is posted
+    public void onEvent(GetAddressTask event){
+        // your implementation
+        // De-serialize the JSON string into an array of address objects
+        if (event.address.equals("")) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
+            address = sdf.format(new Date());
+        }
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
+                Snackbar.LENGTH_LONG).show();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        prefs.edit().putString("games", address).apply();
     }
 
     /* Get address for new places when user long click's on the map and show the address*/
@@ -155,27 +176,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("marLat", String.valueOf(marLat));
         Log.d("marLon", String.valueOf(marLon));
         new GetAddressTask(this,marLat,marLon).execute();
-        SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        addressResult = addressapi.getString("address", "unknown address");
-        Log.d("addressresult",addressResult);
-        try {
-            createAddressFromJson(addressResult);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    void createAddressFromJson(String json) {
-        // De-serialize the JSON string into an array of address objects
-        address=json;
-        if (address.equals("")) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
-            address = sdf.format(new Date());
-        }
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
-                Snackbar.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        prefs.edit().putString("games", address).apply();
+        //SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //addressResult = addressapi.getString("address", "unknown address");
+        //Log.d("addressresult",addressResult);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -59,5 +59,7 @@ dependencies {
     compile 'com.github.paolorotolo:appintro:4.1.0'
     //Display Images
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
+
 }
 apply plugin: 'com.google.gms.google-services'
