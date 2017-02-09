@@ -67,7 +67,7 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                 result += current;
                 data = reader.read();
             }
-
+            return result;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -88,17 +88,14 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                 for (int j = 0; j < arrType.length(); j++) {
                     if (arrType.getString(j).equals("street_number")) {
                         stNumber = arrComponent.getJSONObject(i).getString("short_name");
-                        Log.d("street_number", stNumber);
                     }
                     if (arrType.getString(j).equals("route")) {
                         stRoute = arrComponent.getJSONObject(i).getString("short_name");
-                        Log.d("route", stRoute);
                     }
                 }
                 address = stNumber + " , " + stRoute;
+                Log.d("address",address);
                 EventBus.getDefault().post(address);
-                //        SharedPreferences addressapi = PreferenceManager.getDefaultSharedPreferences(context);
-                //addressapi.edit().putString("address", String.valueOf(address)).apply();
             }
         } catch (JSONException e) {
             e.printStackTrace();

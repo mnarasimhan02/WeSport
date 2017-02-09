@@ -144,15 +144,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
         //Instiantiate background task to download places list and address list for respective locations
-        new DownloadTask(this, map).execute();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        new DownloadTask(this, map).execute();
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
-
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     // This method will be called when a GetAddressTask is posted
     public void onEvent(GetAddressTask event){
