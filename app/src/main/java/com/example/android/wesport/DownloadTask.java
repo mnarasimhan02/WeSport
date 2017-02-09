@@ -6,6 +6,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,12 +27,17 @@ import java.net.URL;
 public class DownloadTask extends AsyncTask<String, Void, String> {
 
     private Context context;
+    GoogleMap map;
+
 
     //save the context recievied via constructor in a local variable
 
-    public DownloadTask(Context context){
-        this.context=context;
+    public DownloadTask(Context context, GoogleMap gMap) {
+        this.context = context;
+        map = gMap;
+
     }
+
     @Override
     protected String doInBackground(String... params) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -34,6 +49,7 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         final String RADIUS_PARAM = "radius";
         final String TYPE_PARAM = "type";
         final String KEY_PARAM = "key";
+        double lat, lon;
 
         Uri builtUri = Uri.parse(BASE_URL)
                 .buildUpon()
@@ -71,4 +87,32 @@ public class DownloadTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
+    @Override
+    protected void onPostExecute(String json) {
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            String parkInfo = jsonObject.getString("results");
+            String latitude = "";
+            String longitude = "";
+            double lat=0, lon = 0;
+
+            JSONArray jsonArray = new JSONArray(parkInfo);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // Create a marker for each near by park in the JSON data.
+                JSONObject jsonObj = jsonArray.getJSONObject(i);
+                latitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lat");
+                longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
+                lat = Double.parseDouble(latitude);
+                lon = Double.parseDouble(longitude);
+                String parkName = jsonObj.getString("name");
+                map.addMarker(new MarkerOptions()
+                        .title(parkName)
+                        .position(new LatLng(lat, lon))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
+            }
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.9f));
+        } catch (JSONException e ) {
+            e.printStackTrace();
+        }
+    }
 }

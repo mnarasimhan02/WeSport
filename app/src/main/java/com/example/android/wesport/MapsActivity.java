@@ -140,8 +140,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map = sMap;
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
+
         //Instiantiate background task to download places list and address list for respective locations
-        new DownloadTask(this).execute();
+        new DownloadTask(this,map).execute();
         new GetAddressTask(this).execute();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
@@ -151,36 +152,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUserMarker(new LatLng(mLat, mLon));
         SharedPreferences downloadapi = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         resultAPI = downloadapi.getString("result", "https://maps.google.com");
-        try {
-            createMarkersFromJson(resultAPI);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
-
-    void createMarkersFromJson(String json) throws JSONException {
-        // De-serialize the JSON string into an array of park objects
-        JSONObject jsonObject = new JSONObject(json);
-        String parkInfo = jsonObject.getString("results");
-        String latitude = "";
-        String longitude = "";
-        JSONArray jsonArray = new JSONArray(parkInfo);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            // Create a marker for each near by park in the JSON data.
-            JSONObject jsonObj = jsonArray.getJSONObject(i);
-            latitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lat");
-            longitude = jsonObj.getJSONObject("geometry").getJSONObject("location").getString("lng");
-            lat = Double.parseDouble(latitude);
-            lon = Double.parseDouble(longitude);
-            String parkName = jsonObj.getString("name");
-            map.addMarker(new MarkerOptions()
-                    .title(parkName)
-                    .position(new LatLng(lat, lon))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-        }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 12.9f));
-    }
-
 
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
@@ -208,7 +180,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (int i = 0; i < jsonArray.length(); i++) {
             // Create a marker for each near by park in the JSON data.
             JSONObject jsonObj = jsonArray.getJSONObject(i);
-            JSONArray addressComp = jsonObject.getJSONArray("results").getJSONObject(0).getJSONArray("address_components");
+            JSONArray addressComp = jsonObject.getJSONArray("results").getJSONObject(i).getJSONArray("address_components");
             for (int a = 0; a < addressComp.length(); a++) {
                 JSONObject component = addressComp.getJSONObject(a);
                 JSONArray types = component.getJSONArray("types");
