@@ -37,6 +37,7 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         this.address=address;
     }
 
+
     @Override
     protected String doInBackground(String... params) {
         Uri.Builder builder = new Uri.Builder();
