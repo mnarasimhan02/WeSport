@@ -178,5 +178,6 @@
     <string name="accessibility_chatbox">image for chatroom</string>
     <string name="sensor_param">false</string>
     <string name="add_desc">click next to create games</string>
+    <string name="get_address">retreiving address</string>
 
 </resources>

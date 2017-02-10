@@ -45,6 +45,7 @@ public class GetAddressTask extends AsyncTask<String, Integer, String> {
     protected void onPreExecute() {
         super.onPreExecute();
         mPDialog.show();
+        mPDialog.setMessage(context.getString(R.string.get_address));
     }
 
     @Override

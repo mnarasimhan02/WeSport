@@ -10,12 +10,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.android.wesport.POJO.Example;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -38,6 +40,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
+
 @SuppressWarnings("ALL")
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener {
 
@@ -53,6 +61,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String selectedGame;
     private String addressResult;
     private View mLayout;
+    private int PROXIMITY_RADIUS = 3000;
+
 
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
@@ -77,7 +87,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mLayout = findViewById(android.R.id.content);
-
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -95,7 +104,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             EventBus.getDefault().register(this);
         }
 
-
     }
 
     public void setUserMarker(LatLng latLng) {
@@ -104,7 +112,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             userMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_marker));
             map.addMarker(userMarker);
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.9f));
+        //map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.9f));
+        //map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        //map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
 
     }
 
@@ -144,14 +154,60 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map = sMap;
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
+
         //Instiantiate background task to download places list and address list for respective locations
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
-        new DownloadTask(this, map).execute();
+        build_retrofit_and_get_response(getString((R.string.type_param)),mLat,mLon);
+
+        //new DownloadTask(this, map).execute();
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
+    }
+
+    private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
+
+        String url = "https://maps.googleapis.com/maps/";
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RetrofitMaps service = retrofit.create(RetrofitMaps.class);
+        Call<Example> call = service.getNearbyPlaces(type, mLat + "," + mLon, PROXIMITY_RADIUS);
+        call.enqueue(new Callback<Example>() {
+            @Override
+            public void onResponse(Response<Example> response, Retrofit retrofit) {
+                try {
+                    map.clear();
+                    // This loop will go through all the results and add marker on each location.
+                    for (int i = 0; i < response.body().getResults().size(); i++) {
+                        Log.d("size", String.valueOf(response.body().getResults().size()));
+                        Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
+                        Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
+                        String parkName = response.body().getResults().get(i).getName();
+                        String vicinity = response.body().getResults().get(i).getVicinity();
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        LatLng latLng = new LatLng(lat, lng);
+                        map.addMarker(new MarkerOptions()
+                                .title(parkName + " : " + vicinity)
+                                .position(latLng)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
+                        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                        map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
+                    }
+
+                } catch (Exception e) {
+                    Log.d("onResponse", "There is an error");
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("onFailure", t.toString());
+            }
+        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
