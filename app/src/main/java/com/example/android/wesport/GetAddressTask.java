@@ -3,7 +3,6 @@ package com.example.android.wesport;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
@@ -37,7 +36,6 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         this.address=address;
     }
 
-
     @Override
     protected String doInBackground(String... params) {
         Uri.Builder builder = new Uri.Builder();
@@ -51,7 +49,6 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                 .appendQueryParameter(SENSOR_PARAM, context.getString((R.string.sensor_param)))
                 .build();
         String SERVICE_URL = builtUri.toString();
-        Log.d("SERVICE_URL", SERVICE_URL);
         String result = "";
         URL url;
         HttpURLConnection urlConnection = null;
@@ -94,7 +91,7 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
                         stRoute = arrComponent.getJSONObject(i).getString("short_name");
                     }
                 }
-                address = stNumber + " , " + stRoute;
+                address = stNumber + " " + stRoute;
                 EventBus.getDefault().post(address);
             }
         } catch (JSONException e) {

@@ -163,7 +163,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUserMarker(new LatLng(mLat, mLon));
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)    // This method will be called when a GetAddressTask is posted
+    @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
     public void onEvent(String address){
         // your implementation
         // De-serialize the JSON string into an array of address objects
@@ -173,6 +173,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
+        mProgressBar.setVisibility(View.GONE);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -184,7 +186,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double marLon = latLng.longitude;
         mProgressBar.setVisibility(View.VISIBLE);
         new GetAddressTask(this,marLat,marLon).execute();
-        mProgressBar.setVisibility(View.GONE);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
