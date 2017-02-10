@@ -2,28 +2,24 @@ package com.example.android.wesport;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.google.firebase.storage.UploadTask.TaskSnapshot;
 
 @SuppressWarnings("ALL")
 public class SigninActivity extends AppCompatActivity {
@@ -105,14 +101,12 @@ public class SigninActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                Log.d("user", String.valueOf(user));
                 if (user != null) {
                     if (user.getDisplayName() != null) {
                         loginUser = onSignedInInitialize(user.getDisplayName());
                     } else {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
-                    Log.d("loginUser", String.valueOf(loginUser));
                     // User is signed in
                     storeUsername(loginUser);
                     //storing username is sharedpref to pass to chatActivity
@@ -142,7 +136,6 @@ public class SigninActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("resultCode", String.valueOf(resultCode));
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
@@ -156,23 +149,6 @@ public class SigninActivity extends AppCompatActivity {
                         Snackbar.LENGTH_LONG).show();
                 finish();
             }
-        } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
-            Uri selectedImageUri = data.getData();
-            // Get a reference to store file at chat_photos/<FILENAME>
-            StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
-
-            // Upload file to Firebase Storage
-            photoRef.putFile(selectedImageUri)
-                    .addOnSuccessListener(this, new OnSuccessListener<TaskSnapshot>() {
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // When the image has successfully uploaded, we get its download URL
-                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                            // Set the download URL to the message box, so that the user can send it to the database
-                            FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
-                            mMessagesDatabaseReference.push().setValue(friendlyMessage);
-                        }
-                    });
         }
     }
 
@@ -187,7 +163,8 @@ public class SigninActivity extends AppCompatActivity {
         super.onPause();
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-            AuthUI.getInstance().signOut(this);
+            //AuthUI.getInstance().signOut(this);
+            //finish();
         }
     }
 
@@ -198,17 +175,23 @@ public class SigninActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sign_out_menu:
+                AuthUI.getInstance().signOut(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private String onSignedInInitialize(String username) {
         if (username != null) {
             mUsername = username;
             // attachDatabaseReadListener();
-            Intent intent = new Intent(getApplicationContext(), SigninActivity.class);
-            startActivity(intent);
         } else {
             mUsername = getString(R.string.email_sign);
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
         }
         return username;
     }
