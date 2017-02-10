@@ -6,12 +6,6 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 tools:context=".MapsActivity">
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true" />
 
     <FrameLayout
         android:layout_width="wrap_content"

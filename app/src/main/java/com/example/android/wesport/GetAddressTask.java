@@ -1,5 +1,6 @@
 package com.example.android.wesport;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -17,12 +18,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class GetAddressTask extends AsyncTask<String, Void, String> {
+public class GetAddressTask extends AsyncTask<String, Integer, String> {
 
-    private Context context;
+    public String address;
     double mLat;
     double mLon;
-    public String address;
+    private Context context;
+    private ProgressDialog mPDialog;
 
     //save the context recievied via constructor in a local variable
 
@@ -30,15 +32,26 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         this.context = context;
         mLat = marLat;
         mLon = marLon;
+        mPDialog = new ProgressDialog(context);
+        mPDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mPDialog.setCancelable(true);
     }
 
     public GetAddressTask(String address) {
-        this.address=address;
+        this.address = address;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mPDialog.show();
     }
 
     @Override
     protected String doInBackground(String... params) {
         Uri.Builder builder = new Uri.Builder();
+        publishProgress(0);
+
         final String BASE_URL =
                 "http://maps.googleapis.com";
         final String SENSOR_PARAM = "sensor";
@@ -73,6 +86,8 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         }
         return null;
     }
+
+
     @Override
     protected void onPostExecute(String json) {
         try {
@@ -97,5 +112,6 @@ public class GetAddressTask extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        mPDialog.dismiss();
     }
 }

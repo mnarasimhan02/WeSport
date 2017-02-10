@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.Status;
@@ -55,14 +54,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String addressResult;
     private View mLayout;
 
-
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
     private TextView mPlaceAttribution;
     private double lat, lon;
-    private ProgressBar mProgressBar;
-
-
 
     public MapsActivity() {
         // Required empty public constructor
@@ -100,10 +95,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             EventBus.getDefault().register(this);
         }
 
-        // Initialize references to views
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        // Initialize progress bar
-        mProgressBar.setVisibility(View.GONE);
 
     }
 
@@ -173,7 +164,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
-        mProgressBar.setVisibility(View.GONE);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
@@ -184,7 +174,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapLongClick(LatLng latLng) {
         Double marLat = latLng.latitude;
         Double marLon = latLng.longitude;
-        mProgressBar.setVisibility(View.VISIBLE);
         new GetAddressTask(this,marLat,marLon).execute();
     }
 
