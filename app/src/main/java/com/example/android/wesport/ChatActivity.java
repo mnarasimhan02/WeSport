@@ -51,13 +51,12 @@ public class ChatActivity extends AppCompatActivity {
     private static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
     private static final String TAG = "SigninActivity";
     private static final int RC_PHOTO_PICKER = 2;
-
+    FirebaseDatabase mFirebaseDatabase;
+    FirebaseStorage mFirebaseStorage;
     private MessageAdapter mMessageAdapter;
     private EditText mMessageEditText;
     private Button mSendButton;
-
     private String mUsername;
-
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
@@ -71,10 +70,11 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         // Initialize Firebase components
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
-        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
+        mFirebaseStorage = FirebaseStorage.getInstance();
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+
         mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
@@ -93,7 +93,6 @@ public class ChatActivity extends AppCompatActivity {
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, friendlyMessages);
         mMessageListView.setAdapter(mMessageAdapter);
 
-        //Attach database listener
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -307,7 +306,6 @@ public class ChatActivity extends AppCompatActivity {
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             // When the image has successfully uploaded, we get its download URL
                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
                             // Set the download URL to the message box, so that the user can send it to the database
                             assert downloadUrl != null;
                             FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());

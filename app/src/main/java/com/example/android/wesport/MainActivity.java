@@ -23,7 +23,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -37,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Location mLastLocation;
     private View mLayout;
     private String chosenGame;
-    private GoogleMap gMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = chGame.edit();
                 editor.putString("chosenGame", chosenGame).apply();
-                // invalidateOptionsMenu();
                 mMenu.getItem(0).setVisible(true);
             }
         });
@@ -187,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public boolean onPrepareOptionsMenu(Menu menu) {
         mMenu = menu;
         mMenu.getItem(0).setVisible(false);
-
         //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }
@@ -199,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (item.getItemId() == R.id.menu_next) {
             Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
             startActivity(intent);
-
         }
         return true;
     }

@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -17,6 +18,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.wesport.data.GameContract.GameEntry;
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 /**
  * Displays list of games that were entered and stored in the app.
@@ -110,8 +114,24 @@ public class CatalogActivity extends AppCompatActivity implements
             case R.id.action_delete_all_entries:
                 deleteAllGames();
                 return true;
+            case R.id.action_signout:
+                signoutuser();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void signoutuser() {
+        //FirebaseAuth.getInstance().signOut();
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // user is now signed out
+                        startActivity(new Intent(CatalogActivity.this, SigninActivity.class));
+                        finish();
+                    }
+                });
     }
 
     @Override
@@ -150,4 +170,6 @@ public class CatalogActivity extends AppCompatActivity implements
         // Callback called when the data needs to be deleted
         mCursorAdapter.swapCursor(null);
     }
+
+
 }

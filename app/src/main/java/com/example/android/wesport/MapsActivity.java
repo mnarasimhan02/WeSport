@@ -10,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -62,7 +61,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String addressResult;
     private View mLayout;
     private int PROXIMITY_RADIUS = 3000;
-
+    private Menu mMenu;
 
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
@@ -112,9 +111,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             userMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_marker));
             map.addMarker(userMarker);
         }
-        //map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.9f));
-        //map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        //map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
+        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
 
     }
 
@@ -180,18 +178,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onResponse(Response<Example> response, Retrofit retrofit) {
                 try {
-                    map.clear();
                     // This loop will go through all the results and add marker on each location.
                     for (int i = 0; i < response.body().getResults().size(); i++) {
-                        Log.d("size", String.valueOf(response.body().getResults().size()));
                         Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
                         Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
                         String parkName = response.body().getResults().get(i).getName();
-                        String vicinity = response.body().getResults().get(i).getVicinity();
                         MarkerOptions markerOptions = new MarkerOptions();
                         LatLng latLng = new LatLng(lat, lng);
                         map.addMarker(new MarkerOptions()
-                                .title(parkName + " : " + vicinity)
+                                .title(parkName)
                                 .position(latLng)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
                         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -199,28 +194,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                 } catch (Exception e) {
-                    Log.d("onResponse", "There is an error");
                     e.printStackTrace();
                 }
             }
             @Override
             public void onFailure(Throwable t) {
-                Log.d("onFailure", t.toString());
             }
         });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
     public void onEvent(String address){
-        // your implementation
-        // De-serialize the JSON string into an array of address objects
+        // store address details for the game
         if (address.equals("")) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
+                + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -231,6 +223,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double marLat = latLng.latitude;
         Double marLon = latLng.longitude;
         new GetAddressTask(this,marLat,marLon).execute();
+        mMenu.getItem(0).setVisible(true);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -255,6 +248,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return true;
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        mMenu = menu;
+        mMenu.getItem(0).setVisible(false);
+        //  By default no Menu
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     /**
      * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
      */
@@ -262,10 +263,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlaceSelected(Place place) {
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " + getString(R.string.save_game_text),
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
+                getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
+        mMenu.getItem(0).setVisible(true);
     }
 
     /**

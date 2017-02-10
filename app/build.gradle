@@ -59,7 +59,9 @@ dependencies {
     compile 'com.github.paolorotolo:appintro:4.1.0'
     //Display Images
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    //Event bus
     compile 'org.greenrobot:eventbus:3.0.0'
+    //Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'

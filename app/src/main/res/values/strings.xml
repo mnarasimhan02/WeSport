@@ -158,6 +158,8 @@
     <string name="signin_cancel">Sign in canceled</string>
     <string name="email_user">Email user</string>
     <string name="email_sign">Email Sign</string>
+    <string name="email_signout">Signout</string>
+
 
     <string name="editor_insert_game_params">Game description and Start date both are required</string>
 
@@ -178,6 +180,6 @@
     <string name="accessibility_chatbox">image for chatroom</string>
     <string name="sensor_param">false</string>
     <string name="add_desc">click next to create games</string>
-    <string name="get_address">retreiving address</string>
+    <string name="get_address">retrieving address</string>
 
 </resources>

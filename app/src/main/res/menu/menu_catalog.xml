@@ -8,4 +8,8 @@
         android:id="@+id/action_delete_all_entries"
         android:title="@string/action_delete_all_entries"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_signout"
+        android:title="@string/email_signout"
+        app:showAsAction="never" />
 </menu>
