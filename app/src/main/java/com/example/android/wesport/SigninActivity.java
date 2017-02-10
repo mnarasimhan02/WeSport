@@ -8,9 +8,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -105,12 +105,14 @@ public class SigninActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+                Log.d("user", String.valueOf(user));
                 if (user != null) {
                     if (user.getDisplayName() != null) {
                         loginUser = onSignedInInitialize(user.getDisplayName());
                     } else {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
+                    Log.d("loginUser", String.valueOf(loginUser));
                     // User is signed in
                     storeUsername(loginUser);
                     //storing username is sharedpref to pass to chatActivity
@@ -140,6 +142,7 @@ public class SigninActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d("resultCode", String.valueOf(resultCode));
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
@@ -184,6 +187,7 @@ public class SigninActivity extends AppCompatActivity {
         super.onPause();
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+            AuthUI.getInstance().signOut(this);
         }
     }
 
@@ -194,23 +198,17 @@ public class SigninActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sign_out_menu:
-                AuthUI.getInstance().signOut(this);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     private String onSignedInInitialize(String username) {
         if (username != null) {
             mUsername = username;
             // attachDatabaseReadListener();
+            Intent intent = new Intent(getApplicationContext(), SigninActivity.class);
+            startActivity(intent);
         } else {
             mUsername = getString(R.string.email_sign);
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         }
         return username;
     }
