@@ -159,10 +159,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         build_retrofit_and_get_response(getString((R.string.type_param)),mLat,mLon);
 
-        //new DownloadTask(this, map).execute();
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
+        Snackbar.make(mLayout, getString(R.string.map_help),
+                Snackbar.LENGTH_LONG).show();
     }
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {

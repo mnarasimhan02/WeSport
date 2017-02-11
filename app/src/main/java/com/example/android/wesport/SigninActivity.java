@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,7 +28,6 @@ public class SigninActivity extends AppCompatActivity {
     public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN = 1;
     private static final String TAG = "SigninActivity";
-    private static final int RC_PHOTO_PICKER = 2;
 
     //private MessageAdapter mMessageAdapter;
     private ProgressBar mProgressBar;
@@ -84,7 +84,6 @@ public class SigninActivity extends AppCompatActivity {
         // Initialize Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
-        // mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
 
         // Initialize references to views
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -92,15 +91,11 @@ public class SigninActivity extends AppCompatActivity {
         // Initialize progress bar
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
-        // ImagePickerButton shows an image picker to upload a image for a message
-
-        mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
-        mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
-
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                FirebaseUser user = firebaseAuth.getCurrentUser();;
+                Log.d("onAuthStateChanged", String.valueOf(user));
                 if (user != null) {
                     if (user.getDisplayName() != null) {
                         loginUser = onSignedInInitialize(user.getDisplayName());
@@ -126,6 +121,20 @@ public class SigninActivity extends AppCompatActivity {
         };
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthStateListener != null) {
+            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+    }
+
     private void storeUsername(String displayName) {
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = prefUser.edit();
@@ -137,6 +146,9 @@ public class SigninActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
+            Log.d("requestCode", String.valueOf(requestCode));
+            Log.d("resultCode", String.valueOf(resultCode));
+            Log.d("data", String.valueOf(data));
             if (resultCode == RESULT_OK) {
                 // Sign-in succeeded, set up the UI
                 Snackbar.make(mLayout, getString(R.string.signin_string),
@@ -149,22 +161,6 @@ public class SigninActivity extends AppCompatActivity {
                         Snackbar.LENGTH_LONG).show();
                 finish();
             }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mAuthStateListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-            //AuthUI.getInstance().signOut(this);
-            //finish();
         }
     }
 

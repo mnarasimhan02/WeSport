@@ -181,5 +181,6 @@
     <string name="sensor_param">false</string>
     <string name="add_desc">click next to create games</string>
     <string name="get_address">retrieving address</string>
+    <string name="map_help">Type address or long click marker to find address</string>
 
 </resources>
