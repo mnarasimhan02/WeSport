@@ -1,6 +1,6 @@
 # WeSport - Location based social connect app
 
-WeSport allows people to connect with each other to play games and stay active and sport a halthy life style
+WeSport allows people to connect with each other to play games and stay active and sport a healthy life style
 
 ## Features
 
@@ -12,10 +12,10 @@ WeSport allows people to connect with each other to play games and stay active a
 
 ## Libraries Used
 
-* [Retrofit] (https://github.com/square/retrofit.git)
-* [Glide] https://github.com/bumptech/glide.git
-* [EventBus Greenrobot] (https://github.com/greenrobot/EventBus.git)
-* [AppIntro] (https://github.com/apl-devs/AppIntro.git
+* [Retrofit](https://github.com/square/retrofit.git)
+* [Glide](https://github.com/bumptech/glide.git)
+* [EventBus Greenrobot](https://github.com/greenrobot/EventBus.git)
+* [AppIntro](https://github.com/apl-devs/AppIntro.git
 
 
 ## License
