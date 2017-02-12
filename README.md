@@ -3,15 +3,6 @@
 WeSport allows people to connect with each other to play games and stay active and sport a healthy life style
 
 
-![Screenshot_1486940183.png]({{site.baseurl}}/Screenshot_1486940183.png)
-![Screenshot_1486157988.png]({{site.baseurl}}/Screenshot_1486157988.png)
-![Screenshot_1486930063.png]({{site.baseurl}}/Screenshot_1486930063.png)
-![Screenshot_1486930063.png]({{site.baseurl}}/Screenshot_1486930063.png)
-![Screenshot_1486930063.png]({{site.baseurl}}/Screenshot_1486930063.png)
-![Screenshot_1486928669.png]({{site.baseurl}}/Screenshot_1486928669.png)
-![Screenshot_1486928708.png]({{site.baseurl}}/Screenshot_1486928708.png)
-![screen6.png]({{site.baseurl}}/screen6.png)
-
 ## Features
 
 * Recommends play places around user location
