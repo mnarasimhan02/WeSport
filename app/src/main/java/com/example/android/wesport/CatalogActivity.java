@@ -128,7 +128,7 @@ public class CatalogActivity extends AppCompatActivity implements
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         // user is now signed out
-                        startActivity(new Intent(CatalogActivity.this, SigninActivity.class));
+                        startActivity(new Intent(CatalogActivity.this, SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                         finish();
                     }
                 });
