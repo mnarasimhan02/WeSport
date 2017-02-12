@@ -15,7 +15,7 @@ WeSport allows people to connect with each other to play games and stay active a
 * [Retrofit](https://github.com/square/retrofit.git)
 * [Glide](https://github.com/bumptech/glide.git)
 * [EventBus Greenrobot](https://github.com/greenrobot/EventBus.git)
-* [AppIntro](https://github.com/apl-devs/AppIntro.git
+* [AppIntro](https://github.com/apl-devs/AppIntro.git)
 
 
 ## License
