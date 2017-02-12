@@ -259,12 +259,7 @@ public class EditorActivity extends AppCompatActivity implements
             int hours = (int) ((difference - (1000*60*60*24*days)) / (1000*60*60));
             int min = (int) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
             //boolean mindiff = (min < 0 ? false : true);
-            if (hours<0 || min<0) {
-                b = false;
-            }
-            else {
-                b = true;
-            }
+            b = !(hours < 0 || min < 0);
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("Convert2Diamond")
 public class Example {
 
     @SerializedName("html_attributions")

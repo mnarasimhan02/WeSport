@@ -9,7 +9,6 @@
     <!-- GridView selection items-->
 
     <string name="chosen_game">Chosen game:  </string>
-    <string name="loc_changed">Location changed</string>
 
 
     <!-- Menu items-->
@@ -42,8 +41,6 @@
     <string name="close_app">Location permissions required to run app. App will now close</string>
 
     <!-- Label for Google API Web-services and Google Maps key-->
-    <string name="place_api_key">AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE</string>
-    <string name="radius_param">3000</string>
     <string name="type_param">park</string>
     <string name="google_maps_key">AIzaSyA6VmyUcYdESQJJbATsA316c7S854W6a8U</string>
     <!-- Games array-->
@@ -90,7 +87,6 @@
     <string name="editor_insert_game_failed">Error with saving Game</string>
 
     <!-- Toast message in editor when current game was successfully updated [CHAR LIMIT=NONE] -->
-    <string name="editor_update_game_successful">Game updated</string>
 
     <!-- Toast message in editor when current game has failed to be updated [CHAR LIMIT=NONE] -->
     <string name="editor_update_game_failed">Error with updating Game</string>
@@ -105,7 +101,6 @@
     <string name="keep_editing">Keep Editing</string>
 
     <!-- Toast message in editor when current game was successfully deleted [CHAR LIMIT=NONE] -->
-    <string name="editor_delete_game_successful">Game deleted</string>
 
     <!-- Toast message in editor when current game has failed to be deleted [CHAR LIMIT=NONE] -->
     <string name="editor_delete_game_failed">Error with deleting Game</string>
@@ -179,8 +174,8 @@
     <string name="accessibility_photopicker">photo picker image</string>
     <string name="accessibility_chatbox">image for chatroom</string>
     <string name="sensor_param">false</string>
-    <string name="add_desc">click next to create games</string>
     <string name="get_address">retrieving address</string>
     <string name="map_help">Type address or long click marker to find address</string>
+    <string name="next">NEXT</string>
 
 </resources>

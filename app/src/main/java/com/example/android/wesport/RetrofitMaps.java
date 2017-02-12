@@ -4,7 +4,7 @@ import retrofit.http.GET;
 import retrofit.Call;
 import retrofit.http.Query;
 
-public interface RetrofitMaps {
+interface RetrofitMaps {
 
     /*
      * Retrofit get annotation with our URL

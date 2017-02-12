@@ -28,27 +28,34 @@
       <w>googleusercontent</w>
       <w>gridview</w>
       <w>gservices</w>
+      <w>gzgab</w>
       <w>hangin</w>
       <w>hltmopqtadgmj</w>
       <w>htvpps</w>
       <w>huskf</w>
       <w>iclient</w>
+      <w>latlng</w>
       <w>listview</w>
       <w>longtitude</w>
+      <w>mindiff</w>
       <w>mnotes</w>
       <w>mobilesdk</w>
       <w>mstart</w>
       <w>mtextview</w>
+      <w>nearbysearch</w>
       <w>newgamelogo</w>
       <w>pamg</w>
       <w>permision</w>
       <w>photopicker</w>
       <w>pingpong</w>
       <w>postivie</w>
+      <w>recievied</w>
       <w>remoteviews</w>
       <w>retreive</w>
       <w>sharedpreferences</w>
       <w>signin</w>
+      <w>signout</w>
+      <w>signoutuser</w>
       <w>signup</w>
       <w>skilllevel</w>
       <w>startdate</w>
@@ -59,6 +66,7 @@
       <w>sttring</w>
       <w>textview</w>
       <w>tqkdq</w>
+      <w>usermarker</w>
       <w>validskill</w>
       <w>wesport</w>
       <w>widgetinfo</w>

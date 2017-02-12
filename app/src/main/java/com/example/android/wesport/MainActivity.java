@@ -26,14 +26,12 @@ import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private final String TAG = "LocationActivity";
     private final int PERMISSION_LOCATION = 1;
     private String lat;
     private String lon;
     private String[] gridViewString;
     private GoogleApiClient mGoogleApiClient;
     private Menu mMenu;
-    private Location mLastLocation;
     private View mLayout;
     private String chosenGame;
 
@@ -136,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void startLocationServices() {
         try {
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             if (mLastLocation != null) {
                 lat = String.valueOf(mLastLocation.getLatitude());
@@ -147,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             mLocationRequest.setInterval(10000); // Update location every 10 seconds
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
+            exception.printStackTrace();
         }
         storeprefs(lat, lon);
     }

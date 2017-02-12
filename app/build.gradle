@@ -45,7 +45,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:10.0.1'
     compile 'com.android.support:design:25.1.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.baoyz.swipemenulistview:library:1.3.0'
     compile 'com.google.firebase:firebase-core:9.0.0'
     //Firebase dependencies
     compile 'com.google.firebase:firebase-database:10.0.1'
@@ -53,8 +52,7 @@ dependencies {
     compile 'com.google.firebase:firebase-storage:10.0.1'
     compile 'com.google.firebase:firebase-messaging:10.0.1'
     compile 'com.google.firebase:firebase-config:10.0.1'
-    //FIreBase UI
-    compile 'com.firebaseui:firebase-ui-auth:1.0.1'
+    compile 'com.firebaseui:firebase-ui-auth:1.1.1'
     //App intro library
     compile 'com.github.paolorotolo:appintro:4.1.0'
     //Display Images

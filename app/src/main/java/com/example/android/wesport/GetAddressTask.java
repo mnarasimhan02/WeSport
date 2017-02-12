@@ -14,15 +14,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class GetAddressTask extends AsyncTask<String, Integer, String> {
+@SuppressWarnings("ALL")
+class GetAddressTask extends AsyncTask<String, Integer, String> {
 
-    public String address;
-    double mLat;
-    double mLon;
+    private String address;
+    private double mLat;
+    private double mLon;
     private Context context;
     private ProgressDialog mPDialog;
 
@@ -65,7 +65,7 @@ public class GetAddressTask extends AsyncTask<String, Integer, String> {
         String SERVICE_URL = builtUri.toString();
         String result = "";
         URL url;
-        HttpURLConnection urlConnection = null;
+        HttpURLConnection urlConnection;
         try {
             // Connect to the web service
             url = new URL(SERVICE_URL);
@@ -80,8 +80,6 @@ public class GetAddressTask extends AsyncTask<String, Integer, String> {
                 data = reader.read();
             }
             return result;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -126,30 +126,46 @@ public class DetailWidgetRemoteViewsService extends RemoteViewsService {
                 }
 
                 Uri gameImageURI=null;
-                if (selectedGame.equals("Basketball")) {
-                     gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/basketball");
+                switch (selectedGame) {
+                    case "Basketball":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/basketball");
+                        break;
+                    case "Cricket":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/cricket");                //}
+
+                        break;
+                    case "Football":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/football");                //}
+
+                        break;
+                    case "Tennis":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/tennis");                //}
+
+                        break;
+                    case "Frisbee":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/frisbee");                //}
+
+                        break;
+                    case "Pingpong":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/pingpong");                //}
+
+                        break;
+                    case "Soccer":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/soccer");                //}
+
+                        break;
+                    case "Volleyball":
+                        gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/volleyball");                //}
+
+                        break;
                 }
-                    else if (selectedGame.equals("Cricket")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/cricket");                //}
-                    } else if (selectedGame.equals("Football")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/football");                //}
-                    } else if (selectedGame.equals("Tennis")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/tennis");                //}
-                    } else if (selectedGame.equals("Frisbee")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/frisbee");                //}
-                    } else if (selectedGame.equals("Pingpong")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/pingpong");                //}
-                    } else if (selectedGame.equals("Soccer")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/soccer");                //}
-                    } else if (selectedGame.equals("Volleyball")) {
-                         gameImageURI = Uri.parse("android.resource://" + DetailWidgetRemoteViewsService.this.getPackageName() + "/drawable/volleyball");                //}
-                    }
                     try {
                         glideImage = Glide.with(DetailWidgetRemoteViewsService.this)
                                 .load(gameImageURI)
                                 .asBitmap()
                                 .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
                     } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
 
                 if (glideImage != null) {

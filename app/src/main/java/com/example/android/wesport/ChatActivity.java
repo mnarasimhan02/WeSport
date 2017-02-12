@@ -49,10 +49,7 @@ public class ChatActivity extends AppCompatActivity {
     private static final String ANONYMOUS = "anonymous";
     private static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
     private static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
-    private static final String TAG = "SigninActivity";
     private static final int RC_PHOTO_PICKER = 2;
-    FirebaseDatabase mFirebaseDatabase;
-    FirebaseStorage mFirebaseStorage;
     private MessageAdapter mMessageAdapter;
     private EditText mMessageEditText;
     private Button mSendButton;
@@ -70,9 +67,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         // Initialize Firebase components
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseStorage = FirebaseStorage.getInstance();
+        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
 
         mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
@@ -330,6 +327,5 @@ public class ChatActivity extends AppCompatActivity {
         detachDatabaseReadListener();
         mMessageAdapter.clear();
     }
-
 
 }

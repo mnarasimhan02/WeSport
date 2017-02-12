@@ -95,7 +95,7 @@ public class CatalogActivity extends AppCompatActivity implements
      * Helper method to delete all games in the database.
      */
     private void deleteAllGames() {
-        int rowsDeleted = getContentResolver().delete(GameEntry.CONTENT_URI, null, null);
+        @SuppressWarnings("UnusedAssignment") int rowsDeleted = getContentResolver().delete(GameEntry.CONTENT_URI, null, null);
     }
 
     @Override

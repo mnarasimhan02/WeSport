@@ -38,11 +38,6 @@
 
     <!-- Today Widget -->
 
-    <dimen name="widget_detail_default_width">250dp</dimen>
-    <dimen name="widget_detail_default_height">180dp</dimen>
-    <dimen name="widget_detail_min_resize_width">220dp</dimen>
-    <dimen name="widget_detail_min_resize_height">@dimen/widget_detail_default_height</dimen>
-
     <!-- Text Sizes - We are using DP here rather than SP because these are already large
          font sizes, and going larger will cause lots of view problems.  This is only for
          the large forecast numbers in the forecast list -->

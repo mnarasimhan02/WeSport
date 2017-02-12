@@ -82,10 +82,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
         setContentView(R.layout.activity_maps);
+
         setUpMapIfNeeded();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         mLayout = findViewById(android.R.id.content);
+        Snackbar.make(mLayout, getString(R.string.map_help),
+                Snackbar.LENGTH_LONG).show();
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -162,8 +165,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
-        Snackbar.make(mLayout, getString(R.string.map_help),
-                Snackbar.LENGTH_LONG).show();
+
     }
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
