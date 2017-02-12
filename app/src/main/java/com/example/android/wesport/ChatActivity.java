@@ -1,10 +1,8 @@
 package com.example.android.wesport;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -83,8 +81,8 @@ public class ChatActivity extends AppCompatActivity {
         mSendButton = (Button) findViewById(R.id.sendButton);
 
         //Get Username from sharedpreferences
-        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final String mUserName = prefUser.getString("displayName", "anonymous");
+        //SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //final String mUserName = prefUser.getString("displayName", "anonymous");
         // Initialize message ListView and its adapter
         List<FriendlyMessage> friendlyMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, friendlyMessages);
@@ -124,7 +122,14 @@ public class ChatActivity extends AppCompatActivity {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUserName, null);
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user.getDisplayName() != null) {
+                    mUsername = user.getDisplayName();
+                    // attachDatabaseReadListener();
+                } else {
+                    mUsername = getString(R.string.email_user);
+                }
+                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, null);
                 mMessagesDatabaseReference.push().setValue(friendlyMessage);
 
                 // Clear input box

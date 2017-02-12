@@ -7,7 +7,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,12 +76,6 @@ public class SigninActivity extends AppCompatActivity {
                     //  Launch Mainactivity
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    Log.d("user", String.valueOf(user));
-                    if (user!=null) {
-                        storeUsername(user.getDisplayName());
-                        Log.d("user.getDisplayName()",user.getDisplayName());
-                    }
                  }
             }
         });
@@ -112,8 +105,6 @@ public class SigninActivity extends AppCompatActivity {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                     }
                     // User is signed in
-                    storeUsername(loginUser);
-                    //storing username is sharedpref to pass to chatActivity
                 } else {
                     // User is signed out
                     startActivityForResult(
@@ -145,34 +136,24 @@ public class SigninActivity extends AppCompatActivity {
         }
     }
 
-    private void storeUsername(String displayName) {
-        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        SharedPreferences.Editor editor = prefUser.edit();
-        editor.putString("displayName", displayName);
-        Log.d("displayName",displayName);
-        editor.apply();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Snackbar.make(mLayout, getString(R.string.signin_string),
                     Snackbar.LENGTH_LONG).show();
-            if (resultCode==RESULT_OK) {
-                // Sign-in succeeded, set up the UI
-                Snackbar.make(mLayout, getString(R.string.signin_string),
-                        Snackbar.LENGTH_LONG).show();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-            } else if (resultCode == RESULT_CANCELED) {
+            // Sign-in succeeded, set up the UI
+            Snackbar.make(mLayout, getString(R.string.signin_string),
+                    Snackbar.LENGTH_LONG).show();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Snackbar.make(mLayout, getString(R.string.signin_cancel),
                         Snackbar.LENGTH_LONG).show();
                 finish();
             }
         }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -196,7 +177,6 @@ public class SigninActivity extends AppCompatActivity {
         if (username != null) {
             mUsername = username;
             // attachDatabaseReadListener();
-            Log.d("mUsername",mUsername);
         } else {
             mUsername = getString(R.string.email_sign);
         }

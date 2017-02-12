@@ -82,13 +82,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
         setContentView(R.layout.activity_maps);
+        mLayout = findViewById(android.R.id.content);
 
         setUpMapIfNeeded();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        mLayout = findViewById(android.R.id.content);
-        Snackbar.make(mLayout, getString(R.string.map_help),
-                Snackbar.LENGTH_LONG).show();
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -194,6 +192,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
                         map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
+                        Snackbar.make(mLayout, getString(R.string.map_help),
+                                Snackbar.LENGTH_LONG).show();
                     }
 
                 } catch (Exception e) {
