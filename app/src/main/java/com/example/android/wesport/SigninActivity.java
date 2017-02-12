@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -76,7 +77,13 @@ public class SigninActivity extends AppCompatActivity {
                     //  Launch Mainactivity
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
-                }
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    Log.d("user", String.valueOf(user));
+                    if (user!=null) {
+                        storeUsername(user.getDisplayName());
+                        Log.d("user.getDisplayName()",user.getDisplayName());
+                    }
+                 }
             }
         });
         // Start the thread
@@ -125,14 +132,14 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
@@ -142,6 +149,7 @@ public class SigninActivity extends AppCompatActivity {
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = prefUser.edit();
         editor.putString("displayName", displayName);
+        Log.d("displayName",displayName);
         editor.apply();
     }
 
@@ -188,11 +196,10 @@ public class SigninActivity extends AppCompatActivity {
         if (username != null) {
             mUsername = username;
             // attachDatabaseReadListener();
+            Log.d("mUsername",mUsername);
         } else {
             mUsername = getString(R.string.email_sign);
         }
         return username;
     }
-
-
 }

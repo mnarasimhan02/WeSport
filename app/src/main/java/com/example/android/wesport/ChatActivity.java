@@ -84,7 +84,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //Get Username from sharedpreferences
         SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final String mUserName = prefUser.getString("displayName", "");
+        final String mUserName = prefUser.getString("displayName", "anonymous");
         // Initialize message ListView and its adapter
         List<FriendlyMessage> friendlyMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, friendlyMessages);
