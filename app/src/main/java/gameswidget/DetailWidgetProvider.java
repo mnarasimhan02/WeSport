@@ -12,8 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
-import com.example.android.wesport.CatalogActivity;
-import com.example.android.wesport.R;
+import com.my.game.wesport.CatalogActivity;
+import com.my.game.wesport.R;
 
 /**
  * Provider for a scrollable weather detail widget

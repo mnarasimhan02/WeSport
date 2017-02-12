@@ -13,13 +13,13 @@ import android.widget.RemoteViewsService;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
-import com.example.android.wesport.R;
-import com.example.android.wesport.data.GameContract.GameEntry;
+import com.my.game.wesport.R;
+import com.my.game.wesport.data.GameContract.GameEntry;
 
 import java.util.concurrent.ExecutionException;
 
-import static com.example.android.wesport.R.id.widget_icon;
-import static com.example.android.wesport.data.GameContract.GameEntry.COLUMN_GAME_NAME;
+import static com.my.game.wesport.R.id.widget_icon;
+import static com.my.game.wesport.data.GameContract.GameEntry.COLUMN_GAME_NAME;
 
 
 /**
