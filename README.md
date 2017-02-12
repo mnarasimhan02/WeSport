@@ -4,10 +4,8 @@ WeSport allows people to connect with each other to play games and stay active a
 
 
 ![Screenshot_1486940183.png]({{site.baseurl}}/Screenshot_1486940183.png)
-
 ![Screenshot_1486157988.png]({{site.baseurl}}/Screenshot_1486157988.png)
 ![Screenshot_1486930063.png]({{site.baseurl}}/Screenshot_1486930063.png)
-
 ![Screenshot_1486930063.png]({{site.baseurl}}/Screenshot_1486930063.png)
 ![Screenshot_1486930063.png]({{site.baseurl}}/Screenshot_1486930063.png)
 ![Screenshot_1486928669.png]({{site.baseurl}}/Screenshot_1486928669.png)
