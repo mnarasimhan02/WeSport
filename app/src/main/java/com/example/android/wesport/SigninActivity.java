@@ -75,6 +75,7 @@ public class SigninActivity extends AppCompatActivity {
                 else {
                     //  Launch Mainactivity
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                  }
             }
@@ -146,6 +147,7 @@ public class SigninActivity extends AppCompatActivity {
             Snackbar.make(mLayout, getString(R.string.signin_string),
                     Snackbar.LENGTH_LONG).show();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
