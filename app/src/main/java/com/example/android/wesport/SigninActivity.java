@@ -21,8 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.Arrays;
-
 @SuppressWarnings("ALL")
 public class SigninActivity extends AppCompatActivity {
 
@@ -46,6 +44,7 @@ public class SigninActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mLayout = findViewById(android.R.id.content);
         //  Declare a new thread to do a preference check. Library to invoke Intro slides
         Thread t = new Thread(new Runnable() {
             @Override
@@ -73,12 +72,16 @@ public class SigninActivity extends AppCompatActivity {
                     //  Apply changes
                     e.apply();
                 }
+                else {
+                    //  Launch Mainactivity
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         // Start the thread
         t.start();
         setContentView(R.layout.activity_main);
-        mLayout = findViewById(android.R.id.content);
         mUsername = ANONYMOUS;
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         // Initialize Firebase components
@@ -95,8 +98,6 @@ public class SigninActivity extends AppCompatActivity {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
                 if (user != null) {
                     if (user.getDisplayName() != null) {
                         loginUser = onSignedInInitialize(user.getDisplayName());
@@ -111,9 +112,11 @@ public class SigninActivity extends AppCompatActivity {
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
-                                    .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
-                                            new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build()))
+                                    .setProviders(
+                                            AuthUI.EMAIL_PROVIDER,
+                                            AuthUI.GOOGLE_PROVIDER)
                                     .setTheme(R.style.GreenTheme)
+                                    .setIsSmartLockEnabled(false)
                                     .build(),
                             RC_SIGN_IN);
                 }
@@ -146,15 +149,13 @@ public class SigninActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
-           Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        //    startActivity(intent);
             Snackbar.make(mLayout, getString(R.string.signin_string),
                     Snackbar.LENGTH_LONG).show();
             if (resultCode==RESULT_OK) {
                 // Sign-in succeeded, set up the UI
                 Snackbar.make(mLayout, getString(R.string.signin_string),
                         Snackbar.LENGTH_LONG).show();
-           // Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
