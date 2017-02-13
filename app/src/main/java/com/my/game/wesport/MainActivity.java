@@ -1,16 +1,22 @@
 package com.my.game.wesport;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -61,12 +67,39 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = chGame.edit();
                 editor.putString("chosenGame", chosenGame).apply();
-                mMenu.getItem(0).setVisible(true);
+                if (isLocationEnabled(getApplicationContext())) {
+                    mMenu.getItem(0).setVisible(true);
+                    buildGoogleApiClient();
+                }
+                else {
+                      Snackbar.make(mLayout, getString(R.string.loc_not_enable),
+                             Snackbar.LENGTH_LONG).show();
+                    buildGoogleApiClient();
+                }
             }
         });
         //setup GoogleApiclient
-        buildGoogleApiClient();
+        //buildGoogleApiClient();
+    }
 
+
+    public static boolean isLocationEnabled(Context context) {
+        int locationMode = 0;
+        String locationProviders;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            try {
+                locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
+
+            } catch (SettingNotFoundException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+
+        }else{
+            locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+            return !TextUtils.isEmpty(locationProviders);
+        }
     }
 
     //This method will be called when the user will tap on allow or deny
@@ -110,8 +143,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         // Connect the client.
-        mGoogleApiClient.connect();
         super.onStart();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
@@ -134,15 +178,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void startLocationServices() {
         try {
+            LocationRequest mLocationRequest = LocationRequest.create();
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-            if (mLastLocation != null) {
+                        mGoogleApiClient);
+            if (mLastLocation==null){
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            } else {
+                Log.d("mLastLocation", String.valueOf(mLastLocation));
                 lat = String.valueOf(mLastLocation.getLatitude());
                 lon = String.valueOf(mLastLocation.getLongitude());
             }
-            LocationRequest mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(10000); // Update location every 10 seconds
+            mLocationRequest.setInterval(10*1000); // Update location every 10 seconds
+            mLocationRequest.setFastestInterval(1 * 1000);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
             exception.printStackTrace();
@@ -158,11 +206,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
-    @SuppressWarnings("EmptyMethod")
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
+
 
     @Override
     public void onLocationChanged(Location location) {
@@ -203,5 +247,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("latitude", lat).apply();
         editor.putString("longtitude", lon).apply();
+
+
     }
 }

@@ -177,5 +177,6 @@
     <string name="get_address">retrieving address</string>
     <string name="map_help">Type address or long click marker to find address</string>
     <string name="next">NEXT</string>
+    <string name="loc_not_enable">Turn on location settings</string>
 
 </resources>
