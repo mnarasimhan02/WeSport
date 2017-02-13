@@ -1,5 +1,6 @@
 package com.my.game.wesport;
 
+import android.Manifest.permission;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,7 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private Menu mMenu;
     private View mLayout;
     private String chosenGame;
+    private Location mlocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,19 +70,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 editor.putString("chosenGame", chosenGame).apply();
                 if (isLocationEnabled(getApplicationContext())) {
                     mMenu.getItem(0).setVisible(true);
-                    buildGoogleApiClient();
+                    //buildGoogleApiClient();
                 }
                 else {
-                      Snackbar.make(mLayout, getString(R.string.loc_not_enable),
-                             Snackbar.LENGTH_LONG).show();
-                    buildGoogleApiClient();
+                    Snackbar.make(mLayout, getString(R.string.loc_not_enable),
+                            Snackbar.LENGTH_LONG).show();
+                    mMenu.getItem(0).setVisible(false);
                 }
             }
         });
         //setup GoogleApiclient
-        //buildGoogleApiClient();
+        buildGoogleApiClient();
     }
-
 
     public static boolean isLocationEnabled(Context context) {
         int locationMode = 0;
@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             try {
                 locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-
             } catch (SettingNotFoundException e) {
                 e.printStackTrace();
                 return false;
@@ -125,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 this.finish();
 
             }
-            // END_INCLUDE(permission_result)
-
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -143,19 +140,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onStart() {
         // Connect the client.
+        mGoogleApiClient.connect();
         super.onStart();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mGoogleApiClient.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-            mGoogleApiClient.disconnect();
-        }
     }
 
     @Override
@@ -167,30 +153,29 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_LOCATION);
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION);
         } else {
             startLocationServices();
-
         }
     }
-
     private void startLocationServices() {
         try {
             LocationRequest mLocationRequest = LocationRequest.create();
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                        mGoogleApiClient);
+                    mGoogleApiClient);
             if (mLastLocation==null){
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
             } else {
-                Log.d("mLastLocation", String.valueOf(mLastLocation));
                 lat = String.valueOf(mLastLocation.getLatitude());
                 lon = String.valueOf(mLastLocation.getLongitude());
             }
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(10*1000); // Update location every 10 seconds
-            mLocationRequest.setFastestInterval(1 * 1000);
+            //less power usage
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+            mLocationRequest.setSmallestDisplacement(30);
+            mLocationRequest.setInterval(60000*10); // Update location every 1 minute
+            mLocationRequest.setFastestInterval(10000);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
             exception.printStackTrace();
@@ -226,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mMenu = menu;
-        mMenu.getItem(0).setVisible(false);
+            mMenu.getItem(0).setVisible(false);
         //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }

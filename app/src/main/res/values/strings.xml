@@ -178,5 +178,8 @@
     <string name="map_help">Type address or long click marker to find address</string>
     <string name="next">NEXT</string>
     <string name="loc_not_enable">Turn on location settings</string>
+    <string name="gps_network_not_enabled">GPS not enabled</string>
+    <string name="open_location_settings">location not enabled</string>
+    <string name="Cancel">cancel</string>
 
 </resources>

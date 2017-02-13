@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.my.game.wesport.POJO.Example;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -30,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.my.game.wesport.POJO.Example;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -62,6 +62,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private View mLayout;
     private int PROXIMITY_RADIUS = 3000;
     private Menu mMenu;
+    private LatLng mlatlng;
 
     /*Autocomplete Widget*/
     private TextView mPlaceDetailsText;
@@ -156,10 +157,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Instiantiate background task to download places list and address list for respective locations
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        Double mLat = Double.parseDouble(preferences.getString("latitude", "-33.837708"));
+        Double mLon = Double.parseDouble(preferences.getString("longtitude", "151.210703"));
         build_retrofit_and_get_response(getString((R.string.type_param)),mLat,mLon);
-
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
