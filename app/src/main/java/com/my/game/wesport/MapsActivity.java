@@ -157,8 +157,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //Instiantiate background task to download places list and address list for respective locations
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Double mLat = Double.parseDouble(preferences.getString("latitude", "-33.837708"));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude", "151.210703"));
+        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
+        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         build_retrofit_and_get_response(getString((R.string.type_param)),mLat,mLon);
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
@@ -190,7 +190,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .title(parkName)
                                 .position(latLng)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-                        map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                        //map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
                         Snackbar.make(mLayout, getString(R.string.map_help),
                                 Snackbar.LENGTH_LONG).show();

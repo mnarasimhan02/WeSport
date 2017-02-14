@@ -154,7 +154,7 @@ public class SigninActivity extends AppCompatActivity {
             //if (!mActivity) {
                 Log.d("mActivity", String.valueOf(mActivity));
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
            // }
         } else if (resultCode == RESULT_CANCELED) {

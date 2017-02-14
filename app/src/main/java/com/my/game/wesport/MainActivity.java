@@ -171,11 +171,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 lat = String.valueOf(mLastLocation.getLatitude());
                 lon = String.valueOf(mLastLocation.getLongitude());
             }
-            //less power usage
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-            mLocationRequest.setSmallestDisplacement(30);
-            mLocationRequest.setInterval(60000*10); // Update location every 1 minute
-            mLocationRequest.setFastestInterval(10000);
+            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mLocationRequest.setInterval(10000); // Update location every 10 mins
+            mLocationRequest.setFastestInterval(1000);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         } catch (SecurityException exception) {
             exception.printStackTrace();
