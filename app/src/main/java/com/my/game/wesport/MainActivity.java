@@ -196,13 +196,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         storeprefs(lat, lon);
     }
 
-
     private void storeprefs(String lat, String lon) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("latitude", lat).apply();
         editor.putString("longtitude", lon).apply();
-
 
     }
 }

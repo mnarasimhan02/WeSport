@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -38,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.my.game.wesport.POJO.Example;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -85,7 +85,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String placeOpen;
     private String parkName;
     private int photoWidth, photoRefsize, widthSize;
-
     private String photoReference;
 
 
@@ -207,29 +206,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
                         parkName = response.body().getResults().get(i).getName();
                         widthSize= response.body().getResults().get(i).getPhotos().size();
-                        Log.d("i", String.valueOf(i));
                         if (i<widthSize) {
                             photoWidth = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
                         }
-                        Log.d("photos().size()", String.valueOf(widthSize));
-                        Log.d("getResults().size()", String.valueOf(response.body().getResults().size()));
-                        Log.d("photoWidth", String.valueOf(photoWidth));
-                        //int photoHeight=response.body().getResults().get(i).getPhotos().get(i).getHeight();
                         photoRefsize= response.body().getResults().get(i).getPhotos().size();
                         if (i<photoRefsize) {
-                            photoReference=response.body().getResults().get(i).getPhotos().get(i).getPhotoReference();
+                            photoReference=response.body().getResults().get(i).getPhotos().get(0).getPhotoReference();
                         }
                         if (open_now==null) {
                             open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
                              placeOpen = String.valueOf(open_now != null ? "Yes" : "");
                         }
-                        ratingstr=String.valueOf(response.body().getResults().get(i).getRating());
+                        ratingstr= String.valueOf(response.body().getResults().get(i).getRating());
+                        Log.d("ratingstrabove",ratingstr);
                         placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth="+photoWidth+
                                 "&photoreference="+photoReference+"&key="+getString(R.string.places_api_key));
-                        Log.d("placeOpen", String.valueOf(placeOpen));
                         Log.d("placeImageURI", String.valueOf(placeImageURI));
-                        Log.d("ratingstr", String.valueOf(ratingstr));
-
                         MarkerOptions markerOptions = new MarkerOptions();
                         LatLng latLng = new LatLng(lat, lng);
                         map.addMarker(new MarkerOptions()
@@ -254,27 +246,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public View getInfoContents(Marker marker) {
-        TextView infoTitle = ((TextView)myContentsView.findViewById(R.id.title));
+        TextView infoTitle = ((TextView) myContentsView.findViewById(R.id.title));
         infoTitle.setText(marker.getTitle());
-        TextView infoSnippet = ((TextView)myContentsView.findViewById(R.id.snippet));
+        TextView infoSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
         infoSnippet.setText(marker.getSnippet());
         TextView infoOpennow = (TextView) myContentsView.findViewById(R.id.open_now);
         infoSnippet.setText(placeOpen);
         ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
         if (placeImageURI == null) {
             placeImage.setVisibility(View.GONE);
-        }else{
-            Glide.with(MapsActivity.this).load(placeImageURI).into(placeImage);
+        } else {
+            Picasso.with(MapsActivity.this)
+                    .load(placeImageURI)
+                    .into(placeImage);
         }
-
         // declare RatingBar object
-        RatingBar ratingval=(RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
-        if( !(ratingstr.equals("null") )){
-            ratingval.setRating(Float.parseFloat(String.valueOf(ratingstr)));
+        RatingBar infoRating = (RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
+        Log.d("ratingstrinsideinfo", String.valueOf(ratingstr));
+        if (!(ratingstr.equals("null"))) {
+            try {
+                infoRating.setRating(Float.parseFloat(ratingstr));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
         }
-
         return myContentsView;
     }
+
+
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
     public void onEvent(String address){
