@@ -4,36 +4,43 @@
               android:layout_height="wrap_content"
               android:orientation="horizontal">
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
+            android:layout_width="100dp"
+            android:layout_height="140dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:contentDescription="@string/accessibility_place"
             android:focusable="false"
             android:adjustViewBounds="true"
             android:id="@+id/place_image"/>
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="@color/colorPrimaryLight" >
+
         <TextView
-        android:id="@+id/open_now"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/title"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
         android:textStyle="bold"/>
-        <RatingBar
-            android:id="@+id/place_rating"
-            style="?android:attr/ratingBarStyleSmall"
-            android:numStars="5"
-            android:rating="0"
-            android:isIndicator="false"
+
+    <RatingBar
+        android:id="@+id/place_rating"
+        style="?android:attr/ratingBarStyleSmall"
+        android:numStars="5"
+        android:rating="0"
+        android:isIndicator="false"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/open_now"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dip" />
+            android:textStyle="bold"/>
+
         <TextView
             android:id="@+id/snippet"
             android:layout_width="wrap_content"

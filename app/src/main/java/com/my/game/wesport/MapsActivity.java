@@ -53,8 +53,6 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-import static android.R.attr.rating;
-
 @SuppressWarnings("ALL")
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
 
@@ -86,7 +84,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Uri placeImageURI=null;
     private String placeOpen;
     private String parkName;
-    private int photoWidth;
+    private int photoWidth, photoRefsize, widthSize;
+
+    private String photoReference;
+
 
 
     public MapsActivity() {
@@ -205,18 +206,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
                         Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
                         parkName = response.body().getResults().get(i).getName();
-                        int size= response.body().getResults().get(i).getPhotos().size();
-                        if (i<size) {
+                        widthSize= response.body().getResults().get(i).getPhotos().size();
+                        Log.d("i", String.valueOf(i));
+                        if (i<widthSize) {
                             photoWidth = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
                         }
-                        Log.d("photos().size()", String.valueOf(size));
+                        Log.d("photos().size()", String.valueOf(widthSize));
                         Log.d("getResults().size()", String.valueOf(response.body().getResults().size()));
                         Log.d("photoWidth", String.valueOf(photoWidth));
                         //int photoHeight=response.body().getResults().get(i).getPhotos().get(i).getHeight();
-                        String photoReference=response.body().getResults().get(i).getPhotos().get(i).getPhotoReference();
+                        photoRefsize= response.body().getResults().get(i).getPhotos().size();
+                        if (i<photoRefsize) {
+                            photoReference=response.body().getResults().get(i).getPhotos().get(i).getPhotoReference();
+                        }
                         if (open_now==null) {
                             open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                             placeOpen = String.valueOf(open_now != null ? open_now : "");
+                             placeOpen = String.valueOf(open_now != null ? "Yes" : "");
                         }
                         ratingstr=String.valueOf(response.body().getResults().get(i).getRating());
                         placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth="+photoWidth+
@@ -225,7 +230,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Log.d("placeImageURI", String.valueOf(placeImageURI));
                         Log.d("ratingstr", String.valueOf(ratingstr));
 
-                        //Log.d("placeImageURI", String.valueOf(placeImageURI));
                         MarkerOptions markerOptions = new MarkerOptions();
                         LatLng latLng = new LatLng(lat, lng);
                         map.addMarker(new MarkerOptions()
@@ -266,7 +270,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // declare RatingBar object
         RatingBar ratingval=(RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
         if( !(ratingstr.equals("null") )){
-            ratingval.setRating(Float.parseFloat(String.valueOf(rating)));
+            ratingval.setRating(Float.parseFloat(String.valueOf(ratingstr)));
         }
 
         return myContentsView;

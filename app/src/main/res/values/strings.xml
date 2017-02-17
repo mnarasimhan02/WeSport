@@ -183,5 +183,6 @@
     <string name="gps_network_not_enabled">GPS not enabled</string>
     <string name="open_location_settings">location not enabled</string>
     <string name="Cancel">cancel</string>
+    <string name="accessibility_place">park image</string>
 
 </resources>
