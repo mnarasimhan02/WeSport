@@ -18,8 +18,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -69,13 +67,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 SharedPreferences.Editor editor = chGame.edit();
                 editor.putString("chosenGame", chosenGame).apply();
                 if (isLocationEnabled(getApplicationContext())) {
-                    mMenu.getItem(0).setVisible(true);
-                    //buildGoogleApiClient();
+                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        startActivity(intent);
                 }
                 else {
                     Snackbar.make(mLayout, getString(R.string.loc_not_enable),
                             Snackbar.LENGTH_LONG).show();
-                    mMenu.getItem(0).setVisible(false);
+                    startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                 }
             }
         });
@@ -190,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
@@ -199,31 +196,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         storeprefs(lat, lon);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_options, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        mMenu = menu;
-            mMenu.getItem(0).setVisible(false);
-        //  By default no Menu
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    //respond to menu item selection
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        super.onOptionsItemSelected(item);
-        if (item.getItemId() == R.id.menu_next) {
-            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-            startActivity(intent);
-        }
-        return true;
-    }
 
     private void storeprefs(String lat, String lon) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());

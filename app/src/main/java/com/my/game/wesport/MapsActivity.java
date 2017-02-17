@@ -185,7 +185,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         selectedGame = chGame.getString("chosenGame", "Other");
         setUserMarker(new LatLng(mLat, mLon));
-
     }
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
