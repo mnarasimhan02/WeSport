@@ -4,18 +4,23 @@ import android.Manifest.permission;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -23,11 +28,14 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.my.game.wesport.POJO.Example;
 
@@ -45,8 +53,10 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
+import static android.R.attr.rating;
+
 @SuppressWarnings("ALL")
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
 
     private static final String LOG_TAG = "GooglePlaces ";
     private final String TAG = "MapActivity";
@@ -69,6 +79,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView mPlaceAttribution;
     private double lat, lon;
 
+    /*Infowindow*/
+    private View myContentsView;
+    private Boolean open_now=null;
+    private String ratingstr;
+    private Uri placeImageURI=null;
+    private String placeOpen;
+    private String parkName;
+    private int photoWidth;
+
+
     public MapsActivity() {
         // Required empty public constructor
     }
@@ -84,6 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Restoring the markers on configuration changes
         setContentView(R.layout.activity_maps);
         mLayout = findViewById(android.R.id.content);
+        myContentsView = getLayoutInflater().inflate(R.layout.custom_info_content, null);
 
         setUpMapIfNeeded();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -154,6 +175,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map = sMap;
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
+        map.setInfoWindowAdapter(this);
 
         //Instiantiate background task to download places list and address list for respective locations
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -183,7 +205,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < response.body().getResults().size(); i++) {
                         Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
                         Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
-                        String parkName = response.body().getResults().get(i).getName();
+                        parkName = response.body().getResults().get(i).getName();
+                        int size= response.body().getResults().get(i).getPhotos().size();
+                        if (i<size) {
+                            photoWidth = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
+                        }
+                        Log.d("photos().size()", String.valueOf(size));
+                        Log.d("getResults().size()", String.valueOf(response.body().getResults().size()));
+                        Log.d("photoWidth", String.valueOf(photoWidth));
+                        //int photoHeight=response.body().getResults().get(i).getPhotos().get(i).getHeight();
+                        String photoReference=response.body().getResults().get(i).getPhotos().get(i).getPhotoReference();
+                        if (open_now==null) {
+                            open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
+                             placeOpen = String.valueOf(open_now != null ? open_now : "");
+                        }
+                        ratingstr=String.valueOf(response.body().getResults().get(i).getRating());
+                        placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth="+photoWidth+
+                                "&photoreference="+photoReference+"&key="+getString(R.string.places_api_key));
+                        Log.d("placeOpen", String.valueOf(placeOpen));
+                        Log.d("placeImageURI", String.valueOf(placeImageURI));
+                        Log.d("ratingstr", String.valueOf(ratingstr));
+
+                        //Log.d("placeImageURI", String.valueOf(placeImageURI));
                         MarkerOptions markerOptions = new MarkerOptions();
                         LatLng latLng = new LatLng(lat, lng);
                         map.addMarker(new MarkerOptions()
@@ -206,6 +249,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    @Override
+    public View getInfoContents(Marker marker) {
+        TextView infoTitle = ((TextView)myContentsView.findViewById(R.id.title));
+        infoTitle.setText(marker.getTitle());
+        TextView infoSnippet = ((TextView)myContentsView.findViewById(R.id.snippet));
+        infoSnippet.setText(marker.getSnippet());
+        TextView infoOpennow = (TextView) myContentsView.findViewById(R.id.open_now);
+        infoSnippet.setText(placeOpen);
+        ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
+        if (placeImageURI == null) {
+            placeImage.setVisibility(View.GONE);
+        }else{
+            Glide.with(MapsActivity.this).load(placeImageURI).into(placeImage);
+        }
+
+        // declare RatingBar object
+        RatingBar ratingval=(RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
+        if( !(ratingstr.equals("null") )){
+            ratingval.setRating(Float.parseFloat(String.valueOf(rating)));
+        }
+
+        return myContentsView;
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
     public void onEvent(String address){
         // store address details for the game
@@ -219,6 +286,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
+
+    private OnMarkerClickListener userMarkerClickListener = new OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            // show dialog
+            marker.showInfoWindow();
+            return true;
+        }
+    };
 
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
@@ -288,4 +364,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
+
+    @Override
+    public View getInfoWindow(Marker marker) {
+        return null;
+    }
+
+
 }

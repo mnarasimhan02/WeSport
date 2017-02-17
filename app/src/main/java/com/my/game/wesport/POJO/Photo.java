@@ -80,8 +80,9 @@ public class Photo {
      *
      * @return
      * The width
+     * @param i
      */
-    public Integer getWidth() {
+    public Integer getWidth(int i) {
         return width;
     }
 

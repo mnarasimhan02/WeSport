@@ -43,6 +43,8 @@
     <!-- Label for Google API Web-services and Google Maps key-->
     <string name="type_param">park</string>
     <string name="google_maps_key">AIzaSyA6VmyUcYdESQJJbATsA316c7S854W6a8U</string>
+    <string name="places_api_key">AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE</string>
+
     <!-- Games array-->
 
     <string-array name="games_array">
