@@ -44,7 +44,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Locale;
 
 import retrofit.Call;
@@ -85,8 +87,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String placeOpen;
     private String parkName;
     private int photoWidth, photoRefsize, widthSize;
-    private String photoReference;
+   // private String[] photoReference;
 
+    private ArrayList<String> photoReference = new ArrayList<String>();
+
+
+    // private String photoReference;
+
+    private Marker marker;
+    private Hashtable<String, Uri> markers;
+    //private ImageLoader imageLoader;
+    //private DisplayImageOptions options;
 
 
     public MapsActivity() {
@@ -188,7 +199,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
-
+        markers = new Hashtable<String, Uri>();
         String url = "https://maps.googleapis.com/maps/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -206,28 +217,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
                         parkName = response.body().getResults().get(i).getName();
                         widthSize= response.body().getResults().get(i).getPhotos().size();
+                        if (open_now==null) {
+                            open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
+                            placeOpen = String.valueOf(open_now != null ? "Yes" : "");
+                        }
                         if (i<widthSize) {
                             photoWidth = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
                         }
                         photoRefsize= response.body().getResults().get(i).getPhotos().size();
+                        photoReference.add(response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
                         if (i<photoRefsize) {
-                            photoReference=response.body().getResults().get(i).getPhotos().get(0).getPhotoReference();
-                        }
-                        if (open_now==null) {
-                            open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                             placeOpen = String.valueOf(open_now != null ? "Yes" : "");
+                            for (int j = 0; j <response.body().getResults().get(i).getPhotos().size(); j++) {
+                                Log.d("photoReference", String.valueOf(photoReference));
+                                placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth="+photoWidth+
+                                        "&photoreference="+photoReference.get(i)+"&key="+getString(R.string.places_api_key));
+                            }
+                            //photoReference=response.body().getResults().get(i).getPhotos().get(0).getPhotoReference();
                         }
                         ratingstr= String.valueOf(response.body().getResults().get(i).getRating());
-                        Log.d("ratingstrabove",ratingstr);
-                        placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth="+photoWidth+
-                                "&photoreference="+photoReference+"&key="+getString(R.string.places_api_key));
-                        Log.d("placeImageURI", String.valueOf(placeImageURI));
-                        MarkerOptions markerOptions = new MarkerOptions();
+                        //Log.d("ratingstrabove",ratingstr);
                         LatLng latLng = new LatLng(lat, lng);
-                        map.addMarker(new MarkerOptions()
+                        Marker parkMarker  = map.addMarker(new MarkerOptions()
                                 .title(parkName)
                                 .position(latLng)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
+                        markers.put(parkMarker.getId(),placeImageURI);
+                        Log.d("placeImageURI", String.valueOf(placeImageURI));
                         //map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
                         Snackbar.make(mLayout, getString(R.string.map_help),
@@ -241,11 +256,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onFailure(Throwable t) {
             }
+
         });
     }
 
     @Override
     public View getInfoContents(Marker marker) {
+        if (MapsActivity.this.marker != null
+                && MapsActivity.this.marker.isInfoWindowShown()) {
+            MapsActivity.this.marker.hideInfoWindow();
+            MapsActivity.this.marker.showInfoWindow();
+        }
+        return null;
+    }
+
+    @Override
+    public View getInfoWindow(Marker marker) {
+        MapsActivity.this.marker = marker;
+        Uri uri = null;
+        if (marker.getId() != null && markers != null && markers.size() > 0) {
+            if ( markers.get(marker.getId()) != null &&
+                    markers.get(marker.getId()) != null) {
+                uri = markers.get(marker.getId());
+            }
+            Log.d("uri", String.valueOf(uri));
+        }
         TextView infoTitle = ((TextView) myContentsView.findViewById(R.id.title));
         infoTitle.setText(marker.getTitle());
         TextView infoSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
@@ -253,12 +288,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         TextView infoOpennow = (TextView) myContentsView.findViewById(R.id.open_now);
         infoSnippet.setText(placeOpen);
         ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
-        if (placeImageURI == null) {
+        if (uri == null) {
             placeImage.setVisibility(View.GONE);
         } else {
             Picasso.with(MapsActivity.this)
-                    .load(placeImageURI)
-                    .into(placeImage);
+                    .load(uri)
+                    .into(placeImage, new InfoWindowRefresher(marker));
         }
         // declare RatingBar object
         RatingBar infoRating = (RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
@@ -272,7 +307,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         return myContentsView;
     }
-
 
 
 
@@ -367,11 +401,5 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         EventBus.getDefault().unregister(this);
         super.onStop();
     }
-
-    @Override
-    public View getInfoWindow(Marker marker) {
-        return null;
-    }
-
 
 }

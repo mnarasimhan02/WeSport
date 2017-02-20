@@ -1,6 +1,5 @@
 package com.my.game.wesport;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager;
@@ -15,11 +14,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
+import android.provider.CalendarContract.Events;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -242,11 +244,15 @@ public class EditorActivity extends AppCompatActivity implements
     }
 
     private void updateDateDisplay(TextView mtextview) {
-        mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), 0));
+        //mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE));
+        long today = mDateAndTime.getTimeInMillis();
+        SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM dd",  Locale.getDefault());
+        String dateString = sdfDate.format(today);
+        mtextview.setText(dateString);
     }
 
     private boolean TimeValidator(String time1, String time2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a",  Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a",  Locale.getDefault());
         boolean b = false;
         try {
             Date startTime = sdf.parse(time1);
@@ -326,7 +332,7 @@ public class EditorActivity extends AppCompatActivity implements
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
         if (mCurrentGameUri == null &&
-                (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(sdString))&&
+                (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(sdString)) &&
                 mSkill == GameEntry.SKILL_ROOKIES) {
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.
@@ -378,114 +384,32 @@ public class EditorActivity extends AppCompatActivity implements
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
-                Snackbar.make(mLayout,  getString(R.string.editor_update_game_failed),
+                Snackbar.make(mLayout, getString(R.string.editor_update_game_failed),
                         Snackbar.LENGTH_LONG).show();
-             } else {
+            } else {
                 // Otherwise, the update was successful and we can display a toast.
-                Snackbar.make(mLayout,  getString(R.string.editor_update_game_failed),
+                Snackbar.make(mLayout, getString(R.string.editor_update_game_failed),
                         Snackbar.LENGTH_LONG).show();
-             }
+            }
         }
 
-        pushAppointmentsToCalender(EditorActivity.this,selectedGame,nameString,gameaddress,5, Long.parseLong(sdString),true,false);
+
+        Calendar cal = Calendar.getInstance();
+        Log.d("cal", String.valueOf(cal.getTimeInMillis()));
+        Intent intent = new Intent(Intent.ACTION_EDIT);
+        intent.setType("vnd.android.cursor.item/event");
+        intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis());
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis()+60*60*1000);
+        intent.putExtra(Events.TITLE, selectedGame);
+        intent.putExtra(Events.DESCRIPTION, nameString);
+        intent.putExtra(Events.EVENT_LOCATION, gameaddress);
+        intent.putExtra(Events.RRULE, "FREQ=YEARLY");
+        startActivity(intent);
 
     }
 
-    public static long pushAppointmentsToCalender(Activity curActivity, String title, String addInfo, String place, int status, long startDate, boolean needReminder, boolean needMailService) {
-        /***************** Event: note(without alert) *******************/
 
-        String eventUriString = "content://com.android.calendar/events";
-        ContentValues eventValues = new ContentValues();
-
-        eventValues.put("calendar_id", 1); // id, We need to choose from
-        // our mobile for primary
-        // its 1
-        eventValues.put("title", title);
-        eventValues.put("description", addInfo);
-        eventValues.put("eventLocation", place);
-
-        long endDate = startDate + 1000 * 60 * 60; // For next 1hr
-
-        eventValues.put("dtstart", startDate);
-        eventValues.put("dtend", endDate);
-
-        // values.put("allDay", 1); //If it is bithday alarm or such
-        // kind (which should remind me for whole day) 0 for false, 1
-        // for true
-        eventValues.put("eventStatus", status); // This information is
-        // sufficient for most
-        // entries tentative (0),
-        // confirmed (1) or canceled
-        // (2):
-        eventValues.put("eventTimezone", "UTC/GMT +2:00");
-   /*Comment below visibility and transparency  column to avoid java.lang.IllegalArgumentException column visibility is invalid error */
-
-    /*eventValues.put("visibility", 3); // visibility to default (0),
-                                        // confidential (1), private
-                                        // (2), or public (3):
-    eventValues.put("transparency", 0); // You can control whether
-                                        // an event consumes time
-                                        // opaque (0) or transparent
-                                        // (1).
-      */
-        eventValues.put("hasAlarm", 1); // 0 for false, 1 for true
-
-        Uri eventUri = curActivity.getApplicationContext().getContentResolver().insert(Uri.parse(eventUriString), eventValues);
-        long eventID = Long.parseLong(eventUri.getLastPathSegment());
-
-        if (needReminder) {
-            /***************** Event: Reminder(with alert) Adding reminder to event *******************/
-
-            String reminderUriString = "content://com.android.calendar/reminders";
-
-            ContentValues reminderValues = new ContentValues();
-
-            reminderValues.put("event_id", eventID);
-            reminderValues.put("minutes", 5); // Default value of the
-            // system. Minutes is a
-            // integer
-            reminderValues.put("method", 1); // Alert Methods: Default(0),
-            // Alert(1), Email(2),
-            // SMS(3)
-
-            Uri reminderUri = curActivity.getApplicationContext().getContentResolver().insert(Uri.parse(reminderUriString), reminderValues);
-        }
-
-        /***************** Event: Meeting(without alert) Adding Attendies to the meeting *******************/
-
-        if (needMailService) {
-            String attendeuesesUriString = "content://com.android.calendar/attendees";
-
-            /********
-             * To add multiple attendees need to insert ContentValues multiple
-             * times
-             ***********/
-            ContentValues attendeesValues = new ContentValues();
-
-            attendeesValues.put("event_id", eventID);
-            attendeesValues.put("attendeeName", "xxxxx"); // Attendees name
-            attendeesValues.put("attendeeEmail", "yyyy@gmail.com");// Attendee
-            // E
-            // mail
-            // id
-            attendeesValues.put("attendeeRelationship", 0); // Relationship_Attendee(1),
-            // Relationship_None(0),
-            // Organizer(2),
-            // Performer(3),
-            // Speaker(4)
-            attendeesValues.put("attendeeType", 0); // None(0), Optional(1),
-            // Required(2), Resource(3)
-            attendeesValues.put("attendeeStatus", 0); // NOne(0), Accepted(1),
-            // Decline(2),
-            // Invited(3),
-            // Tentative(4)
-
-            Uri attendeuesesUri = curActivity.getApplicationContext().getContentResolver().insert(Uri.parse(attendeuesesUriString), attendeesValues);
-        }
-
-        return eventID;
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
