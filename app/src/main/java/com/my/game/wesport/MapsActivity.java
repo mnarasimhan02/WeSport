@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit.Call;
@@ -86,18 +87,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Uri placeImageURI=null;
     private String placeOpen;
     private String parkName;
-    private int photoWidth, photoRefsize, widthSize;
-   // private String[] photoReference;
 
-    private ArrayList<String> photoReference = new ArrayList<String>();
-
-
-    // private String photoReference;
 
     private Marker marker;
     private Hashtable<String, Uri> markers;
-    //private ImageLoader imageLoader;
-    //private DisplayImageOptions options;
+    private List<String> photoReference = new ArrayList<String>();
+
+    private int photoReferenceSize = 0;
 
 
     public MapsActivity() {
@@ -200,6 +196,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
         markers = new Hashtable<String, Uri>();
+        final int[] photoWidth = new int[1];
+        final int[] photoRefsize = new int[1];
+        final int[] widthSize = new int[1];
+
         String url = "https://maps.googleapis.com/maps/";
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -207,58 +207,61 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
         RetrofitMaps service = retrofit.create(RetrofitMaps.class);
         Call<Example> call = service.getNearbyPlaces(type, mLat + "," + mLon, PROXIMITY_RADIUS);
-        call.enqueue(new Callback<Example>() {
-            @Override
-            public void onResponse(Response<Example> response, Retrofit retrofit) {
-                try {
-                    // This loop will go through all the results and add marker on each location.
-                    for (int i = 0; i < response.body().getResults().size(); i++) {
-                        Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
-                        Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
-                        parkName = response.body().getResults().get(i).getName();
-                        widthSize= response.body().getResults().get(i).getPhotos().size();
-                        if (open_now==null) {
-                            open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                            placeOpen = String.valueOf(open_now != null ? "Yes" : "");
-                        }
-                        if (i<widthSize) {
-                            photoWidth = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
-                        }
-                        photoRefsize= response.body().getResults().get(i).getPhotos().size();
-                        photoReference.add(response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
-                        if (i<photoRefsize) {
-                            for (int j = 0; j <response.body().getResults().get(i).getPhotos().size(); j++) {
-                                Log.d("photoReference", String.valueOf(photoReference));
-                                placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth="+photoWidth+
-                                        "&photoreference="+photoReference.get(i)+"&key="+getString(R.string.places_api_key));
+            call.enqueue(new Callback<Example>() {
+                @Override
+                public void onResponse(Response<Example> response, Retrofit retrofit) {
+                    try {
+                        // This loop will go through all the results and add marker on each location.
+                        for (int i = 0; i < response.body().getResults().size(); i++) {
+                            Log.d("i", String.valueOf(i));
+                            Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
+                            Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
+                            parkName = response.body().getResults().get(i).getName();
+                            widthSize[0] = response.body().getResults().get(i).getPhotos().size();
+                            //Get if park is open_now
+                            if (open_now == null) {
+                                open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
+                                placeOpen = String.valueOf(open_now != null ? "Yes" : "");
                             }
-                            //photoReference=response.body().getResults().get(i).getPhotos().get(0).getPhotoReference();
+                            //Get PhotoMaxWidth
+                            if (i < widthSize[0]) {
+                                photoWidth[0] = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
+                                photoRefsize[0] = response.body().getResults().get(i).getPhotos().size();
+                            }
+                            //Get photoreference of first photo of all parks
+                            photoReferenceSize =response.body().getResults().get(i).getPhotos().size();
+                            if (photoReferenceSize !=0) {
+                                photoReference.add(response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
+                            }
+                            if (!photoReference.isEmpty() && photoReference.size()>0) {
+                                        placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth=" + photoWidth[0] +
+                                                "&photoreference=" + photoReference.get(i) + "&key=" + getString(R.string.places_api_key));
+                                Log.d("placeImageURI", String.valueOf(placeImageURI));
+                            }
+                                //Get ratings for parks
+                                ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                                LatLng latLng = new LatLng(lat, lng);
+                                Marker parkMarker = map.addMarker(new MarkerOptions()
+                                        .title(parkName)
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
+                                markers.put(parkMarker.getId(), placeImageURI);
+                                map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
+                                Snackbar.make(mLayout, getString(R.string.map_help),
+                                        Snackbar.LENGTH_LONG).show();
                         }
-                        ratingstr= String.valueOf(response.body().getResults().get(i).getRating());
-                        //Log.d("ratingstrabove",ratingstr);
-                        LatLng latLng = new LatLng(lat, lng);
-                        Marker parkMarker  = map.addMarker(new MarkerOptions()
-                                .title(parkName)
-                                .position(latLng)
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-                        markers.put(parkMarker.getId(),placeImageURI);
-                        Log.d("placeImageURI", String.valueOf(placeImageURI));
-                        //map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                        map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
-                        Snackbar.make(mLayout, getString(R.string.map_help),
-                                Snackbar.LENGTH_LONG).show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-            @Override
-            public void onFailure(Throwable t) {
-            }
 
-        });
-    }
+                @Override
+                public void onFailure(Throwable t) {
+                }
+
+            });
+        }
 
     @Override
     public View getInfoContents(Marker marker) {
@@ -278,8 +281,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if ( markers.get(marker.getId()) != null &&
                     markers.get(marker.getId()) != null) {
                 uri = markers.get(marker.getId());
+                Log.d("uri", String.valueOf(uri));
             }
-            Log.d("uri", String.valueOf(uri));
         }
         TextView infoTitle = ((TextView) myContentsView.findViewById(R.id.title));
         infoTitle.setText(marker.getTitle());
