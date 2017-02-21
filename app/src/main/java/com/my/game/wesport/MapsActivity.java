@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,10 +43,8 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Locale;
 
 import retrofit.Call;
@@ -91,7 +88,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Marker marker;
     private Hashtable<String, Uri> markers;
-    private List<String> photoReference = new ArrayList<String>();
+    private Hashtable<String, String> rating;
+
+    //private List<String> photoReference = new ArrayList<String>();
 
     private int photoReferenceSize = 0;
 
@@ -196,9 +195,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
         markers = new Hashtable<String, Uri>();
+        rating = new Hashtable<String, String>();
         final int[] photoWidth = new int[1];
         final int[] photoRefsize = new int[1];
         final int[] widthSize = new int[1];
+        final String[] photoReference = {null};
 
         String url = "https://maps.googleapis.com/maps/";
         Retrofit retrofit = new Retrofit.Builder()
@@ -213,7 +214,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     try {
                         // This loop will go through all the results and add marker on each location.
                         for (int i = 0; i < response.body().getResults().size(); i++) {
-                            Log.d("i", String.valueOf(i));
                             Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
                             Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
                             parkName = response.body().getResults().get(i).getName();
@@ -231,21 +231,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             //Get photoreference of first photo of all parks
                             photoReferenceSize =response.body().getResults().get(i).getPhotos().size();
                             if (photoReferenceSize !=0) {
-                                photoReference.add(response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
+                                photoReference[0] = (response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
                             }
-                            if (!photoReference.isEmpty() && photoReference.size()>0) {
+                            if (!photoReference[0].isEmpty()) {
                                         placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth=" + photoWidth[0] +
-                                                "&photoreference=" + photoReference.get(i) + "&key=" + getString(R.string.places_api_key));
-                                Log.d("placeImageURI", String.valueOf(placeImageURI));
+                                                "&photoreference="+ photoReference[0] + "&key=" + getString(R.string.places_api_key));
                             }
                                 //Get ratings for parks
-                                ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
-                                LatLng latLng = new LatLng(lat, lng);
+                            ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                            LatLng latLng = new LatLng(lat, lng);
                                 Marker parkMarker = map.addMarker(new MarkerOptions()
                                         .title(parkName)
                                         .position(latLng)
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
                                 markers.put(parkMarker.getId(), placeImageURI);
+                                rating.put(parkMarker.getId(), ratingstr);
                                 map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
                                 Snackbar.make(mLayout, getString(R.string.map_help),
                                         Snackbar.LENGTH_LONG).show();
@@ -277,11 +277,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public View getInfoWindow(Marker marker) {
         MapsActivity.this.marker = marker;
         Uri uri = null;
+        //String ratingstr=null;
         if (marker.getId() != null && markers != null && markers.size() > 0) {
             if ( markers.get(marker.getId()) != null &&
                     markers.get(marker.getId()) != null) {
                 uri = markers.get(marker.getId());
-                Log.d("uri", String.valueOf(uri));
+                ratingstr= rating.get(marker.getId());
             }
         }
         TextView infoTitle = ((TextView) myContentsView.findViewById(R.id.title));
@@ -300,13 +301,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         // declare RatingBar object
         RatingBar infoRating = (RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
-        Log.d("ratingstrinsideinfo", String.valueOf(ratingstr));
         if (!(ratingstr.equals("null"))) {
             try {
                 infoRating.setRating(Float.parseFloat(ratingstr));
             } catch (NumberFormatException e) {
                 e.printStackTrace();
             }
+        } else {
+            infoRating.setRating(0.0f);
         }
         return myContentsView;
     }

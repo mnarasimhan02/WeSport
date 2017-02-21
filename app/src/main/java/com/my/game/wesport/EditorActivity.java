@@ -36,6 +36,7 @@ import android.widget.TimePicker;
 
 import com.my.game.wesport.data.GameContract.GameEntry;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -393,14 +394,49 @@ public class EditorActivity extends AppCompatActivity implements
             }
         }
 
+        final Calendar c = Calendar.getInstance();
+        int yy = c.get(Calendar.YEAR);
 
+        SimpleDateFormat calDatFormat = new SimpleDateFormat("MMMMM DD YYYY", Locale.getDefault());
+        SimpleDateFormat  calDatTargetFormat= new SimpleDateFormat("MM DD YY", Locale.getDefault());
+        DateFormat formatter = new SimpleDateFormat("MM DD yyyy hh:mm a", Locale.getDefault());
+        sdString = sdString + " " + yy;
+        etString = sdString + " " + etString;
+        Log.d("sdString", String.valueOf(sdString));
+        Log.d("etString", String.valueOf(etString));
+        long dtStart = 0;
+        long dtEnd = 0;
+        long dateInLong = 0;
+        try {
+
+            //DateFormat df = new SimpleDateFormat("MMM DD YYYY", Locale.getDefault());
+            //Calendar cal  = Calendar.getInstance();
+            //cal.setTime(df.parse(sdString));
+            Date date = calDatFormat.parse(sdString);
+            System.out.println(date);
+
+            //Date date2 = calDatTargetFormat.format(date);
+
+            dateInLong = date.getTime();
+            Log.d("date", String.valueOf(date));
+            Log.d("dateInLong", String.valueOf(dateInLong));
+
+            //Date finalStdate = calDatFormat.parse(sdString);
+            //Date finalSttime = formatter.parse(etString);
+            //dtStart = finalStdate.getDate();
+            //Log.d("finalStdate", String.valueOf(cal));
+            //Log.d("dateInLong", String.valueOf(dtStart));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         Calendar cal = Calendar.getInstance();
         Log.d("cal", String.valueOf(cal.getTimeInMillis()));
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
         intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis());
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis()+60*60*1000);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, dateInLong);
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 60 * 60 * 1000);
         intent.putExtra(Events.TITLE, selectedGame);
         intent.putExtra(Events.DESCRIPTION, nameString);
         intent.putExtra(Events.EVENT_LOCATION, gameaddress);

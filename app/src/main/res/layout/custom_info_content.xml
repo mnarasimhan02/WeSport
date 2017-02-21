@@ -2,48 +2,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:orientation="horizontal">
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:contentDescription="@string/accessibility_place"
-            android:adjustViewBounds="true"
-            android:id="@+id/place_image"/>
+              android:orientation="horizontal"
+              android:weightSum="1">
+    <ImageView
+        android:id="@+id/place_image"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_marginEnd="8dp"
+        android:scaleType="center"
+        android:contentDescription="@string/accessibility_place"
+        android:adjustViewBounds="true" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/colorPrimaryLight" >
+        android:background="@color/colorPrimaryLight"
+        android:layout_weight="2">
 
         <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:textStyle="bold"/>
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#ff000000"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/snippet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"/>
+            android:textColor="#ff7f7f7f"
+            android:textSize="14sp" />
+
         <TextView
             android:id="@+id/open_now"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"/>
-
-    <RatingBar
-        android:id="@+id/place_rating"
-        style="?android:attr/ratingBarStyleSmall"
-        android:numStars="5"
-        android:rating="0"
-        android:isIndicator="false"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
+        <RatingBar
+            android:id="@+id/place_rating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:numStars="5"
+            android:rating="0"
+            android:isIndicator="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </LinearLayout>
-

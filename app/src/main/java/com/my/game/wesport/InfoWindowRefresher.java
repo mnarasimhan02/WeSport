@@ -1,5 +1,7 @@
 package com.my.game.wesport;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Callback;
 
@@ -23,6 +25,9 @@ public class InfoWindowRefresher implements Callback {
     }
 
     @Override
-    public void onError() {}
+    public void onError() {
+        Log.e(getClass().getSimpleName(), "Error loading park image!");
+
+    }
 
 }
