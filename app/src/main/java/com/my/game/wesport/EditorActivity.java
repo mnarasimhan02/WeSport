@@ -397,13 +397,9 @@ public class EditorActivity extends AppCompatActivity implements
         SimpleDateFormat calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
         SimpleDateFormat caletDatFormat = new SimpleDateFormat("MMMMM dd yyyy hh:mm a", Locale.getDefault());
         sdString = sdString + " " + yy;
-        etString = sdString + " " + etString;
+        etString = sdString + etString;
         long stdateInLong = 0;long etdateInLong = 0;
         try {
-
-            //DateFormat df = new SimpleDateFormat("MMM DD YYYY", Locale.getDefault());
-            //Calendar cal  = Calendar.getInstance();
-            //cal.setTime(df.parse(sdString));
             Date BEGIN_TIME = calstDatFormat.parse(sdString);
             Date END_TIME = caletDatFormat.parse(etString);
             stdateInLong = BEGIN_TIME.getTime();

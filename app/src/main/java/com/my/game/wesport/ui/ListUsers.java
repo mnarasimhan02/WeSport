@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,7 +51,6 @@ public class ListUsers extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_users);
-        Log.d("inside listusers","inside");
         bindButterKnife();
         setAuthInstance();
         setUsersDatabase();
@@ -67,21 +65,16 @@ public class ListUsers extends Activity {
 
     private void setAuthInstance() {
         mAuth = FirebaseAuth.getInstance();
-        Log.d("inside listusers","mAuth");
     }
 
     private void setUsersDatabase() {
         mUserRefDatabase = FirebaseDatabase.getInstance().getReference().child("users");
-        Log.d("inside listusers","setUsers");
-
     }
     private void setUserRecyclerView() {
         mUsersChatAdapter = new UsersChatAdapter(this, new ArrayList<User>());
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mUsersRecyclerView.setHasFixedSize(true);
         mUsersRecyclerView.setAdapter(mUsersChatAdapter);
-        Log.d("inside listusers","setUserRecyclerView");
-
     }
 
     private void setUsersKeyList() {
@@ -108,7 +101,6 @@ public class ListUsers extends Activity {
                     }
                     // User is signed in
                 } else {
-                Log.d("inside listusers", String.valueOf(loginUser));
                     // User is signed out
                     goToLogin();
                 }
@@ -118,14 +110,11 @@ public class ListUsers extends Activity {
 
     private void setUserData(FirebaseUser user) {
         mCurrentUserUid = user.getUid();
-        Log.d("inside listusers", String.valueOf(mCurrentUserUid));
     }
 
     private void queryAllUsers() {
         mChildEventListener = getChildEventListener();
         mUserRefDatabase.limitToFirst(50).addChildEventListener(mChildEventListener);
-        Log.d("queryAllUsers", String.valueOf(mUserRefDatabase.limitToFirst(50).addChildEventListener(mChildEventListener)));
-
     }
 
     private void goToLogin() {
@@ -140,15 +129,12 @@ public class ListUsers extends Activity {
         super.onStart();
         showProgressBarForUsers();
         mAuth.addAuthStateListener(mAuthListener);
-        Log.d("onStart", "onStart");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
         clearCurrentUsers();
-        Log.d("onStop", "onStop");
 
         if (mChildEventListener != null) {
             mUserRefDatabase.removeEventListener(mChildEventListener);
@@ -209,7 +195,6 @@ public class ListUsers extends Activity {
         return new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d("ChildEventListener", String.valueOf(dataSnapshot.exists()));
                 if(dataSnapshot.exists()){
                     String userUid = dataSnapshot.getKey();
                     if(dataSnapshot.getKey().equals(mCurrentUserUid)){

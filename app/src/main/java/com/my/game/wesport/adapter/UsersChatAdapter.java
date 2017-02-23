@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,9 +64,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
             // Red color
             holder.getStatusConnection().setTextColor(Color.parseColor("#FF0000"));
         }
-
     }
-
     @Override
     public int getItemCount() {
         return mUsers.size();
@@ -108,7 +105,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
             mUserDisplayName = (TextView)itemView.findViewById(R.id.text_view_display_name);
             mStatusConnection = (TextView)itemView.findViewById(R.id.text_view_connection_status);
             mContextViewHolder = context;
-
             itemView.setOnClickListener(this);
         }
 
@@ -128,11 +124,8 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         public void onClick(View view) {
             String chatRef=null;
             User user = mUsers.get(getLayoutPosition());
-
-            if (mCurrentUserCreatedAt!=null && mCurrentUserEmail!=null ) {
+            if (mCurrentUserCreatedAt!=null && mCurrentUserEmail!=null) {
                 chatRef = user.createUniqueChatRef(mCurrentUserCreatedAt, mCurrentUserEmail);
-                Log.d("mCurrentUserEmail",mCurrentUserEmail);
-                Log.d("mCurrentUserCreatedAt", String.valueOf(mCurrentUserCreatedAt));
             }
             Intent chatIntent = new Intent(mContextViewHolder, ChatActivity.class);
             chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, mCurrentUserId);

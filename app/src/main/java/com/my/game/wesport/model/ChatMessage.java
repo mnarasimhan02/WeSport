@@ -5,10 +5,10 @@ import com.google.firebase.database.Exclude;
 @SuppressWarnings("unused")
 public class ChatMessage {
 
-    private String photoUrl;
     private String message;
-    private String sender;
     private String recipient;
+    private String sender;
+    private String photoUrl;
     private int mRecipientOrSenderStatus;
 
     public ChatMessage() {

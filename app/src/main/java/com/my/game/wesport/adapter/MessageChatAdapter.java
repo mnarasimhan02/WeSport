@@ -1,6 +1,7 @@
 package com.my.game.wesport.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,13 +76,13 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         boolean isPhoto = senderFireMessage.getPhotoUrl() != null;
         if (isPhoto) {
             viewHolderSender.getSenderMessageTextView().setVisibility(View.GONE);
-            viewHolderSender.getSenderphotoImageView().setVisibility(View.VISIBLE);
+           // viewHolderSender.getSenderphotoImageView().setVisibility(View.VISIBLE);
             Glide.with(viewHolderSender.getSenderphotoImageView().getContext())
                     .load(senderFireMessage.getPhotoUrl())
                     .into(viewHolderSender.mSenderphotoImageView);
         } else {
             viewHolderSender.getSenderMessageTextView().setVisibility(View.VISIBLE);
-            viewHolderSender.getSenderphotoImageView().setVisibility(View.GONE);
+//            viewHolderSender.getSenderphotoImageView().setVisibility(View.GONE);
             viewHolderSender.getSenderMessageTextView().setText(senderFireMessage.getMessage());
         }
     }
@@ -92,20 +93,22 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         boolean isPhoto = recipientFireMessage.getPhotoUrl() != null;
         if (isPhoto) {
             viewHolderRecipient.getRecipientMessageTextView().setVisibility(View.GONE);
-            viewHolderRecipient.getReceiverphotoImageView().setVisibility(View.VISIBLE);
+            //viewHolderRecipient.getReceiverphotoImageView().setVisibility(View.VISIBLE);
             Glide.with(viewHolderRecipient.getReceiverphotoImageView().getContext())
                     .load(recipientFireMessage.getPhotoUrl())
                     .into(viewHolderRecipient.mReceiverphotoImageView);
         } else {
             viewHolderRecipient.getRecipientMessageTextView().setVisibility(View.VISIBLE);
-            viewHolderRecipient.getReceiverphotoImageView().setVisibility(View.GONE);
+            //viewHolderRecipient.getReceiverphotoImageView().setVisibility(View.GONE);
             viewHolderRecipient.getRecipientMessageTextView().setText(recipientFireMessage.getMessage());
         }
     }
 
     @Override
     public int getItemCount() {
+        Log.d("adapter size", String.valueOf(mChatList.size()));
         return mChatList.size();
+
     }
 
 
@@ -113,9 +116,12 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         /*add new message chat to list*/
         mChatList.add(newFireChatMessage);
+        Log.d("Message Chat adapter", "newFireChatMessage");
 
         /*refresh view*/
         notifyItemInserted(getItemCount()-1);
+        Log.d("refresh", "refresh");
+
     }
 
 

@@ -46,8 +46,6 @@ import static com.my.game.wesport.login.SigninActivity.RC_SIGN_IN;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String ANONYMOUS = "anonymous";
-    private static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
-    private static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
     private static final int RC_PHOTO_PICKER = 2;
     private String mUsername;
     private FirebaseAuth mFirebaseAuth;
@@ -55,6 +53,8 @@ public class ChatActivity extends AppCompatActivity {
     private ChildEventListener mChildEventListener;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private StorageReference mChatPhotosStorageReference;
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseStorage mFirebaseStorage;
 
     private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
 
@@ -79,10 +79,9 @@ public class ChatActivity extends AppCompatActivity {
         setUsersId();
         setChatRecyclerView();
         // Initialize Firebase components
-        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
-        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
-        mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
+        mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
         ImageButton mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
@@ -112,14 +111,23 @@ public class ChatActivity extends AppCompatActivity {
         };
     }
 
+    private void bindButterKnife() {
+        ButterKnife.bind(this);
+    }
+    private void setDatabaseInstance() {
+        String chatRef = getIntent().getStringExtra(ExtraIntent.EXTRA_CHAT_REF);
+        if (chatRef!=null) {
+            messageChatDatabase = FirebaseDatabase.getInstance().getReference().child(chatRef);
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        if (messageChatListener != null) {
+
             messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
-
                     if (dataSnapshot.exists()) {
                         ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                         if (newMessage.getSender().equals(mCurrentUserId)) {
@@ -128,10 +136,8 @@ public class ChatActivity extends AppCompatActivity {
                             newMessage.setRecipientOrSenderStatus(MessageChatAdapter.RECIPIENT);
                         }
                         messageChatAdapter.refillAdapter(newMessage);
-                        Log.d("newMessage", String.valueOf(newMessage));
                         mChatRecyclerView.scrollToPosition(messageChatAdapter.getItemCount() - 1);
                     }
-
                 }
 
                 @Override
@@ -156,12 +162,10 @@ public class ChatActivity extends AppCompatActivity {
             });
 
         }
-    }
 
     @Override
     protected void onStop() {
         super.onStop();
-
         if(messageChatListener != null) {
             messageChatDatabase.removeEventListener(messageChatListener);
         }
@@ -171,22 +175,13 @@ public class ChatActivity extends AppCompatActivity {
     @OnClick(R.id.btn_send_message)
     public void btnSendMsgListener(View sendButton){
         String senderMessage = mUserMessageChatText.getText().toString().trim();
-        if(!senderMessage.isEmpty()){
+        if(!senderMessage.isEmpty() && messageChatDatabase!=null){
             ChatMessage newMessage = new ChatMessage(senderMessage,mCurrentUserId,mRecipientId,null);
             messageChatDatabase.push().setValue(newMessage);
             mUserMessageChatText.setText("");
         }
     }
 
-    private void bindButterKnife() {
-        ButterKnife.bind(this);
-    }
-    private void setDatabaseInstance() {
-        String chatRef = getIntent().getStringExtra(ExtraIntent.EXTRA_CHAT_REF);
-        if (chatRef!=null) {
-            messageChatDatabase = FirebaseDatabase.getInstance().getReference().child(chatRef);
-        }
-    }
 
     private void setUsersId() {
         mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
@@ -197,16 +192,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mChatRecyclerView.setHasFixedSize(true);
         messageChatAdapter = new MessageChatAdapter(new ArrayList<ChatMessage>());
-        Log.d("ChatMessage", String.valueOf(messageChatAdapter));
         mChatRecyclerView.setAdapter(messageChatAdapter);
-    }
-
-    //used for reading data from Firebase
-    private void detachDatabaseReadListener() {
-        if (mChildEventListener != null) {
-            mMessagesDatabaseReference.removeEventListener(mChildEventListener);
-            mChildEventListener = null;
-        }
     }
 
     @Override
@@ -243,7 +229,7 @@ public class ChatActivity extends AppCompatActivity {
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
         //mMessageAdapter.clear();
-        detachDatabaseReadListener();
+        //detachDatabaseReadListener();
     }
 
     @Override
@@ -272,7 +258,6 @@ public class ChatActivity extends AppCompatActivity {
                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
                             // Set the download URL to the message box, so that the user can send it to the database
                             assert downloadUrl != null;
-                            // FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
                             ChatMessage newMessage = new ChatMessage(null,mCurrentUserId,mRecipientId,downloadUrl.toString());
                             mMessagesDatabaseReference.push().setValue(newMessage);
                         }
@@ -292,7 +277,7 @@ public class ChatActivity extends AppCompatActivity {
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-        detachDatabaseReadListener();
+        //detachDatabaseReadListener();
         //mMessageAdapter.clear();
     }
 
