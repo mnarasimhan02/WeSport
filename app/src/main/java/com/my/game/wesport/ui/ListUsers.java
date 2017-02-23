@@ -1,9 +1,9 @@
 package com.my.game.wesport.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -32,7 +32,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ListUsers extends Activity {
+public class ListUsers extends AppCompatActivity {
 
 
     private static String TAG =  ListUsers.class.getSimpleName();
