@@ -1,4 +1,4 @@
-package com.my.game.wesport;
+package com.my.game.wesport.login;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,11 +7,11 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.auth.AuthUI;
@@ -21,6 +21,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.my.game.wesport.IntroActivity;
+import com.my.game.wesport.MainActivity;
+import com.my.game.wesport.R;
+import com.my.game.wesport.model.User;
+
+import java.util.Date;
+
+import butterknife.ButterKnife;
 
 @SuppressWarnings("ALL")
 public class SigninActivity extends AppCompatActivity {
@@ -39,9 +47,15 @@ public class SigninActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseStorage mFirebaseStorage;
     private DatabaseReference mMessagesDatabaseReference;
+    private DatabaseReference mDatabase;
     private StorageReference mChatPhotosStorageReference;
     private View mLayout;
     private boolean mActivity=false;
+
+    private static final String TAG = SigninActivity.class.getSimpleName();
+    //@BindView(R.id.edit_text_email_login)
+    EditText mUserEmail;
+    //@BindView(R.id.edit_text_password_log_in) EditText mUserPassWord;
 
 
     @Override
@@ -88,6 +102,24 @@ public class SigninActivity extends AppCompatActivity {
         // Start the thread
         t.start();
         setContentView(R.layout.activity_main);
+        //hideActionBar();
+        bindButterKnife();
+        setAuthInstance();
+
+    }
+
+
+    private void hideActionBar() {
+        this.getActionBar().hide();
+    }
+
+    private void bindButterKnife() {
+        ButterKnife.bind(this);
+    }
+
+
+
+    private void setAuthInstance() {
         mUsername = ANONYMOUS;
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         // Initialize Firebase components
@@ -100,6 +132,11 @@ public class SigninActivity extends AppCompatActivity {
         // Initialize progress bar
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        mMessagesDatabaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://wesport-d7a20.firebaseio.com");
+
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -107,8 +144,11 @@ public class SigninActivity extends AppCompatActivity {
                 if (user != null) {
                     if (user.getDisplayName() != null) {
                         loginUser = onSignedInInitialize(user.getDisplayName());
+                        onAuthSuccess(firebaseAuth.getCurrentUser());
+                        setUserOnline();
                     } else {
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
+                        setUserOnline();
                     }
                     // User is signed in
                 } else {
@@ -126,6 +166,37 @@ public class SigninActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void setUserOnline() {
+        if(mFirebaseAuth.getCurrentUser()!=null ) {
+            String userId = mFirebaseAuth.getCurrentUser().getUid();
+            FirebaseDatabase.getInstance()
+                    .getReference().
+                    child("users").
+                    child(userId).
+                    child("connection").
+                    setValue(com.my.game.wesport.adapter.UsersChatAdapter.ONLINE);
+        }
+    }
+
+    private void onAuthSuccess(FirebaseUser user) {
+        createNewUser(user.getUid());
+    }
+
+    private void createNewUser(String userId){
+        User user = buildNewUser();
+        mMessagesDatabaseReference.child("users").child(userId).setValue(user);
+    }
+
+    private User buildNewUser() {
+        return new User(
+                loginUser,
+                getUserEmail(),
+                com.my.game.wesport.adapter.UsersChatAdapter.ONLINE,
+                com.my.game.wesport.FireChatHelper.ChatHelper.generateRandomAvatarForUser(),
+                new Date().getTime()
+        );
     }
 
     @Override
@@ -152,7 +223,6 @@ public class SigninActivity extends AppCompatActivity {
             Snackbar.make(mLayout, getString(R.string.signin_string),
                     Snackbar.LENGTH_LONG).show();
             //if (!mActivity) {
-                Log.d("mActivity", String.valueOf(mActivity));
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -164,6 +234,15 @@ public class SigninActivity extends AppCompatActivity {
                 finish();
             }
         }
+
+    private String getUserEmail() {
+        return mFirebaseAuth.getCurrentUser().getEmail();
+    }
+
+/*    private String getUserPassword() {
+        return mUserPassWord.getText().toString().trim();
+    }
+    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -46,4 +46,8 @@
     <!-- This is an odd width, but we're trying to match the font closely to keep things working
          on devices that don't yet have Roboto -->
     <dimen name="forecast_widget_text_width">38dp</dimen>
+
+
+    <dimen name="log_in_margin">40dp</dimen>
+    <dimen name="connection_status_padding">8dp</dimen>
 </resources>

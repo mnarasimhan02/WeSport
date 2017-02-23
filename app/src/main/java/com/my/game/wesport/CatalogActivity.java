@@ -21,6 +21,7 @@ import com.my.game.wesport.data.GameContract.GameEntry;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.my.game.wesport.login.SigninActivity;
 
 /**
  * Displays list of games that were entered and stored in the app.

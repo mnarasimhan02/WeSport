@@ -1,26 +1,23 @@
-package com.my.game.wesport;
+package com.my.game.wesport.ui;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.TextWatcher;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,63 +27,65 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.my.game.wesport.FireChatHelper.ExtraIntent;
+import com.my.game.wesport.R;
+import com.my.game.wesport.adapter.MessageChatAdapter;
+import com.my.game.wesport.login.SigninActivity;
+import com.my.game.wesport.model.ChatMessage;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static com.my.game.wesport.SigninActivity.RC_SIGN_IN;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.my.game.wesport.login.SigninActivity.RC_SIGN_IN;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String ANONYMOUS = "anonymous";
     private static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
     private static final String FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length";
     private static final int RC_PHOTO_PICKER = 2;
-    private MessageAdapter mMessageAdapter;
-    private EditText mMessageEditText;
-    private Button mSendButton;
     private String mUsername;
     private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private StorageReference mChatPhotosStorageReference;
-    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+
+    private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
+
+    @BindView(R.id.recycler_view_chat)
+    RecyclerView mChatRecyclerView;
+    @BindView(R.id.edit_text_message) EditText mUserMessageChatText;
+
+
+    private String mRecipientId;
+    private String mCurrentUserId;
+    private MessageChatAdapter messageChatAdapter;
+    private DatabaseReference messageChatDatabase;
+    private ChildEventListener messageChatListener;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        bindButterKnife();
+        setDatabaseInstance();
+        setUsersId();
+        setChatRecyclerView();
         // Initialize Firebase components
         FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
         mFirebaseAuth = FirebaseAuth.getInstance();
         FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
-        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
         mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("messages");
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
-
-        // Initialize references to views
-        ListView mMessageListView = (ListView) findViewById(R.id.messageListView);
         ImageButton mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
-        mMessageEditText = (EditText) findViewById(R.id.messageEditText);
-        mSendButton = (Button) findViewById(R.id.sendButton);
-
-        //Get Username from sharedpreferences
-        //SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        //final String mUserName = prefUser.getString("displayName", "anonymous");
-        // Initialize message ListView and its adapter
-        List<FriendlyMessage> friendlyMessages = new ArrayList<>();
-        mMessageAdapter = new MessageAdapter(this, R.layout.item_message, friendlyMessages);
-        mMessageListView.setAdapter(mMessageAdapter);
 
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,45 +94,6 @@ public class ChatActivity extends AppCompatActivity {
                 intent.setType("image/jpeg");
                 intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
                 startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
-            }
-        });
-        // Enable Send button when there's text to send
-        mMessageEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().trim().length() > 0) {
-                    mSendButton.setEnabled(true);
-                } else {
-                    mSendButton.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-            }
-        });
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
-
-        // Send button sends a message and clears the EditText
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user.getDisplayName() != null) {
-                    mUsername = user.getDisplayName();
-                    // attachDatabaseReadListener();
-                } else {
-                    mUsername = getString(R.string.email_user);
-                }
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, null);
-                mMessagesDatabaseReference.push().setValue(friendlyMessage);
-
-                // Clear input box
-                mMessageEditText.setText("");
             }
         });
 
@@ -150,96 +110,98 @@ public class ChatActivity extends AppCompatActivity {
                 }
             }
         };
-
-
-        // Create Remote Config Setting to enable developer mode.
-        // Fetching configs from the server is normally limited to 5 requests per hour.
-        // Enabling developer mode allows many more requests to be made per hour, so developers
-        // can test different config values during development.
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(BuildConfig.DEBUG)
-                .build();
-        mFirebaseRemoteConfig.setConfigSettings(configSettings);
-
-        // Define default config values. Defaults are used when fetched config values are not
-        // available. Eg: if an error occurred fetching values from the server.
-        Map<String, Object> defaultConfigMap = new HashMap<>();
-        defaultConfigMap.put(FRIENDLY_MSG_LENGTH_KEY, DEFAULT_MSG_LENGTH_LIMIT);
-        mFirebaseRemoteConfig.setDefaults(defaultConfigMap);
-        fetchConfig();
-
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (messageChatListener != null) {
+            messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
 
-    // Fetch the config to determine the allowed length of messages.
-    private void fetchConfig() {
-        long cacheExpiration = 3600; // 1 hour in seconds
-        // If developer mode is enabled reduce cacheExpiration to 0 so that each fetch goes to the
-        // server. This should not be used in release builds.
-        if (mFirebaseRemoteConfig.getInfo().getConfigSettings().isDeveloperModeEnabled()) {
-            cacheExpiration = 0;
+                    if (dataSnapshot.exists()) {
+                        ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
+                        if (newMessage.getSender().equals(mCurrentUserId)) {
+                            newMessage.setRecipientOrSenderStatus(MessageChatAdapter.SENDER);
+                        } else {
+                            newMessage.setRecipientOrSenderStatus(MessageChatAdapter.RECIPIENT);
+                        }
+                        messageChatAdapter.refillAdapter(newMessage);
+                        Log.d("newMessage", String.valueOf(newMessage));
+                        mChatRecyclerView.scrollToPosition(messageChatAdapter.getItemCount() - 1);
+                    }
+
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         }
-        mFirebaseRemoteConfig.fetch(cacheExpiration)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Make the fetched config available
-                        // via FirebaseRemoteConfig get<type> calls, e.g., getLong, getString.
-                        mFirebaseRemoteConfig.activateFetched();
-
-                        // Update the EditText length limit with
-                        // the newly retrieved values from Remote Config.
-                        applyRetrievedLengthLimit();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // An error occurred when fetching the config.
-
-                        // Update the EditText length limit with
-                        // the newly retrieved values from Remote Config.
-                        applyRetrievedLengthLimit();
-                    }
-                });
     }
 
-    /**
-     * Apply retrieved length limit to edit text field. This result may be fresh from the server or it may be from
-     * cached values.
-     */
-    private void applyRetrievedLengthLimit() {
-        Long friendly_msg_length = mFirebaseRemoteConfig.getLong(FRIENDLY_MSG_LENGTH_KEY);
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(friendly_msg_length.intValue())});
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(messageChatListener != null) {
+            messageChatDatabase.removeEventListener(messageChatListener);
+        }
+        messageChatAdapter.cleanUp();
+    }
+
+    @OnClick(R.id.btn_send_message)
+    public void btnSendMsgListener(View sendButton){
+        String senderMessage = mUserMessageChatText.getText().toString().trim();
+        if(!senderMessage.isEmpty()){
+            ChatMessage newMessage = new ChatMessage(senderMessage,mCurrentUserId,mRecipientId,null);
+            messageChatDatabase.push().setValue(newMessage);
+            mUserMessageChatText.setText("");
+        }
+    }
+
+    private void bindButterKnife() {
+        ButterKnife.bind(this);
+    }
+    private void setDatabaseInstance() {
+        String chatRef = getIntent().getStringExtra(ExtraIntent.EXTRA_CHAT_REF);
+        if (chatRef!=null) {
+            messageChatDatabase = FirebaseDatabase.getInstance().getReference().child(chatRef);
+        }
+    }
+
+    private void setUsersId() {
+        mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
+        mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_CURRENT_USER_ID);
+    }
+
+    private void setChatRecyclerView() {
+        mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mChatRecyclerView.setHasFixedSize(true);
+        messageChatAdapter = new MessageChatAdapter(new ArrayList<ChatMessage>());
+        Log.d("ChatMessage", String.valueOf(messageChatAdapter));
+        mChatRecyclerView.setAdapter(messageChatAdapter);
     }
 
     //used for reading data from Firebase
-
-    private void attachDatabaseReadListener() {
-        if (mChildEventListener == null) {
-            mChildEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    FriendlyMessage friendlyMessage = dataSnapshot.getValue(FriendlyMessage.class);
-                    mMessageAdapter.add(friendlyMessage);
-                }
-
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                }
-
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            };
-            mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
-        }
-    }
-
     private void detachDatabaseReadListener() {
         if (mChildEventListener != null) {
             mMessagesDatabaseReference.removeEventListener(mChildEventListener);
@@ -275,12 +237,12 @@ public class ChatActivity extends AppCompatActivity {
 
     private void onSignedInInitialize(String username) {
         mUsername = username;
-        attachDatabaseReadListener();
+        //  attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
-        mMessageAdapter.clear();
+        //mMessageAdapter.clear();
         detachDatabaseReadListener();
     }
 
@@ -310,8 +272,9 @@ public class ChatActivity extends AppCompatActivity {
                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
                             // Set the download URL to the message box, so that the user can send it to the database
                             assert downloadUrl != null;
-                            FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
-                            mMessagesDatabaseReference.push().setValue(friendlyMessage);
+                            // FriendlyMessage friendlyMessage = new FriendlyMessage(null, mUsername, downloadUrl.toString());
+                            ChatMessage newMessage = new ChatMessage(null,mCurrentUserId,mRecipientId,downloadUrl.toString());
+                            mMessagesDatabaseReference.push().setValue(newMessage);
                         }
                     });
         }
@@ -330,7 +293,7 @@ public class ChatActivity extends AppCompatActivity {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
         detachDatabaseReadListener();
-        mMessageAdapter.clear();
+        //mMessageAdapter.clear();
     }
 
 }
