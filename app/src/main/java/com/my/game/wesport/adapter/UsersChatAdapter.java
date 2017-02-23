@@ -124,7 +124,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         public void onClick(View view) {
             String chatRef=null;
             User user = mUsers.get(getLayoutPosition());
-            if (mCurrentUserCreatedAt!=null && mCurrentUserEmail!=null) {
+            if (user!=null && mCurrentUserCreatedAt!=null && mCurrentUserEmail!=null) {
                 chatRef = user.createUniqueChatRef(mCurrentUserCreatedAt, mCurrentUserEmail);
             }
             Intent chatIntent = new Intent(mContextViewHolder, ChatActivity.class);

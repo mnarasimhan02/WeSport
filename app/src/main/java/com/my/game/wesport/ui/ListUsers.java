@@ -11,6 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -155,6 +158,15 @@ public class ListUsers extends Activity {
         showProgressBarForUsers();
         setUserOffline();
         mAuth.signOut();
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // user is now signed out
+                        startActivity(new Intent(ListUsers.this, SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        finish();
+                    }
+                });
     }
 
     private void setUserOffline() {
@@ -173,7 +185,7 @@ public class ListUsers extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.action_signout) {
+        if(item.getItemId()==R.id.action_logout) {
             logout();
             return true;
         }

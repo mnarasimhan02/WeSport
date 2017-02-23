@@ -21,6 +21,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -397,13 +398,17 @@ public class EditorActivity extends AppCompatActivity implements
         SimpleDateFormat calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
         SimpleDateFormat caletDatFormat = new SimpleDateFormat("MMMMM dd yyyy hh:mm a", Locale.getDefault());
         sdString = sdString + " " + yy;
-        etString = sdString + etString;
+        etString = sdString + " "+ etString;
+        Log.d("sdString", String.valueOf(sdString));
+        Log.d("etString", String.valueOf(etString));
         long stdateInLong = 0;long etdateInLong = 0;
         try {
             Date BEGIN_TIME = calstDatFormat.parse(sdString);
             Date END_TIME = caletDatFormat.parse(etString);
             stdateInLong = BEGIN_TIME.getTime();
             etdateInLong = END_TIME.getTime();
+            Log.d("BEGIN_TIME", String.valueOf(BEGIN_TIME));
+            Log.d("END_TIME", String.valueOf(END_TIME));
 
         } catch (ParseException e) {
             e.printStackTrace();

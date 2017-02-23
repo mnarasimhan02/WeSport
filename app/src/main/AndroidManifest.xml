@@ -78,7 +78,6 @@
                   android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -91,7 +90,8 @@
         </activity>
 
         <activity
-            android:name=".ui.ListUsers"/>
+            android:name=".ui.ListUsers"
+            android:theme="@android:style/Theme.Holo.Light.DarkActionBar"/>
         <receiver android:name="gameswidget.DetailWidgetProvider">
             <intent-filter>
 

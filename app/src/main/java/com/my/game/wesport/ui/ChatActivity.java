@@ -7,19 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -33,7 +26,6 @@ import com.google.firebase.storage.UploadTask;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
 import com.my.game.wesport.adapter.MessageChatAdapter;
-import com.my.game.wesport.login.SigninActivity;
 import com.my.game.wesport.model.ChatMessage;
 
 import java.util.ArrayList;
@@ -55,6 +47,8 @@ public class ChatActivity extends AppCompatActivity {
     private StorageReference mChatPhotosStorageReference;
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseStorage mFirebaseStorage;
+    private DatabaseReference mUserRefDatabase;
+
 
     private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
 
@@ -121,10 +115,23 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void setUsersId() {
+        mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
+        mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_CURRENT_USER_ID);
+    }
+
+    private void setChatRecyclerView() {
+        mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mChatRecyclerView.setHasFixedSize(true);
+        messageChatAdapter = new MessageChatAdapter(new ArrayList<ChatMessage>());
+        mChatRecyclerView.setAdapter(messageChatAdapter);
+    }
+
+
     @Override
     protected void onStart() {
         super.onStart();
-
+        //mFirebaseAuth.addAuthStateListener(mAuthStateListener);
             messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
@@ -160,7 +167,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 }
             });
-
         }
 
     @Override
@@ -182,44 +188,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-
-    private void setUsersId() {
-        mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
-        mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_CURRENT_USER_ID);
-    }
-
-    private void setChatRecyclerView() {
-        mChatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mChatRecyclerView.setHasFixedSize(true);
-        messageChatAdapter = new MessageChatAdapter(new ArrayList<ChatMessage>());
-        mChatRecyclerView.setAdapter(messageChatAdapter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.sign_out_menu:
-                AuthUI.getInstance()
-                        .signOut(this)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            public void onComplete(@NonNull Task<Void> task) {
-                                // user is now signed out
-                                startActivity(new Intent(ChatActivity.this, SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-                                finish();
-                            }
-                        });
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     private void onSignedInInitialize(String username) {
         mUsername = username;
@@ -265,20 +233,5 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mAuthStateListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-        }
-        //detachDatabaseReadListener();
-        //mMessageAdapter.clear();
-    }
 
 }
