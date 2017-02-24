@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.my.game.wesport.FireChatHelper.ChatHelper;
 import com.my.game.wesport.IntroActivity;
 import com.my.game.wesport.MainActivity;
 import com.my.game.wesport.R;
@@ -62,6 +64,7 @@ public class SigninActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLayout = findViewById(android.R.id.content);
+
         //  Declare a new thread to do a preference check. Library to invoke Intro slides
         Thread t = new Thread(new Runnable() {
             @Override
@@ -131,11 +134,8 @@ public class SigninActivity extends AppCompatActivity {
 
         // Initialize progress bar
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
         mMessagesDatabaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://wesport-d7a20.firebaseio.com");
-
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -190,6 +190,12 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private User buildNewUser() {
+        Log.d("loginUser",loginUser);
+        Log.d("getUserEmail",getUserEmail());
+        Log.d("Status",com.my.game.wesport.adapter.UsersChatAdapter.ONLINE);
+        Log.d("Avatar", String.valueOf(ChatHelper.generateRandomAvatarForUser()));
+        Log.d("datetime", String.valueOf(new Date().getTime()));
+
         return new User(
                 loginUser,
                 getUserEmail(),
@@ -236,13 +242,9 @@ public class SigninActivity extends AppCompatActivity {
         }
 
     private String getUserEmail() {
+        Log.d("getCurrentUser().getEmail()",mFirebaseAuth.getCurrentUser().getEmail());
         return mFirebaseAuth.getCurrentUser().getEmail();
     }
-
-/*    private String getUserPassword() {
-        return mUserPassWord.getText().toString().trim();
-    }
-    */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

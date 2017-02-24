@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class ChatHelper {
 
-    private static Random randomAvatarGenerator = new Random();
+    private static final Random randomAvatarGenerator = new Random();
     private static final int NUMBER_OF_AVATAR = 3;
 
     /*Generate an avatar randomly*/

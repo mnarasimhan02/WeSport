@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
     public static final String ONLINE = "online";
     public static final String OFFLINE = "offline";
-    private List<User> mUsers;
+    private final List<User> mUsers;
     private Context mContext;
     private String mCurrentUserEmail;
     private Long mCurrentUserCreatedAt;
@@ -84,6 +85,9 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         mCurrentUserId = userUid;
         mCurrentUserEmail = email;
         mCurrentUserCreatedAt = createdAt;
+        Log.d("mCurrentUserId",mCurrentUserId);
+        Log.d("mCurrentUserEmail",mCurrentUserEmail);
+        Log.d("mCurrentUserCreatedAt", String.valueOf(mCurrentUserCreatedAt));
     }
 
     public void clear() {
@@ -94,9 +98,9 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     /* ViewHolder for RecyclerView */
     public class ViewHolderUsers extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private ImageView mUserAvatar;
+        private final ImageView mUserAvatar;
         private TextView mUserDisplayName;
-        private TextView mStatusConnection;
+        private final TextView mStatusConnection;
         private Context mContextViewHolder;
 
         public ViewHolderUsers(Context context, View itemView) {
@@ -111,7 +115,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         public ImageView getUserAvatar() {
             return mUserAvatar;
         }
-
         public TextView getUserDisplayName() {
             return mUserDisplayName;
         }
@@ -122,19 +125,23 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
         @Override
         public void onClick(View view) {
-            String chatRef=null;
-            User user = mUsers.get(getLayoutPosition());
-            if (user!=null && mCurrentUserCreatedAt!=null && mCurrentUserEmail!=null) {
-                chatRef = user.createUniqueChatRef(mCurrentUserCreatedAt, mCurrentUserEmail);
+            try {
+                String chatRef = null;
+                User user = mUsers.get(getLayoutPosition());
+                if (user != null && mCurrentUserCreatedAt != null && mCurrentUserEmail != null) {
+                    chatRef = user.createUniqueChatRef(mCurrentUserCreatedAt, mCurrentUserEmail);
+                    Log.d("onClick", chatRef);
+                }
+                Intent chatIntent = new Intent(mContextViewHolder, ChatActivity.class);
+                chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, mCurrentUserId);
+                assert user != null;
+                chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, user.getRecipientId());
+                chatIntent.putExtra(ExtraIntent.EXTRA_CHAT_REF, chatRef);
+                // Start new activity
+                mContextViewHolder.startActivity(chatIntent);
+            } catch (Exception e){
+                e.printStackTrace();
             }
-            Intent chatIntent = new Intent(mContextViewHolder, ChatActivity.class);
-            chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, mCurrentUserId);
-            chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, user.getRecipientId());
-            chatIntent.putExtra(ExtraIntent.EXTRA_CHAT_REF, chatRef);
-
-            // Start new activity
-            mContextViewHolder.startActivity(chatIntent);
-
         }
     }
 

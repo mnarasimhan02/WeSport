@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,20 +41,15 @@ public class ChatActivity extends AppCompatActivity {
     private static final String ANONYMOUS = "anonymous";
     private static final int RC_PHOTO_PICKER = 2;
     private String mUsername;
-    private FirebaseAuth mFirebaseAuth;
     private DatabaseReference mMessagesDatabaseReference;
     private ChildEventListener mChildEventListener;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
     private StorageReference mChatPhotosStorageReference;
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseStorage mFirebaseStorage;
     private DatabaseReference mUserRefDatabase;
 
 
     private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
 
-    @BindView(R.id.recycler_view_chat)
-    RecyclerView mChatRecyclerView;
+    @BindView(R.id.recycler_view_chat) RecyclerView mChatRecyclerView;
     @BindView(R.id.edit_text_message) EditText mUserMessageChatText;
 
 
@@ -73,9 +69,9 @@ public class ChatActivity extends AppCompatActivity {
         setUsersId();
         setChatRecyclerView();
         // Initialize Firebase components
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseStorage = FirebaseStorage.getInstance();
+        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
+        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
         ImageButton mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
@@ -90,7 +86,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+        FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -110,8 +106,10 @@ public class ChatActivity extends AppCompatActivity {
     }
     private void setDatabaseInstance() {
         String chatRef = getIntent().getStringExtra(ExtraIntent.EXTRA_CHAT_REF);
+        Log.d ("chatRef", String.valueOf(chatRef));
         if (chatRef!=null) {
             messageChatDatabase = FirebaseDatabase.getInstance().getReference().child(chatRef);
+            Log.d ("setDatabaseInstance", String.valueOf(messageChatDatabase));
         }
     }
 
@@ -131,8 +129,8 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        //mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-            messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
+        Log.d ("onStart", String.valueOf(messageChatDatabase));
+        messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
                     if (dataSnapshot.exists()) {
@@ -179,7 +177,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btn_send_message)
-    public void btnSendMsgListener(View sendButton){
+    public void btnSendMsgListener(@SuppressWarnings("UnusedParameters") View sendButton){
         String senderMessage = mUserMessageChatText.getText().toString().trim();
         if(!senderMessage.isEmpty() && messageChatDatabase!=null){
             ChatMessage newMessage = new ChatMessage(senderMessage,mCurrentUserId,mRecipientId,null);
@@ -187,7 +185,6 @@ public class ChatActivity extends AppCompatActivity {
             mUserMessageChatText.setText("");
         }
     }
-
 
     private void onSignedInInitialize(String username) {
         mUsername = username;

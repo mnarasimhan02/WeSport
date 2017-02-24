@@ -82,7 +82,7 @@ public class Photo {
      * The width
      * @param i
      */
-    public Integer getWidth(int i) {
+    public Integer getWidth(@SuppressWarnings("UnusedParameters") int i) {
         return width;
     }
 

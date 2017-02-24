@@ -16,7 +16,7 @@ import java.util.List;
 
 public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
-    private List<ChatMessage> mChatList;
+    private final List<ChatMessage> mChatList;
     public static final int SENDER = 0;
     public static final int RECIPIENT = 1;
 
@@ -137,7 +137,7 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public class ViewHolderSender extends RecyclerView.ViewHolder {
 
         private TextView mSenderMessageTextView;
-        private ImageView mSenderphotoImageView;
+        private final ImageView mSenderphotoImageView;
 
         public ViewHolderSender(View itemView) {
             super(itemView);
@@ -156,7 +156,7 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public class ViewHolderRecipient extends RecyclerView.ViewHolder {
 
         private TextView mRecipientMessageTextView;
-        private ImageView mReceiverphotoImageView;
+        private final ImageView mReceiverphotoImageView;
 
         public ViewHolderRecipient(View itemView) {
             super(itemView);

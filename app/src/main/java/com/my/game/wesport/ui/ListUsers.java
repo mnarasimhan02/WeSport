@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +49,7 @@ public class ListUsers extends AppCompatActivity {
     private DatabaseReference mUserRefDatabase;
     private ChildEventListener mChildEventListener;
     private UsersChatAdapter mUsersChatAdapter;
-    private String mUsername, loginUser;
+    private String loginUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,19 +208,25 @@ public class ListUsers extends AppCompatActivity {
         return new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(dataSnapshot.exists()){
-                    String userUid = dataSnapshot.getKey();
-                    if(dataSnapshot.getKey().equals(mCurrentUserUid)){
-                        User currentUser = dataSnapshot.getValue(User.class);
-                        mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(), currentUser.getCreatedAt());
-                    }else {
-                        User recipient = dataSnapshot.getValue(User.class);
-                        recipient.setRecipientId(userUid);
-                        mUsersKeyList.add(userUid);
-                        mUsersChatAdapter.refill(recipient);
+                try {
+                    if (dataSnapshot.exists()) {
+                        String userUid = dataSnapshot.getKey();
+                        Log.d("userUid", userUid);
+                        if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
+                            Log.d("onChildAdded", String.valueOf(dataSnapshot.getKey().equals(mCurrentUserUid)));
+                            User currentUser = dataSnapshot.getValue(User.class);
+                            Log.d("userEmail", currentUser.getEmail());
+                            mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(), currentUser.getCreatedAt());
+                        } else {
+                            User recipient = dataSnapshot.getValue(User.class);
+                            recipient.setRecipientId(userUid);
+                            mUsersKeyList.add(userUid);
+                            mUsersChatAdapter.refill(recipient);
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
             }
 
             @Override
@@ -253,6 +260,7 @@ public class ListUsers extends AppCompatActivity {
         };
     }
     private String onSignedInInitialize(String username) {
+        String mUsername;
         if (username != null) {
             mUsername = username;
             // attachDatabaseReadListener();
