@@ -202,6 +202,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("latitude", lat).apply();
         editor.putString("longtitude", lon).apply();
-
     }
 }

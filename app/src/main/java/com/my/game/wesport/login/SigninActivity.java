@@ -1,5 +1,6 @@
 package com.my.game.wesport.login;
 
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -105,6 +106,7 @@ public class SigninActivity extends AppCompatActivity {
         // Start the thread
         t.start();
         setContentView(R.layout.activity_main);
+
         //hideActionBar();
         bindButterKnife();
         setAuthInstance();

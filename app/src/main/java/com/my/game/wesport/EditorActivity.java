@@ -1,32 +1,42 @@
 package com.my.game.wesport;
 
+import android.Manifest.permission;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.LoaderManager;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.app.TimePickerDialog;
+import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -34,6 +44,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.my.game.wesport.data.GameContract.GameEntry;
 
 import java.text.ParseException;
@@ -41,6 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static com.my.game.wesport.R.id.start_time;
 
@@ -50,7 +62,7 @@ import static com.my.game.wesport.R.id.start_time;
  */
 @SuppressWarnings("UnusedParameters")
 public class EditorActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderCallbacks<Cursor> {
 
     /**
      * Identifier for the game data loader
@@ -61,7 +73,7 @@ public class EditorActivity extends AppCompatActivity implements
     private EditText mendTime;
     private final Calendar mDateAndTime = Calendar.getInstance();
     private View mLayout;
-
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 123;
     /**
      * Content URI for the existing game (null if it's a new game)
      */
@@ -96,17 +108,32 @@ public class EditorActivity extends AppCompatActivity implements
     private String selectedGame = "";
 
     private String mUserName = "";
+
+    private String nameString="";
+
+    private String sdString="";
+
+    private String notesString="";
+
+    private AlertDialog alert;
+
+
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mGameHasChanged boolean to true.
      */
-    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+    private final OnTouchListener mTouchListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             mGameHasChanged = true;
             return false;
         }
     };
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @SuppressWarnings("UnusedAssignment")
     public EditorActivity() {
@@ -174,14 +201,13 @@ public class EditorActivity extends AppCompatActivity implements
         mstartDate.setOnTouchListener(mTouchListener);
         mstartTime.setOnTouchListener(mTouchListener);
         mendTime.setOnTouchListener(mTouchListener);
-
         setupSpinner();
     }
 
 
     public void onDateClicked(View v) {
 
-        DatePickerDialog.OnDateSetListener mDateListener = new DatePickerDialog.OnDateSetListener() {
+        OnDateSetListener mDateListener = new OnDateSetListener() {
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
                 mDateAndTime.set(Calendar.YEAR, year);
@@ -201,7 +227,7 @@ public class EditorActivity extends AppCompatActivity implements
 
     public void stTimePicker(View v) {
 
-        TimePickerDialog.OnTimeSetListener mTimeListener = new TimePickerDialog.OnTimeSetListener() {
+        OnTimeSetListener mTimeListener = new OnTimeSetListener() {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 mDateAndTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mDateAndTime.set(Calendar.MINUTE, minute);
@@ -217,7 +243,7 @@ public class EditorActivity extends AppCompatActivity implements
 
     public void etTimePicker(View v) {
 
-        TimePickerDialog.OnTimeSetListener mTimeListener = new TimePickerDialog.OnTimeSetListener() {
+        OnTimeSetListener mTimeListener = new OnTimeSetListener() {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 mDateAndTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mDateAndTime.set(Calendar.MINUTE, minute);
@@ -232,10 +258,9 @@ public class EditorActivity extends AppCompatActivity implements
 
     private void updateTimeDisplay(TextView mtextview) {
         mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
-        if ( !mendTime.getText().toString().isEmpty() &&
+        if (!mendTime.getText().toString().isEmpty() &&
                 !TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
-               )
-        {
+                ) {
             Snackbar.make(mLayout, getString(R.string.date_compare_string),
                     Snackbar.LENGTH_LONG).show();
             mendTime.setText("");
@@ -246,25 +271,25 @@ public class EditorActivity extends AppCompatActivity implements
     private void updateDateDisplay(TextView mtextview) {
         //mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE));
         long today = mDateAndTime.getTimeInMillis();
-        SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM dd",  Locale.getDefault());
+        SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM dd", Locale.getDefault());
         String dateString = sdfDate.format(today);
         mtextview.setText(dateString);
     }
 
     private boolean TimeValidator(String time1, String time2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a",  Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
         boolean b = false;
         try {
             Date startTime = sdf.parse(time1);
             Date endTime = sdf.parse(time2);
             long difference = endTime.getTime() - startTime.getTime();
 
-            if (difference<0) {
+            if (difference < 0) {
                 difference = (endTime.getTime() - startTime.getTime()) + (endTime.getTime() - startTime.getTime());
             }
             int days = (int) (difference / (1000 * 60 * 60 * 24));
-            int hours = (int) ((difference - (1000*60*60*24*days)) / (1000*60*60));
-            int min = (int) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
+            int hours = (int) ((difference - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
+            int min = (int) (difference - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60);
             //boolean mindiff = (min < 0 ? false : true);
             b = !(hours < 0 || min < 0);
         } catch (ParseException e) {
@@ -290,7 +315,7 @@ public class EditorActivity extends AppCompatActivity implements
         mSkillSpinner.setAdapter(genderSpinnerAdapter);
 
         // Set the integer mSelected to the constant values
-        mSkillSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mSkillSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selection = (String) parent.getItemAtPosition(position);
@@ -323,11 +348,11 @@ public class EditorActivity extends AppCompatActivity implements
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
-        String nameString = mNameEditText.getText().toString().trim();
-        String sdString = mstartDate.getText().toString().trim();
-        String sttring = mstartTime.getText().toString().trim();
-        String etString = mendTime.getText().toString().trim();
-        String notesString = mnotesEditText.getText().toString().trim();
+         nameString = mNameEditText.getText().toString().trim();
+         sdString = mstartDate.getText().toString().trim();
+         String sttring = mstartTime.getText().toString().trim();
+         String etString = mendTime.getText().toString().trim();
+         notesString = mnotesEditText.getText().toString().trim();
 
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
@@ -392,41 +417,93 @@ public class EditorActivity extends AppCompatActivity implements
                         Snackbar.LENGTH_LONG).show();
             }
         }
+        boolean result = checkPermission();
+        if (result) {
+            writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
+        }
 
+    }
+
+    private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString, String notesString) {
+        final ContentValues event = new ContentValues();
         final Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
         SimpleDateFormat calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
-        SimpleDateFormat caletDatFormat = new SimpleDateFormat("MMMMM dd yyyy hh:mm a", Locale.getDefault());
-        sdString = sdString + " " + yy;
-        etString = sdString + " "+ etString;
-        Log.d("sdString", String.valueOf(sdString));
-        Log.d("etString", String.valueOf(etString));
-        long stdateInLong = 0;long etdateInLong = 0;
+            sdString = sdString + " " + yy;
+        long stdateInLong = 0;
         try {
             Date BEGIN_TIME = calstDatFormat.parse(sdString);
-            Date END_TIME = caletDatFormat.parse(etString);
             stdateInLong = BEGIN_TIME.getTime();
-            etdateInLong = END_TIME.getTime();
-            Log.d("BEGIN_TIME", String.valueOf(BEGIN_TIME));
-            Log.d("END_TIME", String.valueOf(END_TIME));
 
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Calendar cal = Calendar.getInstance();
-        Intent intent = new Intent(Intent.ACTION_EDIT);
-        intent.setType("vnd.android.cursor.item/event");
-        intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, stdateInLong);
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, etdateInLong);
-        intent.putExtra(Events.TITLE, selectedGame);
-        intent.putExtra(Events.DESCRIPTION, nameString);
-        intent.putExtra(Events.EVENT_LOCATION, gameaddress);
-        intent.putExtra(Events.RRULE, "FREQ=YEARLY");
-        startActivity(intent);
-
+        event.put(Events.CALENDAR_ID, 1);
+        event.put(Events.EVENT_LOCATION, gameaddress);
+        event.put(Events.TITLE, selectedGame);
+        event.put(Events.DESCRIPTION, nameString + " "+ notesString);
+        event.put(Events.DTSTART, stdateInLong);//startTimeMillis
+        event.put(Events.DTEND, stdateInLong);//endTimeMillis
+        event.put(Events.ALL_DAY, 0); // 0 for false, 1 for true
+        String timeZone = TimeZone.getDefault().getID();
+        event.put(Events.EVENT_TIMEZONE, timeZone);
+        Uri baseUri;
+        if (VERSION.SDK_INT >= 8) {
+            baseUri = Uri.parse("content://com.android.calendar/events");
+        } else {
+            baseUri = Uri.parse("content://calendar/events");
+        }
+        getApplicationContext().getContentResolver().insert(baseUri, event);
+        Snackbar.make(mLayout, R.string.calendar_add_game,
+                Snackbar.LENGTH_LONG).show();
     }
 
+    @TargetApi(VERSION_CODES.JELLY_BEAN)
+    public boolean checkPermission() {
+        int currentAPIVersion = VERSION.SDK_INT;
+        if (currentAPIVersion >= VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(EditorActivity.this, permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(EditorActivity.this, permission.WRITE_CALENDAR)) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(EditorActivity.this);
+                    alertBuilder.setCancelable(true);
+                    alertBuilder.setTitle(getString(R.string.cal_perm_required));
+                    alertBuilder.setMessage(getString(R.string.cal_perm_message)) ;
+                    alertBuilder.setPositiveButton(android.R.string.yes, new OnClickListener() {
+                        @TargetApi(VERSION_CODES.JELLY_BEAN)
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(EditorActivity.this,
+                                    new String[]{permission.WRITE_CALENDAR}, MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
+                        }
+                    });
+                    AlertDialog alert = alertBuilder.create();
+                    alert.show();
+                } else {
+                    ActivityCompat.requestPermissions(EditorActivity.this,
+                            new String[]{permission.WRITE_CALENDAR}, MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
+                }
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_CALENDAR:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
+                } else {
+//code for deny
+                    Snackbar.make(mLayout, R.string.cal_perm_message,
+                            Snackbar.LENGTH_LONG).show();
+                }
+                break;
+        }
+    }
 
 
     @Override
@@ -480,8 +557,8 @@ public class EditorActivity extends AppCompatActivity implements
                 // Otherwise if there are unsaved changes, setup a dialog to warn the user.
                 // Create a click listener to handle the user confirming that
                 // changes should be discarded.
-                DialogInterface.OnClickListener discardButtonClickListener =
-                        new DialogInterface.OnClickListener() {
+                OnClickListener discardButtonClickListener =
+                        new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // User clicked "Discard" button, navigate to parent activity.
@@ -509,8 +586,8 @@ public class EditorActivity extends AppCompatActivity implements
 
         // Otherwise if there are unsaved changes, setup a dialog to warn the user.
         // Create a click listener to handle the user confirming that changes should be discarded.
-        DialogInterface.OnClickListener discardButtonClickListener =
-                new DialogInterface.OnClickListener() {
+        OnClickListener discardButtonClickListener =
+                new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // User clicked "Discard" button, close the current activity.
@@ -639,13 +716,13 @@ public class EditorActivity extends AppCompatActivity implements
      *                                   the user confirms they want to discard their changes
      */
     private void showUnsavedChangesDialog(
-            DialogInterface.OnClickListener discardButtonClickListener) {
+            OnClickListener discardButtonClickListener) {
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the postivie and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_msg);
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);
-        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.keep_editing, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Keep editing" button, so dismiss the dialog
                 // and continue editing the game.
@@ -668,13 +745,13 @@ public class EditorActivity extends AppCompatActivity implements
         // for the postivie and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.delete_dialog_msg);
-        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.delete, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Delete" button, so delete the game.
                 deleteGame();
             }
         });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Cancel" button, so dismiss the dialog
                 // and continue editing the game.
@@ -688,6 +765,7 @@ public class EditorActivity extends AppCompatActivity implements
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
 
     /**
      * Perform the deletion of the game in the database.
@@ -709,9 +787,8 @@ public class EditorActivity extends AppCompatActivity implements
                 // Otherwise, the delete was successful and we can display a toast.
                 Snackbar.make(mLayout, getString(R.string.editor_delete_game_failed),
                         Snackbar.LENGTH_LONG).show();
-           }
+            }
         }
-
         // Close the activity
         finish();
     }
