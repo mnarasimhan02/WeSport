@@ -28,14 +28,13 @@ public class User {
 
     public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
         String uniqueChatRef="";
-        Log.d("mCurrentUserEmail", String.valueOf(createdAtCurrentUser));
-        Log.d("mCurrentUserCreatedAt", String.valueOf(currentUserEmail));
+        Log.d("createdAtCurrentUser", String.valueOf(createdAtCurrentUser));
+        Log.d("currentUserEmail", String.valueOf(currentUserEmail));
         Log.d("getCreatedAt", String.valueOf(getCreatedAt()));
         if(createdAtCurrentUser > getCreatedAt()){
             uniqueChatRef = cleanEmailAddress(currentUserEmail)+"-"+cleanEmailAddress(getUserEmail());
             Log.d("uniqueChatRef",uniqueChatRef);
         }else {
-
             uniqueChatRef=cleanEmailAddress(getUserEmail())+"-"+cleanEmailAddress(currentUserEmail);
             Log.d("uniqueChatRef2",uniqueChatRef);
         }

@@ -133,6 +133,7 @@ public class ChatActivity extends AppCompatActivity {
         messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
+                    try{
                     if (dataSnapshot.exists()) {
                         ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                         if (newMessage.getSender().equals(mCurrentUserId)) {
@@ -143,8 +144,10 @@ public class ChatActivity extends AppCompatActivity {
                         messageChatAdapter.refillAdapter(newMessage);
                         mChatRecyclerView.scrollToPosition(messageChatAdapter.getItemCount() - 1);
                     }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 

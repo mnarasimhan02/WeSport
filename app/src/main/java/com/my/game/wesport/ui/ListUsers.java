@@ -211,9 +211,7 @@ public class ListUsers extends AppCompatActivity {
                 try {
                     if (dataSnapshot.exists()) {
                         String userUid = dataSnapshot.getKey();
-                        Log.d("userUid", userUid);
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
-                            Log.d("onChildAdded", String.valueOf(dataSnapshot.getKey().equals(mCurrentUserUid)));
                             User currentUser = dataSnapshot.getValue(User.class);
                             Log.d("userEmail", currentUser.getEmail());
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(), currentUser.getCreatedAt());
@@ -231,7 +229,8 @@ public class ListUsers extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                if(dataSnapshot.exists()) {
+                try {
+                    if(dataSnapshot.exists()) {
                     String userUid = dataSnapshot.getKey();
                     if(!userUid.equals(mCurrentUserUid)) {
                         User user = dataSnapshot.getValue(User.class);
@@ -240,7 +239,9 @@ public class ListUsers extends AppCompatActivity {
                             mUsersChatAdapter.changeUser(index, user);
                         }
                     }
-
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             @Override
