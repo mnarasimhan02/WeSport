@@ -411,13 +411,8 @@ public class EditorActivity extends AppCompatActivity implements
                         Snackbar.LENGTH_LONG).show();
             }
         }
+        writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
     }
-        /*boolean result = checkPermission();
-        if (result) {
-            writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
-        }
-
-    }*/
 
     private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString, String notesString) {
         final ContentValues event = new ContentValues();
@@ -449,8 +444,7 @@ public class EditorActivity extends AppCompatActivity implements
             baseUri = Uri.parse("content://calendar/events");
         }
         getApplicationContext().getContentResolver().insert(baseUri, event);
-        Snackbar.make(mLayout, R.string.calendar_add_game,
-                Snackbar.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -484,8 +478,19 @@ public class EditorActivity extends AppCompatActivity implements
             case R.id.action_save:
                 // Save game to database
                 saveGames();
+    //Show snackbar and then finish activity
+                Snackbar.make(mLayout, R.string.calendar_add_game,Snackbar.LENGTH_SHORT)
+                        .addCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar,
+                                                    int event) {
+                                if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                                    EditorActivity.this.finish();
+                                }
+                            }
+                        }).show();
                 // Exit activity
-                finish();
+                //finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

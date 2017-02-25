@@ -38,7 +38,7 @@
 
     <string name="permision_available_location">Location permission granted.</string>
     <string name="permissions_not_granted">Permissions were not granted.</string>
-    <string name="close_app">Location permissions required to run app. App will now close</string>
+    <string name="close_app">Location and Calendar permissions required to run app. App will now close</string>
 
     <!-- Label for Google API Web-services and Google Maps key-->
     <string name="type_param">park</string>
@@ -200,7 +200,5 @@
     <string name="error_fields_empty">Please make sure you enter display name, email and password!</string>
     <string name="error_incorrect_email_pass">Provide correct email and password with more than 6 characters.</string>
     <string name="calendar_add_game">Game Added to Calendar</string>
-    <string name="cal_perm_required">Permission</string>
-    <string name="cal_perm_message">Calendar permission is necessary to write Game data!!!</string>
 
 </resources>

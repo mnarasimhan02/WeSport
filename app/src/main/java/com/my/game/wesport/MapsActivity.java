@@ -293,7 +293,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         TextView infoSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
         infoSnippet.setText(marker.getSnippet());
         TextView infoOpennow = (TextView) myContentsView.findViewById(R.id.open_now);
-        infoSnippet.setText(placeOpen);
+        infoOpennow.setText(placeOpen);
         ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
         if (uri == null) {
             placeImage.setVisibility(View.GONE);

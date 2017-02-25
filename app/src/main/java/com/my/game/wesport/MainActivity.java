@@ -27,6 +27,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import static android.support.design.widget.Snackbar.make;
+
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private final int PERMISSION_MULTIPLE= 1;
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
-                Snackbar.make(mLayout, getString(R.string.chosen_game) + " "+gridViewString[+i],
+                make(mLayout, getString(R.string.chosen_game) + " "+gridViewString[+i],
                         Snackbar.LENGTH_LONG).show();
                 chosenGame = gridViewString[+i];
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     startActivity(intent);
                 }
                 else {
-                    Snackbar.make(mLayout, getString(R.string.loc_not_enable),
+                    make(mLayout, getString(R.string.loc_not_enable),
                             Snackbar.LENGTH_LONG).show();
                     startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                 }
@@ -114,11 +116,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Snackbar.LENGTH_LONG).show();
                 startLocationServices();
             } else {
-                Snackbar.make(mLayout, R.string.permissions_not_granted,
-                        Snackbar.LENGTH_LONG).show();
-                Snackbar.make(mLayout, R.string.close_app,
-                        Snackbar.LENGTH_LONG).show();
-                this.finish();
+                Snackbar.make(mLayout, R.string.close_app,Snackbar.LENGTH_SHORT)
+                        .addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar,
+                                            int event) {
+                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                            MainActivity.this.finish();
+                        }
+                    }
+                }).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -156,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     (MainActivity.this, permission.ACCESS_COARSE_LOCATION) ||
                     ActivityCompat.shouldShowRequestPermissionRationale
                             (MainActivity.this, permission.WRITE_CALENDAR)) {
-                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                make(mLayout, R.string.permissions_not_granted,
                         Snackbar.LENGTH_LONG).setAction("ENABLE",
                         new View.OnClickListener() {
                             @Override
