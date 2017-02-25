@@ -182,15 +182,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
         map.setInfoWindowAdapter(this);
-
-        //Instiantiate background task to download places list and address list for respective locations
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
-        build_retrofit_and_get_response(getString((R.string.type_param)),mLat,mLon);
-        SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        selectedGame = chGame.getString("chosenGame", "Other");
-        setUserMarker(new LatLng(mLat, mLon));
+        try {
+            //Instiantiate background task to download places list and address list for respective locations
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
+            Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+            build_retrofit_and_get_response(getString((R.string.type_param)), mLat, mLon);
+            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            selectedGame = chGame.getString("chosenGame", "Other");
+            setUserMarker(new LatLng(mLat, mLon));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {

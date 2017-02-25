@@ -1,7 +1,5 @@
 package com.my.game.wesport;
 
-import android.Manifest.permission;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
@@ -15,18 +13,14 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Events;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -348,11 +342,11 @@ public class EditorActivity extends AppCompatActivity implements
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
-         nameString = mNameEditText.getText().toString().trim();
-         sdString = mstartDate.getText().toString().trim();
-         String sttring = mstartTime.getText().toString().trim();
-         String etString = mendTime.getText().toString().trim();
-         notesString = mnotesEditText.getText().toString().trim();
+        nameString = mNameEditText.getText().toString().trim();
+        sdString = mstartDate.getText().toString().trim();
+        String sttring = mstartTime.getText().toString().trim();
+        String etString = mendTime.getText().toString().trim();
+        notesString = mnotesEditText.getText().toString().trim();
 
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
@@ -417,12 +411,13 @@ public class EditorActivity extends AppCompatActivity implements
                         Snackbar.LENGTH_LONG).show();
             }
         }
-        boolean result = checkPermission();
+    }
+        /*boolean result = checkPermission();
         if (result) {
             writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
         }
 
-    }
+    }*/
 
     private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString, String notesString) {
         final ContentValues event = new ContentValues();
@@ -457,54 +452,6 @@ public class EditorActivity extends AppCompatActivity implements
         Snackbar.make(mLayout, R.string.calendar_add_game,
                 Snackbar.LENGTH_LONG).show();
     }
-
-    @TargetApi(VERSION_CODES.JELLY_BEAN)
-    public boolean checkPermission() {
-        int currentAPIVersion = VERSION.SDK_INT;
-        if (currentAPIVersion >= VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(EditorActivity.this, permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(EditorActivity.this, permission.WRITE_CALENDAR)) {
-                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(EditorActivity.this);
-                    alertBuilder.setCancelable(true);
-                    alertBuilder.setTitle(getString(R.string.cal_perm_required));
-                    alertBuilder.setMessage(getString(R.string.cal_perm_message)) ;
-                    alertBuilder.setPositiveButton(android.R.string.yes, new OnClickListener() {
-                        @TargetApi(VERSION_CODES.JELLY_BEAN)
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(EditorActivity.this,
-                                    new String[]{permission.WRITE_CALENDAR}, MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-                        }
-                    });
-                    AlertDialog alert = alertBuilder.create();
-                    alert.show();
-                } else {
-                    ActivityCompat.requestPermissions(EditorActivity.this,
-                            new String[]{permission.WRITE_CALENDAR}, MY_PERMISSIONS_REQUEST_WRITE_CALENDAR);
-                }
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_WRITE_CALENDAR:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
-                } else {
-//code for deny
-                    Snackbar.make(mLayout, R.string.cal_perm_message,
-                            Snackbar.LENGTH_LONG).show();
-                }
-                break;
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

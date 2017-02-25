@@ -17,7 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -30,15 +29,14 @@ import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private final int PERMISSION_LOCATION = 1;
+    private final int PERMISSION_MULTIPLE= 1;
+
     private String lat;
     private String lon;
     private String[] gridViewString;
     private GoogleApiClient mGoogleApiClient;
-    private Menu mMenu;
     private View mLayout;
     private String chosenGame;
-    private Location mlocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 SharedPreferences.Editor editor = chGame.edit();
                 editor.putString("chosenGame", chosenGame).apply();
                 if (isLocationEnabled(getApplicationContext())) {
-                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-                        startActivity(intent);
+                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                    startActivity(intent);
                 }
                 else {
                     Snackbar.make(mLayout, getString(R.string.loc_not_enable),
@@ -104,13 +102,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-
-        if (requestCode == PERMISSION_LOCATION) {
+        if (requestCode == PERMISSION_MULTIPLE ) {
             // BEGIN_INCLUDE(permission_result)
             // Received permission result for location permission.
-
             // Check if the only required permission has been granted
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 // Location permission has been granted, preview can be displayed
                 Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_LONG).show();
@@ -121,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Snackbar.make(mLayout, R.string.close_app,
                         Snackbar.LENGTH_LONG).show();
                 this.finish();
-
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -152,13 +149,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), permission.ACCESS_COARSE_LOCATION)
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), permission.ACCESS_COARSE_LOCATION) +
+                (ContextCompat.checkSelfPermission(getApplicationContext(), permission.WRITE_CALENDAR))
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_LOCATION);
+            if (ActivityCompat.shouldShowRequestPermissionRationale
+                    (MainActivity.this, permission.ACCESS_COARSE_LOCATION) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale
+                            (MainActivity.this, permission.WRITE_CALENDAR)) {
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_LONG).setAction("ENABLE",
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, permission.WRITE_CALENDAR},
+                                        PERMISSION_MULTIPLE);
+                            }
+                        }).show();
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, permission.WRITE_CALENDAR},
+                        PERMISSION_MULTIPLE);
+            }
         } else {
             startLocationServices();
         }
     }
+
     private void startLocationServices() {
         try {
             LocationRequest mLocationRequest = LocationRequest.create();
