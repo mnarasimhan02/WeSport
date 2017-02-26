@@ -2,18 +2,14 @@
 package com.my.game.wesport;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.my.game.wesport.data.GameContract.GameEntry;
-import com.my.game.wesport.ui.ListUsers;
 
 
 /**
@@ -49,7 +45,7 @@ public class GameCursorAdapter extends CursorAdapter {
         TextView starttime = (TextView) view.findViewById(R.id.start_time);
 
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
-        ImageView chatview = (ImageView) view.findViewById(R.id.chatimage);
+        //ImageView chatview = (ImageView) view.findViewById(R.id.chatimage);
 
         // Find the columns of game attributes that we're interested in
         int descColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
@@ -73,14 +69,14 @@ public class GameCursorAdapter extends CursorAdapter {
         startdate.setText(stDate + " " + stTime + " " + "at " + gameaddress);
         summaryTextView.setText(notes);
 
-        chatview.setOnClickListener(new OnClickListener() {
+     /*   chatview.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), ListUsers.class);
                 v.getContext().startActivity(intent);
             }
-        });
+        });*/
     }
 
 

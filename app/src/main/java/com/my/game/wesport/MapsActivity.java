@@ -1,15 +1,18 @@
 package com.my.game.wesport;
 
 import android.Manifest.permission;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -111,10 +114,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         // Restoring the markers on configuration changes
         //setContentView(R.layout.activity_maps);
         View rootView = inflater.inflate(R.layout.activity_maps, container, false);
-        mLayout = rootView.findViewById(android.R.id.content);
-        myContentsView = inflater.inflate(R.layout.custom_info_content, null, false);
 
-        setUpMapIfNeeded();
+        //setUpMapIfNeeded();
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
         // Retrieve the PlaceAutocompleteFragment.
@@ -136,6 +137,25 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         return rootView;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        FragmentManager fm = getChildFragmentManager();
+        SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
+        if (mapFragment == null) {
+            mapFragment = new SupportMapFragment();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.add(R.id.map, mapFragment, "mapFragment");
+            ft.commit();
+            fm.executePendingTransactions();
+        }
+        mapFragment.getMapAsync(this);
+        mLayout = getView().findViewById(android.R.id.content);
+        LayoutInflater inflater = (LayoutInflater)   getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        myContentsView = inflater.inflate(R.layout.custom_info_content,null, false);
+
+    }
+
     public void setUserMarker(LatLng latLng) {
         if (userMarker == null) {
             userMarker = new MarkerOptions().position(latLng).title(getString(R.string.usermarker_title));
@@ -147,7 +167,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
 
     }
 
-    private void setUpMapIfNeeded() {
+    /*private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
         if (map == null) {
@@ -161,8 +181,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                 setUpMap();
             }
         }
+        mLayout = getView().findViewById(android.R.id.content);
     }
-
+*/
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
         if (ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_FINE_LOCATION)
@@ -177,7 +198,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     public void onMapReady(GoogleMap sMap) {
         map = sMap;
         map.setOnMapLongClickListener(this);
-        mainFragment.setRetainInstance(true);
+        //mainFragment.setRetainInstance(true);
         map.setInfoWindowAdapter(this);
         try {
             //Instiantiate background task to download places list and address list for respective locations
@@ -208,60 +229,60 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                 .build();
         RetrofitMaps service = retrofit.create(RetrofitMaps.class);
         Call<Example> call = service.getNearbyPlaces(type, mLat + "," + mLon, PROXIMITY_RADIUS);
-            call.enqueue(new Callback<Example>() {
-                @Override
-                public void onResponse(Response<Example> response, Retrofit retrofit) {
-                    try {
-                        // This loop will go through all the results and add marker on each location.
-                        for (int i = 0; i < response.body().getResults().size(); i++) {
-                            Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
-                            Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
-                            parkName = response.body().getResults().get(i).getName();
-                            widthSize[0] = response.body().getResults().get(i).getPhotos().size();
-                            //Get if park is open_now
-                            if (open_now == null) {
-                                open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                                placeOpen = String.valueOf(open_now != null ? "Yes" : "");
-                            }
-                            //Get PhotoMaxWidth
-                            if (i < widthSize[0]) {
-                                photoWidth[0] = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
-                                photoRefsize[0] = response.body().getResults().get(i).getPhotos().size();
-                            }
-                            //Get photoreference of first photo of all parks
-                            photoReferenceSize =response.body().getResults().get(i).getPhotos().size();
-                            if (photoReferenceSize !=0) {
-                                photoReference[0] = (response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
-                            }
-                            if (!photoReference[0].isEmpty()) {
-                                        placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth=" + photoWidth[0] +
-                                                "&photoreference="+ photoReference[0] + "&key=" + getString(R.string.places_api_key));
-                            }
-                                //Get ratings for parks
-                            ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
-                            LatLng latLng = new LatLng(lat, lng);
-                                Marker parkMarker = map.addMarker(new MarkerOptions()
-                                        .title(parkName)
-                                        .position(latLng)
-                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-                                markers.put(parkMarker.getId(), placeImageURI);
-                                rating.put(parkMarker.getId(), ratingstr);
-                                map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
-                         Snackbar.make(mLayout, getResources().getString(R.string.map_help),
-                                        Snackbar.LENGTH_LONG).show();
+        call.enqueue(new Callback<Example>() {
+            @Override
+            public void onResponse(Response<Example> response, Retrofit retrofit) {
+                try {
+                    // This loop will go through all the results and add marker on each location.
+                    for (int i = 0; i < response.body().getResults().size(); i++) {
+                        Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
+                        Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
+                        parkName = response.body().getResults().get(i).getName();
+                        widthSize[0] = response.body().getResults().get(i).getPhotos().size();
+                        //Get if park is open_now
+                        if (open_now == null) {
+                            open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
+                            placeOpen = String.valueOf(open_now != null ? "Yes" : "");
                         }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        //Get PhotoMaxWidth
+                        if (i < widthSize[0]) {
+                            photoWidth[0] = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
+                            photoRefsize[0] = response.body().getResults().get(i).getPhotos().size();
+                        }
+                        //Get photoreference of first photo of all parks
+                        photoReferenceSize =response.body().getResults().get(i).getPhotos().size();
+                        if (photoReferenceSize !=0) {
+                            photoReference[0] = (response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
+                        }
+                        if (!photoReference[0].isEmpty()) {
+                            placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth=" + photoWidth[0] +
+                                    "&photoreference="+ photoReference[0] + "&key=" + getString(R.string.places_api_key));
+                        }
+                        //Get ratings for parks
+                        ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                        LatLng latLng = new LatLng(lat, lng);
+                        Marker parkMarker = map.addMarker(new MarkerOptions()
+                                .title(parkName)
+                                .position(latLng)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
+                        markers.put(parkMarker.getId(), placeImageURI);
+                        rating.put(parkMarker.getId(), ratingstr);
+                        map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
+                        //Snackbar.make(mLayout, getResources().getString(R.string.map_help),
+                        //        Snackbar.LENGTH_LONG).show();
                     }
-                }
 
-                @Override
-                public void onFailure(Throwable t) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
 
-            });
-        }
+            @Override
+            public void onFailure(Throwable t) {
+            }
+
+        });
+    }
 
     @Override
     public View getInfoContents(Marker marker) {
@@ -323,7 +344,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
             address = sdf.format(new Date());
         }
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
-                + "  " + getString(R.string.save_game_text),
+                        + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.edit().putString("games", address).apply();
@@ -355,7 +376,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
 
     /*respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
-
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -386,7 +406,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                getString(R.string.save_game_text),
+                        getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.edit().putString("games", address).apply();

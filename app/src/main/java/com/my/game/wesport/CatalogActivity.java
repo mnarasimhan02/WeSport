@@ -12,6 +12,8 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +91,7 @@ public class CatalogActivity extends Fragment implements
                 startActivity(intent);
             }
         });
+        setHasOptionsMenu(true);
 
         // Kick off the loader
         getLoaderManager().initLoader(GAME_LOADER, null, this);
@@ -103,15 +106,13 @@ public class CatalogActivity extends Fragment implements
         @SuppressWarnings("UnusedAssignment") int rowsDeleted = getActivity().getContentResolver().delete(GameEntry.CONTENT_URI, null, null);
     }
 
-    /*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu options from the res/menu/menu_catalog.xml file.
         // This adds menu items to the app bar.
-        getMenuInflater().inflate(R.menu.menu_catalog, menu);
-        return true;
+        inflater.inflate(R.menu.menu_catalog, menu);
     }
-*/
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu

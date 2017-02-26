@@ -8,6 +8,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +66,7 @@ public class ListUsers extends Fragment {
         setUserRecyclerView();
         setUsersKeyList();
         setAuthListener();
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -177,13 +180,13 @@ public class ListUsers extends Fragment {
         }
     }
 
-    /*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.list_signout, menu);
-        return true;
-    }*/
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu options from the res/menu/menu_catalog.xml file.
+        // This adds menu items to the app bar.
+        inflater.inflate(R.menu.list_signout, menu);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
