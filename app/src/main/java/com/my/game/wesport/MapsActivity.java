@@ -112,7 +112,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         //setContentView(R.layout.activity_maps);
         View rootView = inflater.inflate(R.layout.activity_maps, container, false);
         mLayout = rootView.findViewById(android.R.id.content);
-        myContentsView = inflater.inflate(R.layout.custom_info_content, null);
+        myContentsView = inflater.inflate(R.layout.custom_info_content, null, false);
 
         setUpMapIfNeeded();
         ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);

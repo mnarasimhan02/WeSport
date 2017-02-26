@@ -4,7 +4,6 @@ package com.my.game.wesport;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -80,8 +79,6 @@ public class GameCursorAdapter extends CursorAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), ListUsers.class);
                 v.getContext().startActivity(intent);
-                Log.d("outside listusers","outside");
-
             }
         });
     }
