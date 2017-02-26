@@ -55,9 +55,8 @@ public class ListUsers extends Fragment {
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
                                 Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_list_users, container, false);
-
         super.onCreate(savedInstanceState);
+        View rootView = inflater.inflate(R.layout.activity_list_users, container, false);
         bindButterKnife();
         setAuthInstance();
         setUsersDatabase();
@@ -80,7 +79,9 @@ public class ListUsers extends Fragment {
     }
     private void setUserRecyclerView() {
         mUsersChatAdapter = new UsersChatAdapter(getActivity(), new ArrayList<User>());
-        mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        mUsersRecyclerView.setLayoutManager(layoutManager);
+        //mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mUsersRecyclerView.setHasFixedSize(true);
         mUsersRecyclerView.setAdapter(mUsersChatAdapter);
     }

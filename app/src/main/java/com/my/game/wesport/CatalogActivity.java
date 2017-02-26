@@ -1,33 +1,34 @@
 package com.my.game.wesport;
 
-import android.app.LoaderManager;
 import android.content.ContentUris;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.my.game.wesport.data.GameContract.GameEntry;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.my.game.wesport.data.GameContract.GameEntry;
 import com.my.game.wesport.login.SigninActivity;
 
 /**
  * Displays list of games that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class CatalogActivity extends Fragment implements
+        LoaderCallbacks<Cursor> {
 
     /**
      * Identifier for  Game data loader
@@ -40,30 +41,31 @@ public class CatalogActivity extends AppCompatActivity implements
     private GameCursorAdapter mCursorAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView (LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_catalog, container, false);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_catalog);
 
         // Setup FAB to open EditorActivity
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+                Intent intent = new Intent(getActivity(), EditorActivity.class);
                 startActivity(intent);
             }
         });
 
         // Find the ListView which will be populated with the game data
-        ListView gameListView = (ListView) findViewById(R.id.list);
+        ListView gameListView = (ListView) rootView.findViewById(R.id.list);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        View emptyView = findViewById(R.id.empty_view);
+        View emptyView = rootView.findViewById(R.id.empty_view);
         gameListView.setEmptyView(emptyView);
 
         // Setup an Adapter to create a list item for each row of game data in the Cursor.
         // There is no game data yet (until the loader finishes) so pass in null for the Cursor.
-        mCursorAdapter = new GameCursorAdapter(this, null);
+        mCursorAdapter = new GameCursorAdapter(getActivity(), null);
         gameListView.setAdapter(mCursorAdapter);
 
         // Setup the item click listener
@@ -71,7 +73,7 @@ public class CatalogActivity extends AppCompatActivity implements
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 // Create new intent to go to {@link EditorActivity}
-                Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
+                Intent intent = new Intent(getActivity(), EditorActivity.class);
 
                 // Form the content URI that represents the specific game that was clicked on,
                 // by appending the "id" (passed as input to this method) onto the
@@ -90,15 +92,18 @@ public class CatalogActivity extends AppCompatActivity implements
 
         // Kick off the loader
         getLoaderManager().initLoader(GAME_LOADER, null, this);
+        return rootView;
+
     }
 
     /**
      * Helper method to delete all games in the database.
      */
     private void deleteAllGames() {
-        @SuppressWarnings("UnusedAssignment") int rowsDeleted = getContentResolver().delete(GameEntry.CONTENT_URI, null, null);
+        @SuppressWarnings("UnusedAssignment") int rowsDeleted = getActivity().getContentResolver().delete(GameEntry.CONTENT_URI, null, null);
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_catalog.xml file.
@@ -106,7 +111,7 @@ public class CatalogActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.menu_catalog, menu);
         return true;
     }
-
+*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -125,12 +130,13 @@ public class CatalogActivity extends AppCompatActivity implements
     private void signoutuser() {
         //FirebaseAuth.getInstance().signOut();
         AuthUI.getInstance()
-                .signOut(this)
+                .signOut(getActivity())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         // user is now signed out
-                        startActivity(new Intent(CatalogActivity.this, SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-                        finish();
+                        startActivity(new Intent(getActivity(), SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        getActivity().finish();
                     }
                 });
     }
@@ -152,7 +158,7 @@ public class CatalogActivity extends AppCompatActivity implements
         };
 
         // This loader will execute the ContentProvider's query method on a background thread
-        return new CursorLoader(this,   // Parent activity context
+        return new CursorLoader(getActivity(),   // Parent activity context
                 GameEntry.CONTENT_URI,   // Provider content URI to query
                 projection,             // Columns to include in the resulting Cursor
                 null,                   // No selection clause

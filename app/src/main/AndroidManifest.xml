@@ -53,7 +53,7 @@
             android:value="@string/google_maps_key"/>
 
         <activity
-            android:name=".CatalogActivity"
+            android:name=".EditorActivity"
             android:label="@string/app_name"/>
 
         <provider

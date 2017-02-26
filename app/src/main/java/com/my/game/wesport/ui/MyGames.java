@@ -8,14 +8,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.my.game.wesport.EditorActivity;
+import com.my.game.wesport.CatalogActivity;
 import com.my.game.wesport.MapsActivity;
 import com.my.game.wesport.R;
 
@@ -87,15 +83,6 @@ public class MyGames extends AppCompatActivity {
             fragment.setArguments(args);
             return fragment;
         }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_my_games, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
     }
 
     /**
@@ -117,8 +104,8 @@ public class MyGames extends AppCompatActivity {
                     MapsActivity mapsFragment = new MapsActivity();
                     return mapsFragment;
                 case 1:
-                    EditorActivity editFragment = new EditorActivity();
-                    return editFragment;
+                    CatalogActivity catFragment = new CatalogActivity();
+                    return catFragment;
                 case 2:
                     ListUsers lstuserFragment = new ListUsers();
                     return lstuserFragment;

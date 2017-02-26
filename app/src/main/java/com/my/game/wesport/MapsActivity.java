@@ -1,21 +1,18 @@
 package com.my.game.wesport;
 
 import android.Manifest.permission;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -56,12 +53,10 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
-
 @SuppressWarnings("ALL")
 public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
 
-    private static final String LOG_TAG = "GooglePlaces ";
+    private static final String LOG_TAG = "GooglePlaces";
     private final String TAG = "MapActivity";
     FragmentManager fm;
     //Variables to store games and locations from marker click
@@ -116,12 +111,12 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         // Restoring the markers on configuration changes
         //setContentView(R.layout.activity_maps);
         View rootView = inflater.inflate(R.layout.activity_maps, container, false);
-        mLayout = (CoordinatorLayout) getView().findViewById(android.R.id.content);
+        mLayout = rootView.findViewById(android.R.id.content);
         myContentsView = inflater.inflate(R.layout.custom_info_content, null);
 
         setUpMapIfNeeded();
-        ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getActivity().getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -158,7 +153,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            mainFragment = (SupportMapFragment) getFragmentManager()
+            mainFragment = (SupportMapFragment) getChildFragmentManager()
                     .findFragmentById(R.id.map);
             mainFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
@@ -171,7 +166,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
         if (ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         map.setMyLocationEnabled(true);
@@ -185,11 +181,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         map.setInfoWindowAdapter(this);
         try {
             //Instiantiate background task to download places list and address list for respective locations
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
             Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
             build_retrofit_and_get_response(getString((R.string.type_param)), mLat, mLon);
-            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getActivity());
             selectedGame = chGame.getString("chosenGame", "Other");
             setUserMarker(new LatLng(mLat, mLon));
         } catch (Exception e){
@@ -251,7 +247,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                                 markers.put(parkMarker.getId(), placeImageURI);
                                 rating.put(parkMarker.getId(), ratingstr);
                                 map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
-                                Snackbar.make(mLayout, getString(R.string.map_help),
+                         Snackbar.make(mLayout, getResources().getString(R.string.map_help),
                                         Snackbar.LENGTH_LONG).show();
                         }
 
@@ -357,7 +353,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         return true;
     }*/
 
-    //respond to menu item selection
+    /*respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
 
         super.onOptionsItemSelected(item);
@@ -372,7 +368,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         }
         return true;
     }
-
     /*
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {

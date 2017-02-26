@@ -3,12 +3,15 @@ package com.my.game.wesport;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,21 +19,16 @@ import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Events;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -50,7 +48,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
 import static com.my.game.wesport.R.id.start_time;
 
 
@@ -58,7 +55,7 @@ import static com.my.game.wesport.R.id.start_time;
  * Allows user to create a new game or edit an existing one.
  */
 @SuppressWarnings("UnusedParameters")
-public class EditorActivity extends Fragment implements
+public class EditorActivity extends AppCompatActivity implements
         LoaderCallbacks<Cursor> {
 
     /**
@@ -144,12 +141,10 @@ public class EditorActivity extends Fragment implements
     }
 
     @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container,
-                              Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_editor);
-        View rootView = inflater.inflate(R.layout.activity_editor, container, false);
-        mLayout = (CoordinatorLayout) getView().findViewById(android.R.id.content);
+        setContentView(R.layout.activity_editor);
+        mLayout = findViewById(android.R.id.content);
 
         //Get Location and Selected Game from sharedpreferences
 
@@ -164,19 +159,19 @@ public class EditorActivity extends Fragment implements
 
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new Game or editing an existing one.
-        Intent intent = getActivity().getIntent();
+        Intent intent = getIntent();
         mCurrentGameUri = intent.getData();
         // If the intent DOES NOT contain a Game content URI, then we know that we are
         // creating a new game.
         if (mCurrentGameUri == null) {
             // This is a new game, so change the app bar to say "Add a Game"
-            getActivity().setTitle(getString(R.string.editor_activity_title_new_game));
+            setTitle(getString(R.string.editor_activity_title_new_game));
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
-            getActivity().invalidateOptionsMenu();
+            invalidateOptionsMenu();
         } else {
             // Otherwise this is an existing Game, so change app bar to say "Edit Game"
-            getActivity().setTitle(getString(R.string.editor_activity_title_edit_game));
+            setTitle(getString(R.string.editor_activity_title_edit_game));
 
             // Initialize a loader to read the Game data from the database
             // and display the current values in the editor
@@ -184,12 +179,12 @@ public class EditorActivity extends Fragment implements
         }
 
         // Find all relevant views that we will need to read user input from
-        mNameEditText = (EditText) getView().findViewById(R.id.edit_game_name);
-        mnotesEditText = (EditText) getView().findViewById(R.id.edit_game_notes);
-        mSkillSpinner = (Spinner) getView().findViewById(R.id.spinner_game);
-        mstartDate = (EditText) getView().findViewById(R.id.startdate);
-        mstartTime = (EditText) getView().findViewById(start_time);
-        mendTime = (EditText) getView().findViewById(R.id.end_time);
+        mNameEditText = (EditText) findViewById(R.id.edit_game_name);
+        mnotesEditText = (EditText) findViewById(R.id.edit_game_notes);
+        mSkillSpinner = (Spinner) findViewById(R.id.spinner_game);
+        mstartDate = (EditText) findViewById(R.id.startdate);
+        mstartTime = (EditText) findViewById(start_time);
+        mendTime = (EditText) findViewById(R.id.end_time);
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -201,8 +196,6 @@ public class EditorActivity extends Fragment implements
         mstartTime.setOnTouchListener(mTouchListener);
         mendTime.setOnTouchListener(mTouchListener);
         setupSpinner();
-        return rootView ;
-
     }
 
 
@@ -218,7 +211,7 @@ public class EditorActivity extends Fragment implements
             }
         };
 
-        DatePickerDialog startDate = new DatePickerDialog(getActivity(), mDateListener,
+        DatePickerDialog startDate = new DatePickerDialog(EditorActivity.this, mDateListener,
                 mDateAndTime.get(Calendar.YEAR),
                 mDateAndTime.get(Calendar.MONTH),
                 mDateAndTime.get(Calendar.DAY_OF_MONTH));
@@ -236,7 +229,7 @@ public class EditorActivity extends Fragment implements
             }
         };
 
-        new TimePickerDialog(getActivity(), mTimeListener,
+        new TimePickerDialog(EditorActivity.this, mTimeListener,
                 mDateAndTime.get(Calendar.HOUR_OF_DAY),
                 mDateAndTime.get(Calendar.MINUTE), false).show();
 
@@ -251,14 +244,14 @@ public class EditorActivity extends Fragment implements
                 updateTimeDisplay(mendTime);
             }
         };
-        new TimePickerDialog(getActivity(), mTimeListener,
+        new TimePickerDialog(EditorActivity.this, mTimeListener,
                 mDateAndTime.get(Calendar.HOUR_OF_DAY),
                 mDateAndTime.get(Calendar.MINUTE), false).show();
 
     }
 
     private void updateTimeDisplay(TextView mtextview) {
-        mtextview.setText(DateUtils.formatDateTime(getActivity(), mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
+        mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
         if (!mendTime.getText().toString().isEmpty() &&
                 !TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
                 ) {
@@ -306,7 +299,7 @@ public class EditorActivity extends Fragment implements
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
-        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.array_game_options, android.R.layout.simple_spinner_item);
 
         // Specify dropdown layout style - simple list view with 1 item per line
@@ -384,7 +377,7 @@ public class EditorActivity extends Fragment implements
         if (mCurrentGameUri == null) {
             // This is a NEW game, so insert a new game into the provider,
             // returning the content URI for the new game.
-            Uri newUri = getActivity().getContentResolver().insert(GameEntry.CONTENT_URI, values);
+            Uri newUri = getContentResolver().insert(GameEntry.CONTENT_URI, values);
 
             // Show a toast message depending on whether or not the insertion was successful.
             if (newUri == null) {
@@ -405,7 +398,7 @@ public class EditorActivity extends Fragment implements
 
             // Use the user name from shared preferences as the (only) selection argument to filter games only for that user.
             selectionArgs = new String[]{mUserName};
-            int rowsAffected = getActivity().getContentResolver().update(mCurrentGameUri, values, GameEntry.COLUMN_USER_NAME, selectionArgs);
+            int rowsAffected = getContentResolver().update(mCurrentGameUri, values, GameEntry.COLUMN_USER_NAME, selectionArgs);
 
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
@@ -426,7 +419,7 @@ public class EditorActivity extends Fragment implements
         final Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
         SimpleDateFormat calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
-            sdString = sdString + " " + yy;
+        sdString = sdString + " " + yy;
         long stdateInLong = 0;
         try {
             Date BEGIN_TIME = calstDatFormat.parse(sdString);
@@ -453,7 +446,7 @@ public class EditorActivity extends Fragment implements
         getApplicationContext().getContentResolver().insert(baseUri, event);
 
     }
-/*
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_editor.xml file.
@@ -461,11 +454,11 @@ public class EditorActivity extends Fragment implements
         getMenuInflater().inflate(R.menu.menu_editor, menu);
         return true;
     }
-*/
+
     /**
      * This method is called after invalidateOptionsMenu(), so that the
      * menu can be updated (some menu items can be hidden or made visible).
-
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -476,7 +469,7 @@ public class EditorActivity extends Fragment implements
         }
         return true;
     }
-*/
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -485,14 +478,14 @@ public class EditorActivity extends Fragment implements
             case R.id.action_save:
                 // Save game to database
                 saveGames();
-    //Show snackbar and then finish activity
+                //Show snackbar and then finish activity
                 Snackbar.make(mLayout, R.string.calendar_add_game,Snackbar.LENGTH_SHORT)
                         .addCallback(new Snackbar.Callback() {
                             @Override
                             public void onDismissed(Snackbar transientBottomBar,
                                                     int event) {
                                 if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                                    getActivity().finish();
+                                    EditorActivity.this.finish();
                                 }
                             }
                         }).show();
@@ -509,7 +502,7 @@ public class EditorActivity extends Fragment implements
                 // If the game hasn't changed, continue with navigating up to parent activity
                 // which is the {@link CatalogActivity}.
                 if (!mGameHasChanged) {
-                    NavUtils.navigateUpFromSameTask(getActivity());
+                    NavUtils.navigateUpFromSameTask(EditorActivity.this);
                     return true;
                 }
 
@@ -521,7 +514,7 @@ public class EditorActivity extends Fragment implements
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // User clicked "Discard" button, navigate to parent activity.
-                                NavUtils.navigateUpFromSameTask(getActivity());
+                                NavUtils.navigateUpFromSameTask(EditorActivity.this);
                             }
                         };
 
@@ -535,11 +528,11 @@ public class EditorActivity extends Fragment implements
     /**
      * This method is called when the back button is pressed.
      */
-
+    @Override
     public void onBackPressed() {
         // If the game hasn't changed, continue with handling back button press
         if (!mGameHasChanged) {
-            super.getActivity().onBackPressed();
+            super.onBackPressed();
             return;
         }
 
@@ -550,14 +543,13 @@ public class EditorActivity extends Fragment implements
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         // User clicked "Discard" button, close the current activity.
-                        getActivity().finish();
+                        finish();
                     }
                 };
 
         // Show dialog that there are unsaved changes
         showUnsavedChangesDialog(discardButtonClickListener);
     }
-
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -591,7 +583,7 @@ public class EditorActivity extends Fragment implements
             selectionArgs = new String[]{mUserName};
         }
         // This loader will execute the ContentProvider's query method on a background thread
-        return new CursorLoader(getActivity(),   // Parent activity context
+        return new CursorLoader(this,   // Parent activity context
                 mCurrentGameUri,         // Query the content URI for the current game
                 projection,             // Columns to include in the resulting Cursor
                 selectionClause,                   //  selection clause
@@ -679,7 +671,7 @@ public class EditorActivity extends Fragment implements
             OnClickListener discardButtonClickListener) {
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the postivie and negative buttons on the dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_msg);
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);
         builder.setNegativeButton(R.string.keep_editing, new OnClickListener() {
@@ -703,7 +695,7 @@ public class EditorActivity extends Fragment implements
     private void showDeleteConfirmationDialog() {
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the postivie and negative buttons on the dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.delete_dialog_msg);
         builder.setPositiveButton(R.string.delete, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -736,7 +728,7 @@ public class EditorActivity extends Fragment implements
             // Call the ContentResolver to delete the game at the given content URI.
             // Pass in null for the selection and selection args because the mCurrentGameUri
             // content URI already identifies the game that we want.
-            int rowsDeleted = getActivity().getContentResolver().delete(mCurrentGameUri, null, null);
+            int rowsDeleted = getContentResolver().delete(mCurrentGameUri, null, null);
 
             // Show a toast message depending on whether or not the delete was successful.
             if (rowsDeleted == 0) {
@@ -750,6 +742,6 @@ public class EditorActivity extends Fragment implements
             }
         }
         // Close the activity
-        getActivity().finish();
+        finish();
     }
 }
