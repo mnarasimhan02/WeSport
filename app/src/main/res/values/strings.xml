@@ -200,5 +200,7 @@
     <string name="error_fields_empty">Please make sure you enter display name, email and password!</string>
     <string name="error_incorrect_email_pass">Provide correct email and password with more than 6 characters.</string>
     <string name="calendar_add_game">Game Added to Calendar</string>
+    <string name="title_activity_my_games">MyGames</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

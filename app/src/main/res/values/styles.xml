@@ -66,15 +66,36 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
-    <style name="FirebaseUI.Text.TextInputLayout" parent="@style/FirebaseUI.EditText" />
+    <style name="FirebaseUI.Text.TextInputLayout" parent="@style/FirebaseUI.EditText"/>
 
-    <style name="FirebaseUI.Text.HintText" parent="@style/FirebaseUI.EditText" />
+    <style name="FirebaseUI.Text.HintText" parent="@style/FirebaseUI.EditText"/>
 
     <style name="FirebaseUI.ImageView.VisibilityToggle" parent="@style/FirebaseUI.EditText">
         <item name="android:visibility">gone</item>
     </style>
 
-    <style name="FirebaseUI.Text.Link" parent="FirebaseUI.EditText" />
+    <style name="FirebaseUI.Text.Link" parent="FirebaseUI.EditText"/>
 
-    <style name="FirebaseUI.Text.BodyText" parent="FirebaseUI.EditText" />
+    <style name="FirebaseUI.Text.BodyText" parent="FirebaseUI.EditText"/>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="MyMaterialTheme" parent="MyMaterialTheme.Base">
+
+    </style>
+
+    <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 </resources>

@@ -3,13 +3,14 @@ package com.my.game.wesport.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.auth.AuthUI;
@@ -33,7 +34,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ListUsers extends AppCompatActivity {
+public class ListUsers extends Fragment {
 
 
     private static String TAG =  ListUsers.class.getSimpleName();
@@ -52,19 +53,22 @@ public class ListUsers extends AppCompatActivity {
     private String loginUser;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView (LayoutInflater inflater, ViewGroup container,
+                                Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.activity_list_users, container, false);
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_list_users);
         bindButterKnife();
         setAuthInstance();
         setUsersDatabase();
         setUserRecyclerView();
         setUsersKeyList();
         setAuthListener();
+        return rootView;
     }
 
     private void bindButterKnife() {
-        ButterKnife.bind(this);
+        ButterKnife.bind(getActivity());
     }
 
     private void setAuthInstance() {
@@ -75,8 +79,8 @@ public class ListUsers extends AppCompatActivity {
         mUserRefDatabase = FirebaseDatabase.getInstance().getReference().child("users");
     }
     private void setUserRecyclerView() {
-        mUsersChatAdapter = new UsersChatAdapter(this, new ArrayList<User>());
-        mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mUsersChatAdapter = new UsersChatAdapter(getActivity(), new ArrayList<User>());
+        mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mUsersRecyclerView.setHasFixedSize(true);
         mUsersRecyclerView.setAdapter(mUsersChatAdapter);
     }
@@ -122,7 +126,7 @@ public class ListUsers extends AppCompatActivity {
     }
 
     private void goToLogin() {
-        Intent intent = new Intent(this, SigninActivity.class);
+        Intent intent = new Intent(getActivity(), SigninActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // SigninActivity is a New Task
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // The old task when coming back to this activity should be cleared so we cannot come back to it.
         startActivity(intent);
@@ -160,12 +164,12 @@ public class ListUsers extends AppCompatActivity {
         setUserOffline();
         mAuth.signOut();
         AuthUI.getInstance()
-                .signOut(this)
+                .signOut(getActivity())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         // user is now signed out
-                        startActivity(new Intent(ListUsers.this, SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-                        finish();
+                        startActivity(new Intent(getActivity(), SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        getActivity().finish();
                     }
                 });
     }
@@ -177,12 +181,13 @@ public class ListUsers extends AppCompatActivity {
         }
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.list_signout, menu);
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

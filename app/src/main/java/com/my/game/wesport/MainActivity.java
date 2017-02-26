@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.my.game.wesport.ui.MyGames;
 
 import static android.support.design.widget.Snackbar.make;
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 SharedPreferences.Editor editor = chGame.edit();
                 editor.putString("chosenGame", chosenGame).apply();
                 if (isLocationEnabled(getApplicationContext())) {
-                    Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), MyGames.class);
                     startActivity(intent);
                 }
                 else {

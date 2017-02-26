@@ -7,14 +7,17 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -53,8 +56,10 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 @SuppressWarnings("ALL")
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
+public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
 
     private static final String LOG_TAG = "GooglePlaces ";
     private final String TAG = "MapActivity";
@@ -105,19 +110,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView (LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
-        setContentView(R.layout.activity_maps);
-        mLayout = findViewById(android.R.id.content);
-        myContentsView = getLayoutInflater().inflate(R.layout.custom_info_content, null);
+        //setContentView(R.layout.activity_maps);
+        View rootView = inflater.inflate(R.layout.activity_maps, container, false);
+        mLayout = (CoordinatorLayout) getView().findViewById(android.R.id.content);
+        myContentsView = inflater.inflate(R.layout.custom_info_content, null);
 
         setUpMapIfNeeded();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+                getActivity().getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setHint(getString(R.string.autocomplete_hint));
 
         // Register a listener to receive callbacks when a place has been selected or an error has
@@ -131,7 +138,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(!EventBus.getDefault().hasSubscriberForEvent(GetAddressTask.class)) {
             EventBus.getDefault().register(this);
         }
-
+        return rootView;
     }
 
     public void setUserMarker(LatLng latLng) {
@@ -151,7 +158,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            mainFragment = (SupportMapFragment) getSupportFragmentManager()
+            mainFragment = (SupportMapFragment) getFragmentManager()
                     .findFragmentById(R.id.map);
             mainFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
@@ -163,19 +170,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
-        if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         map.setMyLocationEnabled(true);
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap sMap) {
         map = sMap;
@@ -298,7 +299,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (uri == null) {
             placeImage.setVisibility(View.GONE);
         } else {
-            Picasso.with(MapsActivity.this)
+            Picasso.with(getActivity())
                     .load(uri)
                     .into(placeImage, new InfoWindowRefresher(marker));
         }
@@ -328,7 +329,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
                 + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.edit().putString("games", address).apply();
     }
 
@@ -346,15 +347,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapLongClick(LatLng latLng) {
         Double marLat = latLng.latitude;
         Double marLon = latLng.longitude;
-        new GetAddressTask(this,marLat,marLon).execute();
+        new GetAddressTask(getActivity(),marLat,marLon).execute();
         mMenu.getItem(0).setVisible(true);
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
+   /* public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.maps_menu, menu);
         return true;
-    }
+    }*/
 
     //respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -362,16 +363,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case android.R.id.home:
-                this.finish();
+                getActivity().finish();
                 break;
             case R.id.map_menu:
-                Intent intent = new Intent(this, CatalogActivity.class);
+                Intent intent = new Intent(getActivity(), CatalogActivity.class);
                 startActivity(intent);
                 break;
         }
         return true;
     }
 
+    /*
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mMenu = menu;
@@ -379,6 +381,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }
+    */
 
     /**
      * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
@@ -390,7 +393,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
                 getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.edit().putString("games", address).apply();
         mMenu.getItem(0).setVisible(true);
     }
