@@ -69,7 +69,6 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -78,6 +77,10 @@
             android:label="@string/title_activity_chat"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity
+            android:name="com.my.game.wesport.MapsActivity"
+            android:label="@string/title_activity_maps">
         </activity>
 
         <receiver android:name="gameswidget.DetailWidgetProvider">

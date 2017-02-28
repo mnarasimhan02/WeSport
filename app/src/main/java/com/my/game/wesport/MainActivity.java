@@ -26,7 +26,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.my.game.wesport.ui.MyGames;
 
 import static android.support.design.widget.Snackbar.make;
 
@@ -57,31 +56,39 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         GridView androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
         androidGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int i, long id) {
-                make(mLayout, getString(R.string.chosen_game) + " "+gridViewString[+i],
-                        Snackbar.LENGTH_LONG).show();
+                try{
+                Snackbar.make(mLayout, getString(R.string.chosen_game) + " "+gridViewString[+i],Snackbar.LENGTH_SHORT)
+                        .addCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onDismissed(Snackbar transientBottomBar,
+                                                    int event){
+                                if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                                    if (isLocationEnabled(getApplicationContext())) {
+                                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                                        startActivity(intent);
+                                    } else {
+                                        Snackbar.make(mLayout, getString(R.string.loc_not_enable),
+                                                Snackbar.LENGTH_LONG).show();
+                                        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
+                                    }
+                                }
+                            }}).show();
                 chosenGame = gridViewString[+i];
                 SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = chGame.edit();
                 editor.putString("chosenGame", chosenGame).apply();
-                if (isLocationEnabled(getApplicationContext())) {
-                    Intent intent = new Intent(getApplicationContext(), MyGames.class);
-                    startActivity(intent);
-                }
-                else {
-                    make(mLayout, getString(R.string.loc_not_enable),
-                            Snackbar.LENGTH_LONG).show();
-                    startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
-                }
             }
-        });
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+        }});
         //setup GoogleApiclient
         buildGoogleApiClient();
     }
-
+    
     public static boolean isLocationEnabled(Context context) {
         int locationMode = 0;
         String locationProviders;

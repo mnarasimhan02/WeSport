@@ -3,14 +3,18 @@ package com.my.game.wesport;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
 import com.my.game.wesport.data.GameContract.GameEntry;
-
 
 /**
  * {@link GameCursorAdapter} is an adapter for a list view
@@ -45,7 +49,7 @@ public class GameCursorAdapter extends CursorAdapter {
         TextView starttime = (TextView) view.findViewById(R.id.start_time);
 
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
-        //ImageView chatview = (ImageView) view.findViewById(R.id.chatimage);
+        ImageView chatview = (ImageView) view.findViewById(R.id.chatimage);
 
         // Find the columns of game attributes that we're interested in
         int descColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
@@ -68,6 +72,60 @@ public class GameCursorAdapter extends CursorAdapter {
         nameTextView.setText(selectedGame + "\n" + gameDesc);
         startdate.setText(stDate + " " + stTime + " " + "at " + gameaddress);
         summaryTextView.setText(notes);
+        Uri gameImageURI=null;
+        Target<Bitmap> glideImage = null;
+
+        switch (selectedGame) {
+            case "Basketball":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/basketball");
+                break;
+            case "Cricket":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/cricket");                //}
+
+                break;
+            case "Football":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/football");                //}
+
+                break;
+            case "Tennis":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/tennis");                //}
+
+                break;
+            case "Frisbee":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/frisbee");                //}
+
+                break;
+            case "Pingpong":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/pingpong");                //}
+
+                break;
+            case "Soccer":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/soccer");                //}
+
+                break;
+            case "Volleyball":
+                gameImageURI = Uri.parse("android.resource://" + context.getPackageName()
+                        + "/drawable/volleyball");                //}
+
+                break;
+        }
+        try {
+
+            glideImage = Glide.with(context)
+                    .load(gameImageURI)
+                    .asBitmap()
+                    .into(chatview);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
      /*   chatview.setOnClickListener(new OnClickListener() {
 

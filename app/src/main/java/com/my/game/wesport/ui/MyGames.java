@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.my.game.wesport.CatalogActivity;
-import com.my.game.wesport.MapsActivity;
 import com.my.game.wesport.R;
 
 public class MyGames extends AppCompatActivity {
@@ -22,15 +21,17 @@ public class MyGames extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-*/
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+         //       WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_my_games);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         }
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -105,12 +106,9 @@ public class MyGames extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position) {
                 case 0:
-                    MapsActivity mapsFragment = new MapsActivity();
-                    return mapsFragment;
-                case 1:
                     CatalogActivity catFragment = new CatalogActivity();
                     return catFragment;
-                case 2:
+                case 1:
                     ListUsers lstuserFragment = new ListUsers();
                     return lstuserFragment;
             }
@@ -120,17 +118,15 @@ public class MyGames extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Parks";
-                case 1:
                     return "Games";
-                case 2:
+                case 1:
                     return "Chat";
             }
             return null;

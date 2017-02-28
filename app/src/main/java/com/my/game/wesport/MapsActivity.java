@@ -1,23 +1,20 @@
 package com.my.game.wesport;
 
 import android.Manifest.permission;
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -39,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.my.game.wesport.POJO.Example;
+import com.my.game.wesport.ui.MyGames;
 import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,9 +55,9 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 @SuppressWarnings("ALL")
-public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
 
-    private static final String LOG_TAG = "GooglePlaces";
+    private static final String LOG_TAG = "GooglePlaces ";
     private final String TAG = "MapActivity";
     FragmentManager fm;
     //Variables to store games and locations from marker click
@@ -83,7 +81,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     /*Infowindow*/
     private View myContentsView;
     private Boolean open_now=null;
-    private String ratingstr;
+    private String ratingstr, vicinitystr;
     private Uri placeImageURI=null;
     private String placeOpen;
     private String parkName;
@@ -92,6 +90,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     private Marker marker;
     private Hashtable<String, Uri> markers;
     private Hashtable<String, String> rating;
+    private Hashtable<String, String> vicinity;
+
 
     //private List<String> photoReference = new ArrayList<String>();
 
@@ -108,19 +108,18 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     }
 
     @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container,
-                              Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
-        //setContentView(R.layout.activity_maps);
-        View rootView = inflater.inflate(R.layout.activity_maps, container, false);
-
-        //setUpMapIfNeeded();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+        setContentView(R.layout.activity_maps);
+        mLayout = findViewById(android.R.id.content);
+        myContentsView = getLayoutInflater().inflate(R.layout.custom_info_content, null);
+        setUpMapIfNeeded();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
         // Retrieve the PlaceAutocompleteFragment.
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getActivity().getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
         autocompleteFragment.setHint(getString(R.string.autocomplete_hint));
 
         // Register a listener to receive callbacks when a place has been selected or an error has
@@ -134,25 +133,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         if(!EventBus.getDefault().hasSubscriberForEvent(GetAddressTask.class)) {
             EventBus.getDefault().register(this);
         }
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        FragmentManager fm = getChildFragmentManager();
-        SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
-        if (mapFragment == null) {
-            mapFragment = new SupportMapFragment();
-            FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.map, mapFragment, "mapFragment");
-            ft.commit();
-            fm.executePendingTransactions();
-        }
-        mapFragment.getMapAsync(this);
-        mLayout = getView().findViewById(android.R.id.content);
-        LayoutInflater inflater = (LayoutInflater)   getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        myContentsView = inflater.inflate(R.layout.custom_info_content,null, false);
 
     }
 
@@ -167,13 +147,13 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
 
     }
 
-    /*private void setUpMapIfNeeded() {
+    private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
         if (map == null) {
             // Try to obtain the map from the SupportMapFragment.
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            mainFragment = (SupportMapFragment) getChildFragmentManager()
+            mainFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
             mainFragment.getMapAsync(this);
             // Check if we were successful in obtaining the map.
@@ -181,32 +161,36 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                 setUpMap();
             }
         }
-        mLayout = getView().findViewById(android.R.id.content);
     }
-*/
+
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
-        if (ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
-                permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         map.setMyLocationEnabled(true);
     }
 
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
     @Override
     public void onMapReady(GoogleMap sMap) {
         map = sMap;
         map.setOnMapLongClickListener(this);
-        //mainFragment.setRetainInstance(true);
+        mainFragment.setRetainInstance(true);
         map.setInfoWindowAdapter(this);
         try {
             //Instiantiate background task to download places list and address list for respective locations
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
             Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
             build_retrofit_and_get_response(getString((R.string.type_param)), mLat, mLon);
-            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             selectedGame = chGame.getString("chosenGame", "Other");
             setUserMarker(new LatLng(mLat, mLon));
         } catch (Exception e){
@@ -217,6 +201,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
         markers = new Hashtable<String, Uri>();
         rating = new Hashtable<String, String>();
+        vicinity = new Hashtable<String, String>();
+
         final int[] photoWidth = new int[1];
         final int[] photoRefsize = new int[1];
         final int[] widthSize = new int[1];
@@ -242,7 +228,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                         //Get if park is open_now
                         if (open_now == null) {
                             open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                            placeOpen = String.valueOf(open_now != null ? "Yes" : "");
+                            placeOpen = String.valueOf(open_now != null ? "Open now" : "closed");
                         }
                         //Get PhotoMaxWidth
                         if (i < widthSize[0]) {
@@ -260,6 +246,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                         }
                         //Get ratings for parks
                         ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                        vicinitystr=String.valueOf(response.body().getResults().get(i).getVicinity());
                         LatLng latLng = new LatLng(lat, lng);
                         Marker parkMarker = map.addMarker(new MarkerOptions()
                                 .title(parkName)
@@ -267,9 +254,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
                         markers.put(parkMarker.getId(), placeImageURI);
                         rating.put(parkMarker.getId(), ratingstr);
+                        vicinity.put(parkMarker.getId(), vicinitystr);
+
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
-                        //Snackbar.make(mLayout, getResources().getString(R.string.map_help),
-                        //        Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(mLayout, getString(R.string.map_help),
+                                Snackbar.LENGTH_LONG).show();
                     }
 
                 } catch (Exception e) {
@@ -304,19 +293,20 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
                     markers.get(marker.getId()) != null) {
                 uri = markers.get(marker.getId());
                 ratingstr= rating.get(marker.getId());
+                vicinitystr= vicinity.get(marker.getId());
             }
         }
         TextView infoTitle = ((TextView) myContentsView.findViewById(R.id.title));
         infoTitle.setText(marker.getTitle());
         TextView infoSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
-        infoSnippet.setText(marker.getSnippet());
+        infoSnippet.setText(vicinitystr);
         TextView infoOpennow = (TextView) myContentsView.findViewById(R.id.open_now);
         infoOpennow.setText(placeOpen);
         ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
         if (uri == null) {
             placeImage.setVisibility(View.GONE);
         } else {
-            Picasso.with(getActivity())
+            Picasso.with(MapsActivity.this)
                     .load(uri)
                     .into(placeImage, new InfoWindowRefresher(marker));
         }
@@ -346,7 +336,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
                         + "  " + getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
 
@@ -364,31 +354,33 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
     public void onMapLongClick(LatLng latLng) {
         Double marLat = latLng.latitude;
         Double marLon = latLng.longitude;
-        new GetAddressTask(getActivity(),marLat,marLon).execute();
+        new GetAddressTask(this,marLat,marLon).execute();
         mMenu.getItem(0).setVisible(true);
     }
 
-   /* public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.maps_menu, menu);
         return true;
-    }*/
+    }
 
-    /*respond to menu item selection
+    //respond to menu item selection
     public boolean onOptionsItemSelected(MenuItem item) {
+
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case android.R.id.home:
-                getActivity().finish();
+                this.finish();
                 break;
             case R.id.map_menu:
-                Intent intent = new Intent(getActivity(), CatalogActivity.class);
+                Intent intent = new Intent(this, MyGames.class);
                 startActivity(intent);
                 break;
         }
         return true;
     }
-    /*
+
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mMenu = menu;
@@ -396,7 +388,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }
-    */
+
 
     /**
      * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
@@ -408,7 +400,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, OnMapL
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
                         getString(R.string.save_game_text),
                 Snackbar.LENGTH_LONG).show();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
         mMenu.getItem(0).setVisible(true);
     }

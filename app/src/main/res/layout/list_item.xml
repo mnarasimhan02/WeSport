@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="#2B3D4D"  />
+        android:textColor="#2B3D4D" />
 
     <TextView
         android:id="@+id/startdate"
@@ -34,8 +34,19 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif"
         android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="#AEB6BD"  />
+        android:textColor="@color/colorAccent"  />
 
 
 </LinearLayout>
+    <ImageView
+        android:id="@+id/chatimage"
+        android:layout_width="50dp"
+        android:layout_height="70dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_chat"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="false"
+        android:contentDescription="@string/accessibility_chatbox"
+        tools:ignore="RtlHardcoded"/>
     </RelativeLayout>
