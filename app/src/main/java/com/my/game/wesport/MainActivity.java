@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                                         startActivity(intent);
                                     } else {
                                         Snackbar.make(mLayout, getString(R.string.loc_not_enable),
-                                                Snackbar.LENGTH_LONG).show();
+                                                Snackbar.LENGTH_SHORT).show();
                                         startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
                                     }
                                 }
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 // Location permission has been granted, preview can be displayed
                 Snackbar.make(mLayout, R.string.permision_available_location,
-                        Snackbar.LENGTH_LONG).show();
+                        Snackbar.LENGTH_SHORT).show();
                 startLocationServices();
             } else {
                 Snackbar.make(mLayout, R.string.close_app,Snackbar.LENGTH_SHORT)
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     ActivityCompat.shouldShowRequestPermissionRationale
                             (MainActivity.this, permission.WRITE_CALENDAR)) {
                 make(mLayout, R.string.permissions_not_granted,
-                        Snackbar.LENGTH_LONG).setAction("ENABLE",
+                        Snackbar.LENGTH_SHORT).setAction("ENABLE",
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

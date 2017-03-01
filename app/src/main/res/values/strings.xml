@@ -177,7 +177,7 @@
     <string name="accessibility_chatbox">image for chatroom</string>
     <string name="sensor_param">false</string>
     <string name="get_address">retrieving address</string>
-    <string name="map_help">Type address or long click marker to find address</string>
+    <string name="map_help">Tap any park to find out more information and then click/search to retrieve address</string>
     <string name="next">NEXT</string>
     <string name="loc_not_enable">Turn on location settings</string>
     <string name="gps_network_not_enabled">GPS not enabled</string>
@@ -185,10 +185,7 @@
     <string name="Cancel">cancel</string>
     <string name="accessibility_place">park image</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_log_in">LogIn</string>
-    <string name="title_activity_register">Register</string>
 
 
     <!-- LogInActivity-->
@@ -196,11 +193,7 @@
     <string name="login_error_title">Checking</string>
     <string name="title_activity_chat">Chat</string>
 
-    <!-- RegisterActivity-->
-    <string name="error_fields_empty">Please make sure you enter display name, email and password!</string>
-    <string name="error_incorrect_email_pass">Provide correct email and password with more than 6 characters.</string>
+    <!-- Calendar-->
     <string name="calendar_add_game">Game Added to Calendar</string>
     <string name="title_activity_my_games">MyGames</string>
-    <string name="section_format">Hello World from section: %1$d</string>
-
 </resources>

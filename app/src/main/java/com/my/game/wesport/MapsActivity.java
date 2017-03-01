@@ -258,7 +258,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         markers.put(parkMarker.getId(), placeImageURI);
                         rating.put(parkMarker.getId(), ratingstr);
                         vicinity.put(parkMarker.getId(), vicinitystr);
-
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
                         Snackbar.make(mLayout, getString(R.string.map_help),
                                 Snackbar.LENGTH_LONG).show();
@@ -337,7 +336,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
                         + "  " + getString(R.string.save_game_text),
-                Snackbar.LENGTH_LONG).show();
+                Snackbar.LENGTH_SHORT).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -354,6 +353,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
+        latLng = marker.getPosition();
+        Double marLat = latLng.latitude;
+        Double marLon = latLng.longitude;
+        //new GetAddressTask(this,marLat,marLon).execute();
+        //mMenu.getItem(0).setVisible(true);
+        vicinitystr= vicinity.get(marker.getId());
+        address=vicinitystr;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        prefs.edit().putString("games", address).apply();
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
+                getString(R.string.save_game_text),Snackbar.LENGTH_SHORT)
+                .addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar,
+                                            int event) {
+                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                            Intent intent = new Intent(MapsActivity.this, MyGames.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);                        }
+                    }
+                }).show();
 
     }
 
@@ -371,10 +391,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case android.R.id.home:
                 this.finish();
                 break;
-            case R.id.map_menu:
-                Intent intent = new Intent(this, MyGames.class);
-                startActivity(intent);
-                break;
         }
         return true;
     }
@@ -383,11 +399,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mMenu = menu;
-        mMenu.getItem(0).setVisible(false);
+        //mMenu.getItem(0).setVisible(false);
         //  By default no Menu
         return super.onPrepareOptionsMenu(menu);
     }
-
 
     /**
      * Callback invoked when a place has been selected from the PlaceAutocompleteFragment.
@@ -397,14 +412,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                getString(R.string.save_game_text),Snackbar.LENGTH_LONG)
+                getString(R.string.save_game_text),Snackbar.LENGTH_SHORT)
                 .addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar,
                                             int event) {
                         if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
                             Intent intent = new Intent(MapsActivity.this, MyGames.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);                        }
                     }
                 }).show();
@@ -440,14 +455,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                getString(R.string.save_game_text),Snackbar.LENGTH_LONG)
+                getString(R.string.save_game_text),Snackbar.LENGTH_SHORT)
                 .addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar,
                                             int event) {
                         if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
                             Intent intent = new Intent(MapsActivity.this, MyGames.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);                        }
                     }
                 }).show();
