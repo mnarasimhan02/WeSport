@@ -27,6 +27,7 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,7 +56,8 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 @SuppressWarnings("ALL")
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener, InfoWindowAdapter {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener,
+        InfoWindowAdapter, OnInfoWindowClickListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
     private final String TAG = "MapActivity";
@@ -184,6 +186,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
         map.setInfoWindowAdapter(this);
+        map.setOnInfoWindowClickListener(this);
         try {
             //Instiantiate background task to download places list and address list for respective locations
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -325,7 +328,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
     public void onEvent(String address){
         // store address details for the game
@@ -352,10 +354,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /* Get address for new places when user long click's on the map and show the address*/
     @Override
     public void onMapLongClick(LatLng latLng) {
-        Double marLat = latLng.latitude;
-        Double marLon = latLng.longitude;
-        new GetAddressTask(this,marLat,marLon).execute();
-        mMenu.getItem(0).setVisible(true);
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -398,11 +397,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
         Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                        getString(R.string.save_game_text),
-                Snackbar.LENGTH_LONG).show();
+                getString(R.string.save_game_text),Snackbar.LENGTH_LONG)
+                .addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar,
+                                            int event) {
+                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                            Intent intent = new Intent(MapsActivity.this, MyGames.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);                        }
+                    }
+                }).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
-        mMenu.getItem(0).setVisible(true);
+        //mMenu.getItem(0).setVisible(true);
     }
 
     /**
@@ -420,4 +428,29 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onStop();
     }
 
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        LatLng latLng = marker.getPosition();
+        Double marLat = latLng.latitude;
+        Double marLon = latLng.longitude;
+        //new GetAddressTask(this,marLat,marLon).execute();
+        //mMenu.getItem(0).setVisible(true);
+        vicinitystr= vicinity.get(marker.getId());
+        address=vicinitystr;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        prefs.edit().putString("games", address).apply();
+        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
+                getString(R.string.save_game_text),Snackbar.LENGTH_LONG)
+                .addCallback(new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar,
+                                            int event) {
+                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                            Intent intent = new Intent(MapsActivity.this, MyGames.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);                        }
+                    }
+                }).show();
+
+    }
 }

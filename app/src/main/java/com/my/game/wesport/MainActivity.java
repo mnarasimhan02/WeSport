@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //setup GoogleApiclient
         buildGoogleApiClient();
     }
-    
+
     public static boolean isLocationEnabled(Context context) {
         int locationMode = 0;
         String locationProviders;
