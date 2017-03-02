@@ -137,7 +137,7 @@ public class SigninActivity extends AppCompatActivity {
         // Initialize progress bar
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        mMessagesDatabaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://wesport-d7a20.firebaseio.com");
+        mMessagesDatabaseReference= FirebaseDatabase.getInstance().getReference();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -149,9 +149,13 @@ public class SigninActivity extends AppCompatActivity {
                         onAuthSuccess(firebaseAuth.getCurrentUser());
                         setUserOnline();
                     } else {
+//                        Log.d("user displayname",user.getDisplayName());
+                        Log.d("user token", String.valueOf(user.getToken(true)));
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
+                        onAuthSuccess(firebaseAuth.getCurrentUser());
                         setUserOnline();
                     }
+
                     // User is signed in
                 } else {
                     // User is signed out
@@ -183,11 +187,13 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private void onAuthSuccess(FirebaseUser user) {
+        Log.d("onAuthSuccess",user.getUid());
         createNewUser(user.getUid());
     }
 
     private void createNewUser(String userId){
         User user = buildNewUser();
+        Log.d("buildNewUser","buildNewUser");
         mMessagesDatabaseReference.child("users").child(userId).setValue(user);
     }
 

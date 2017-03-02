@@ -45,6 +45,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public void onBindViewHolder(ViewHolderUsers holder, int position) {
 
         User fireChatUser = mUsers.get(position);
+        Log.d("mUsers.get(position)", String.valueOf(mUsers.get(position)));
 
         // Set avatar
         int userAvatarId= ChatHelper.getDrawableAvatarId(fireChatUser.getAvatarId());
@@ -53,9 +54,12 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
+//        Log.d("fireChatUser.getDisplay",fireChatUser.getDisplayName());
 
         // Set presence status
         holder.getStatusConnection().setText(fireChatUser.getConnection());
+        Log.d("fireChatgetConnec",fireChatUser.getConnection());
+
 
         // Set presence text color
         if(fireChatUser.getConnection().equals(ONLINE)) {
@@ -85,9 +89,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         mCurrentUserId = userUid;
         mCurrentUserEmail = email;
         mCurrentUserCreatedAt = createdAt;
-        Log.d("mCurrentUserId",mCurrentUserId);
-        Log.d("mCurrentUserEmail",mCurrentUserEmail);
-        Log.d("mCurrentUserCreatedAt", String.valueOf(mCurrentUserCreatedAt));
+
     }
 
     public void clear() {
@@ -128,12 +130,15 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
             try {
                 String chatRef = null;
                 User user = mUsers.get(getLayoutPosition());
+                Log.d("mCurrentUserId",mCurrentUserId);
+                Log.d("mCurrentUserEmail",mCurrentUserEmail);
+                Log.d("mCurrentUserCreatedAt", String.valueOf(mCurrentUserCreatedAt));
+                Log.d("user chat on click", String.valueOf(user));
                 if (user != null && mCurrentUserCreatedAt != null && mCurrentUserEmail != null) {
                     chatRef = user.createUniqueChatRef(mCurrentUserCreatedAt, mCurrentUserEmail);
                 }
                 Intent chatIntent = new Intent(mContextViewHolder, ChatActivity.class);
                 chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, mCurrentUserId);
-                assert user != null;
                 chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, user.getRecipientId());
                 chatIntent.putExtra(ExtraIntent.EXTRA_CHAT_REF, chatRef);
                 // Start new activity
