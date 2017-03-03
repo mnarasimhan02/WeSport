@@ -3,8 +3,7 @@ package com.my.game.wesport.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.my.game.wesport.FireChatHelper.ChatHelper;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
 import com.my.game.wesport.model.User;
 import com.my.game.wesport.ui.ChatActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -46,9 +45,17 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
         User fireChatUser = mUsers.get(position);
         // Set avatar
-        int userAvatarId= ChatHelper.getDrawableAvatarId(fireChatUser.getAvatarId());
-        Drawable  avatarDrawable = ContextCompat.getDrawable(mContext,userAvatarId);
-        holder.getUserAvatar().setImageDrawable(avatarDrawable);
+        Uri mPhotoUri= fireChatUser.getAvatarId();
+       // Drawable  avatarDrawable = ContextCompat.getDrawable(mContext,userAvatarId);
+
+        //holder.getUserAvatar().setImageDrawable(avatarDrawable);
+        if (mPhotoUri == null) {
+            holder.getUserAvatar().setVisibility(View.GONE);
+        } else {
+            Picasso.with(mContext)
+                    .load(mPhotoUri)
+                    .into(holder.mUserAvatar);
+        }
 
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());

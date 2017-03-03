@@ -3,6 +3,7 @@ package com.my.game.wesport.login;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -113,7 +114,6 @@ public class SigninActivity extends AppCompatActivity {
 
     }
 
-
     private void hideActionBar() {
         this.getActionBar().hide();
     }
@@ -121,8 +121,6 @@ public class SigninActivity extends AppCompatActivity {
     private void bindButterKnife() {
         ButterKnife.bind(this);
     }
-
-
 
     private void setAuthInstance() {
         mUsername = ANONYMOUS;
@@ -176,7 +174,6 @@ public class SigninActivity extends AppCompatActivity {
 
     private void setUserOnline() {
         if(mFirebaseAuth.getCurrentUser()!=null ) {
-            Log.d("user online","Setting ONline");
             String userId = mFirebaseAuth.getCurrentUser().getUid();
             FirebaseDatabase.getInstance()
                     .getReference().
@@ -202,12 +199,13 @@ public class SigninActivity extends AppCompatActivity {
         Log.d("Status",com.my.game.wesport.adapter.UsersChatAdapter.ONLINE);
         Log.d("Avatar", String.valueOf(ChatHelper.generateRandomAvatarForUser()));
         Log.d("datetime", String.valueOf(new Date().getTime()));
+        Log.d("getUserPhotoUri", String.valueOf(getUserPhotoUri()));
 
         return new User(
                 loginUser,
                 getUserEmail(),
                 com.my.game.wesport.adapter.UsersChatAdapter.ONLINE,
-                com.my.game.wesport.FireChatHelper.ChatHelper.generateRandomAvatarForUser(),
+                getUserPhotoUri(),
                 new Date().getTime()
         );
     }
@@ -250,6 +248,10 @@ public class SigninActivity extends AppCompatActivity {
 
     private String getUserEmail() {
         return mFirebaseAuth.getCurrentUser().getEmail();
+    }
+
+    private Uri getUserPhotoUri() {
+        return mFirebaseAuth.getCurrentUser().getPhotoUrl();
     }
 
     @Override

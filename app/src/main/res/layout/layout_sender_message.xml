@@ -15,7 +15,7 @@
         android:layout_marginBottom="2dp"
         android:textStyle="bold"
         android:textSize="14sp"
-        android:textColor="@color/colorPrimaryLight"
+        android:textColor="#FFFFFF"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:background="@drawable/sender_rounded_corners"/>

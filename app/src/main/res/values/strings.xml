@@ -177,7 +177,7 @@
     <string name="accessibility_chatbox">image for chatroom</string>
     <string name="sensor_param">false</string>
     <string name="get_address">retrieving address</string>
-    <string name="map_help">Tap any park to find out more information and then click/search to retrieve address</string>
+    <string name="map_help">Tap any park to find out more information and then click info window/search to retrieve address</string>
     <string name="next">NEXT</string>
     <string name="loc_not_enable">Turn on location settings</string>
     <string name="gps_network_not_enabled">GPS not enabled</string>

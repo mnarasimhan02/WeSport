@@ -1,5 +1,7 @@
 package com.my.game.wesport.model;
 
+import android.net.Uri;
+
 import com.google.firebase.database.Exclude;
 
 public class User {
@@ -7,7 +9,8 @@ public class User {
     private String displayName;
     private String email;
     private String connection;
-    private int avatarId;
+    //private int avatarId;
+    private Uri photoUrl;
     private long createdAt;
 
     private String mRecipientId;
@@ -15,12 +18,12 @@ public class User {
     public User() {
     }
 
-    public User(String displayName, String email, String connection, int avatarId, long createdAt) {
+    public User(String displayName, String email, String connection,  Uri photoUrl, long createdAt) {
         this.displayName = displayName;
         this.email = email;
         this.connection = connection;
-        this.avatarId = avatarId;
         this.createdAt = createdAt;
+        this.photoUrl = photoUrl;
     }
 
 
@@ -60,8 +63,8 @@ public class User {
         return connection;
     }
 
-    public int getAvatarId() {
-        return avatarId;
+    public Uri getAvatarId() {
+        return photoUrl;
     }
 
     @Exclude

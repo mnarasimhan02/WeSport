@@ -28,7 +28,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -56,7 +55,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 @SuppressWarnings("ALL")
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, OnMapLongClickListener, PlaceSelectionListener,
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
         InfoWindowAdapter, OnInfoWindowClickListener {
 
     private static final String LOG_TAG = "GooglePlaces ";
@@ -183,7 +182,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap sMap) {
         map = sMap;
-        map.setOnMapLongClickListener(this);
         mainFragment.setRetainInstance(true);
         map.setInfoWindowAdapter(this);
         map.setOnInfoWindowClickListener(this);
@@ -350,32 +348,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     };
 
-    /* Get address for new places when user long click's on the map and show the address*/
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-        latLng = marker.getPosition();
-        Double marLat = latLng.latitude;
-        Double marLon = latLng.longitude;
-        //new GetAddressTask(this,marLat,marLon).execute();
-        //mMenu.getItem(0).setVisible(true);
-        vicinitystr= vicinity.get(marker.getId());
-        address=vicinitystr;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        prefs.edit().putString("games", address).apply();
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                getString(R.string.save_game_text),Snackbar.LENGTH_SHORT)
-                .addCallback(new Snackbar.Callback() {
-                    @Override
-                    public void onDismissed(Snackbar transientBottomBar,
-                                            int event) {
-                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                            Intent intent = new Intent(MapsActivity.this, MyGames.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);                        }
-                    }
-                }).show();
-
-    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
