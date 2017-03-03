@@ -139,6 +139,7 @@ public class SigninActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mMessagesDatabaseReference= FirebaseDatabase.getInstance().getReference();
 
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -150,7 +151,6 @@ public class SigninActivity extends AppCompatActivity {
                         setUserOnline();
                     } else {
 //                        Log.d("user displayname",user.getDisplayName());
-                        Log.d("user token", String.valueOf(user.getToken(true)));
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                         onAuthSuccess(firebaseAuth.getCurrentUser());
                         setUserOnline();
@@ -176,6 +176,7 @@ public class SigninActivity extends AppCompatActivity {
 
     private void setUserOnline() {
         if(mFirebaseAuth.getCurrentUser()!=null ) {
+            Log.d("user online","Setting ONline");
             String userId = mFirebaseAuth.getCurrentUser().getUid();
             FirebaseDatabase.getInstance()
                     .getReference().
@@ -187,13 +188,11 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private void onAuthSuccess(FirebaseUser user) {
-        Log.d("onAuthSuccess",user.getUid());
         createNewUser(user.getUid());
     }
 
     private void createNewUser(String userId){
         User user = buildNewUser();
-        Log.d("buildNewUser","buildNewUser");
         mMessagesDatabaseReference.child("users").child(userId).setValue(user);
     }
 
@@ -250,7 +249,6 @@ public class SigninActivity extends AppCompatActivity {
         }
 
     private String getUserEmail() {
-        Log.d("getCurrentUser().getEmail()",mFirebaseAuth.getCurrentUser().getEmail());
         return mFirebaseAuth.getCurrentUser().getEmail();
     }
 

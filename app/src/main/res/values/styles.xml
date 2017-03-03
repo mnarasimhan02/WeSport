@@ -52,7 +52,6 @@
         <item name="android:textAppearance">?android:textAppearanceSmall</item>
     </style>
 
-
     <!-- Style for an EditText field in the editor -->
     <style name="EditorFieldStyle">
         <item name="android:layout_height">wrap_content</item>
@@ -98,4 +97,6 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+
 </resources>

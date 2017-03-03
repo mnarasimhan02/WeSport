@@ -28,7 +28,6 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
-
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <!-- Accepts URIs that begin with "http://games” -->
@@ -77,11 +76,13 @@
             android:name=".ui.ChatActivity"
             android:label="@string/title_activity_chat"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName="com.my.game.wesport.ui.MyGames">
         </activity>
         <activity
             android:name="com.my.game.wesport.MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:parentActivityName="com.my.game.wesport.MainActivity">
         </activity>
 
         <receiver android:name="gameswidget.DetailWidgetProvider">
@@ -107,11 +108,10 @@
         <activity
             android:name=".ui.MyGames"
             android:label="@string/title_activity_my_games"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/MyMaterialTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.my.game.wesport.MainActivity"/>
+                android:value="com.my.game.wesport.MapsActivity"/>
         </activity>
     </application>
 

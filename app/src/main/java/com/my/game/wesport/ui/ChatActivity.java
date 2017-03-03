@@ -1,21 +1,18 @@
 package com.my.game.wesport.ui;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,10 +20,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
 import com.my.game.wesport.adapter.MessageChatAdapter;
+import com.my.game.wesport.adapter.UsersChatAdapter;
 import com.my.game.wesport.model.ChatMessage;
 
 import java.util.ArrayList;
@@ -45,13 +42,13 @@ public class ChatActivity extends AppCompatActivity {
     private ChildEventListener mChildEventListener;
     private StorageReference mChatPhotosStorageReference;
     private DatabaseReference mUserRefDatabase;
+    private UsersChatAdapter mUsersChatAdapter;
 
 
     private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
 
     @BindView(R.id.recycler_view_chat) RecyclerView mChatRecyclerView;
     @BindView(R.id.edit_text_message) EditText mUserMessageChatText;
-
 
     private String mRecipientId;
     private String mCurrentUserId;
@@ -64,6 +61,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
         bindButterKnife();
         setDatabaseInstance();
         setUsersId();
@@ -74,31 +73,21 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
         mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
-        ImageButton mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
-
-        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/jpeg");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent, "Complete action using"), RC_PHOTO_PICKER);
-            }
-        });
-
-        FirebaseAuth.AuthStateListener mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    onSignedInInitialize(user.getDisplayName());
-                } else {
-                    // User is signed out
-                    onSignedOutCleanup();
-                }
-            }
-        };
+        if(getActionBar() != null){
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.chat_username);
+        //actionBar.setCustomView(addView,new ActionBar.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        TextView label = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.username);
+        getSupportActionBar().setTitle(
+                Html.fromHtml("<font color=\"white\">" + mUsername + " - "
+                        + "</font>"));
+        label.setText(mUsername);
     }
 
     private void bindButterKnife() {
@@ -106,16 +95,16 @@ public class ChatActivity extends AppCompatActivity {
     }
     private void setDatabaseInstance() {
         String chatRef = getIntent().getStringExtra(ExtraIntent.EXTRA_CHAT_REF);
-        Log.d ("chatRef", String.valueOf(chatRef));
         if (chatRef!=null) {
             messageChatDatabase = FirebaseDatabase.getInstance().getReference().child(chatRef);
-            Log.d ("setDatabaseInstance", String.valueOf(messageChatDatabase));
         }
     }
 
     private void setUsersId() {
         mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
         mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_CURRENT_USER_ID);
+        mUsername=getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME);
+        Log.d("mRecipient mUsername",mUsername);
     }
 
     private void setChatRecyclerView() {
@@ -189,17 +178,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void onSignedInInitialize(String username) {
-        mUsername = username;
-        //  attachDatabaseReadListener();
-    }
-
-    private void onSignedOutCleanup() {
-        mUsername = ANONYMOUS;
-        //mMessageAdapter.clear();
-        //detachDatabaseReadListener();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -212,26 +190,6 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.signin_cancel), Toast.LENGTH_SHORT).show();
                 finish();
             }
-        } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
-            Uri selectedImageUri = data.getData();
-
-            // Get a reference to store file at chat_photos/<FILENAME>
-            StorageReference photoRef = mChatPhotosStorageReference.child(selectedImageUri.getLastPathSegment());
-
-            // Upload file to Firebase Storage
-            photoRef.putFile(selectedImageUri)
-                    .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // When the image has successfully uploaded, we get its download URL
-                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                            // Set the download URL to the message box, so that the user can send it to the database
-                            assert downloadUrl != null;
-                            ChatMessage newMessage = new ChatMessage(null,mCurrentUserId,mRecipientId,downloadUrl.toString());
-                            mMessagesDatabaseReference.push().setValue(newMessage);
-                        }
-                    });
         }
     }
-
-
 }

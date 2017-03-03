@@ -1,7 +1,5 @@
 package com.my.game.wesport.model;
 
-import android.util.Log;
-
 import com.google.firebase.database.Exclude;
 
 public class User {
@@ -28,15 +26,10 @@ public class User {
 
     public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
         String uniqueChatRef="";
-        Log.d("User class createdAt", String.valueOf(createdAtCurrentUser));
-        Log.d("User class currentEmail", String.valueOf(currentUserEmail));
-        Log.d("User class getCreatedAt", String.valueOf(getCreatedAt()));
         if(createdAtCurrentUser > getCreatedAt()){
             uniqueChatRef = cleanEmailAddress(currentUserEmail)+"-"+cleanEmailAddress(getUserEmail());
-            Log.d("uniqueChatRef",uniqueChatRef);
         }else {
             uniqueChatRef=cleanEmailAddress(getUserEmail())+"-"+cleanEmailAddress(currentUserEmail);
-            Log.d("uniqueChatRef2",uniqueChatRef);
         }
         return uniqueChatRef;
     }

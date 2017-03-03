@@ -5,10 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.my.game.wesport.R;
 import com.my.game.wesport.model.ChatMessage;
 
@@ -72,43 +70,21 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private void configureSenderView(ViewHolderSender viewHolderSender, int position) {
         ChatMessage senderFireMessage= mChatList.get(position);
-        viewHolderSender.getSenderMessageTextView().setText(senderFireMessage.getMessage());
-        boolean isPhoto = senderFireMessage.getPhotoUrl() != null;
-        if (isPhoto) {
-            viewHolderSender.getSenderMessageTextView().setVisibility(View.GONE);
-           // viewHolderSender.getSenderphotoImageView().setVisibility(View.VISIBLE);
-            Glide.with(viewHolderSender.getSenderphotoImageView().getContext())
-                    .load(senderFireMessage.getPhotoUrl())
-                    .into(viewHolderSender.mSenderphotoImageView);
-        } else {
-            viewHolderSender.getSenderMessageTextView().setVisibility(View.VISIBLE);
-//            viewHolderSender.getSenderphotoImageView().setVisibility(View.GONE);
             viewHolderSender.getSenderMessageTextView().setText(senderFireMessage.getMessage());
-        }
+            viewHolderSender.getSenderMessageTextView().setVisibility(View.VISIBLE);
+
     }
 
     private void configureRecipientView(ViewHolderRecipient viewHolderRecipient, int position) {
         ChatMessage recipientFireMessage = mChatList.get(position);
         viewHolderRecipient.getRecipientMessageTextView().setText(recipientFireMessage.getMessage());
-        boolean isPhoto = recipientFireMessage.getPhotoUrl() != null;
-        if (isPhoto) {
-            viewHolderRecipient.getRecipientMessageTextView().setVisibility(View.GONE);
-            //viewHolderRecipient.getReceiverphotoImageView().setVisibility(View.VISIBLE);
-            Glide.with(viewHolderRecipient.getReceiverphotoImageView().getContext())
-                    .load(recipientFireMessage.getPhotoUrl())
-                    .into(viewHolderRecipient.mReceiverphotoImageView);
-        } else {
-            viewHolderRecipient.getRecipientMessageTextView().setVisibility(View.VISIBLE);
-            //viewHolderRecipient.getReceiverphotoImageView().setVisibility(View.GONE);
-            viewHolderRecipient.getRecipientMessageTextView().setText(recipientFireMessage.getMessage());
-        }
+        viewHolderRecipient.getRecipientMessageTextView().setVisibility(View.VISIBLE);
     }
 
     @Override
     public int getItemCount() {
         Log.d("adapter size", String.valueOf(mChatList.size()));
         return mChatList.size();
-
     }
 
 
@@ -116,12 +92,8 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         /*add new message chat to list*/
         mChatList.add(newFireChatMessage);
-        Log.d("Message Chat adapter", "newFireChatMessage");
-
         /*refresh view*/
         notifyItemInserted(getItemCount()-1);
-        Log.d("refresh", "refresh");
-
     }
 
 
@@ -137,18 +109,13 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public class ViewHolderSender extends RecyclerView.ViewHolder {
 
         private TextView mSenderMessageTextView;
-        private final ImageView mSenderphotoImageView;
 
         public ViewHolderSender(View itemView) {
             super(itemView);
             mSenderMessageTextView =(TextView)itemView.findViewById(R.id.text_view_sender_message);
-            mSenderphotoImageView = (ImageView)itemView.findViewById(R.id.photoPickerButton);
         }
         public TextView getSenderMessageTextView() {
             return mSenderMessageTextView;
-        }
-        public ImageView getSenderphotoImageView() {
-            return mSenderphotoImageView;
         }
     }
 
@@ -156,19 +123,13 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public class ViewHolderRecipient extends RecyclerView.ViewHolder {
 
         private TextView mRecipientMessageTextView;
-        private final ImageView mReceiverphotoImageView;
 
         public ViewHolderRecipient(View itemView) {
             super(itemView);
             mRecipientMessageTextView=(TextView)itemView.findViewById(R.id.text_view_recipient_message);
-            mReceiverphotoImageView = (ImageView) itemView.findViewById(R.id.photoPickerButton);
         }
         public TextView getRecipientMessageTextView() {
             return mRecipientMessageTextView;
         }
-        public ImageView getReceiverphotoImageView() {
-            return mReceiverphotoImageView;
-        }
-
     }
 }

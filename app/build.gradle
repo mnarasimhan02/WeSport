@@ -70,5 +70,8 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 
+    compile 'com.firebase:geofire-android:2.1.1'
+
+
 }
 apply plugin: 'com.google.gms.google-services'
