@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -217,10 +218,13 @@ public class ListUsers extends Fragment {
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
                             User currentUser = dataSnapshot.getValue(User.class);
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(), currentUser.getCreatedAt());
+                            Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
+
                         } else {
                             User recipient = dataSnapshot.getValue(User.class);
                             recipient.setRecipientId(userUid);
                             mUsersKeyList.add(userUid);
+                            Log.d("recipient UsersKeyList", String.valueOf(mUsersKeyList.add(userUid)));
                             mUsersChatAdapter.refill(recipient);
                         }
                     }

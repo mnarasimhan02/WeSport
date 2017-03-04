@@ -25,12 +25,9 @@ public class ChatHelper {
                 return R.mipmap.ic_avatar_blue;
             case 1:
                 return R.mipmap.ic_avatar_green;
-            case 2:
-                return R.mipmap.ic_avatar_purple;
             default:
                 return R.mipmap.ic_avatar_purple;
         }
     }
-
 
 }

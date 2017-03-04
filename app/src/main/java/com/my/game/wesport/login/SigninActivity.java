@@ -3,7 +3,6 @@ package com.my.game.wesport.login;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -124,7 +123,9 @@ public class SigninActivity extends AppCompatActivity {
 
     private void setAuthInstance() {
         mUsername = ANONYMOUS;
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+
         // Initialize Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseStorage = FirebaseStorage.getInstance();
@@ -137,6 +138,7 @@ public class SigninActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mMessagesDatabaseReference= FirebaseDatabase.getInstance().getReference();
 
+        //enabling disk persistance
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -206,8 +208,9 @@ public class SigninActivity extends AppCompatActivity {
                 getUserEmail(),
                 com.my.game.wesport.adapter.UsersChatAdapter.ONLINE,
                 getUserPhotoUri(),
-                new Date().getTime()
-        );
+                new Date().getTime(),
+                com.my.game.wesport.FireChatHelper.ChatHelper.generateRandomAvatarForUser()
+                );
     }
 
     @Override
@@ -250,9 +253,7 @@ public class SigninActivity extends AppCompatActivity {
         return mFirebaseAuth.getCurrentUser().getEmail();
     }
 
-    private Uri getUserPhotoUri() {
-        return mFirebaseAuth.getCurrentUser().getPhotoUrl();
-    }
+    private String getUserPhotoUri() { return String.valueOf(mFirebaseAuth.getCurrentUser().getPhotoUrl());}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

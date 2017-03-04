@@ -1,7 +1,5 @@
 package com.my.game.wesport.model;
 
-import android.net.Uri;
-
 import com.google.firebase.database.Exclude;
 
 public class User {
@@ -10,24 +8,26 @@ public class User {
     private String email;
     private String connection;
     //private int avatarId;
-    private Uri photoUrl;
+    private String photoUrl;
     private long createdAt;
+    private int nonAvatarId;
+
 
     private String mRecipientId;
 
     public User() {
     }
 
-    public User(String displayName, String email, String connection,  Uri photoUrl, long createdAt) {
+    public User(String displayName, String email, String connection,  String photoUrl, long createdAt, int nonAvatarId) {
         this.displayName = displayName;
         this.email = email;
         this.connection = connection;
-        this.createdAt = createdAt;
         this.photoUrl = photoUrl;
+        this.createdAt = createdAt;
+        this.nonAvatarId = nonAvatarId;
     }
 
-
-    public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
+     public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
         String uniqueChatRef="";
         if(createdAtCurrentUser > getCreatedAt()){
             uniqueChatRef = cleanEmailAddress(currentUserEmail)+"-"+cleanEmailAddress(getUserEmail());
@@ -63,9 +63,11 @@ public class User {
         return connection;
     }
 
-    public Uri getAvatarId() {
+    public String getPhotoUri() {
         return photoUrl;
     }
+
+    public int getNonAvatarId() {return nonAvatarId;}
 
     @Exclude
     public String getRecipientId() {

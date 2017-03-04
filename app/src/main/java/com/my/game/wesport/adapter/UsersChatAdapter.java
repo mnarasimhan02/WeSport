@@ -3,7 +3,8 @@ package com.my.game.wesport.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.my.game.wesport.FireChatHelper.ChatHelper;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
 import com.my.game.wesport.model.User;
@@ -44,14 +46,16 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public void onBindViewHolder(ViewHolderUsers holder, int position) {
 
         User fireChatUser = mUsers.get(position);
+        int userAvatarId= ChatHelper.getDrawableAvatarId(fireChatUser.getNonAvatarId());
         Log.d("fireChatUser", fireChatUser.getDisplayName());
         // Set avatar
-        Uri mPhotoUri= fireChatUser.getAvatarId();
-       // Drawable  avatarDrawable = ContextCompat.getDrawable(mContext,userAvatarId);
-
-        //holder.getUserAvatar().setImageDrawable(avatarDrawable);
+        String mPhotoUri= null;
+        mPhotoUri = fireChatUser.getPhotoUri();
+//        Log.d("mPhotoUri", mPhotoUri);
         if (mPhotoUri == null) {
-            holder.getUserAvatar().setVisibility(View.GONE);
+            Drawable avatarDrawable = ContextCompat.getDrawable(mContext,userAvatarId);
+            holder.getUserNonAvatar().setImageDrawable(avatarDrawable);
+            //holder.getUserAvatar().setVisibility(View.GONE);
         } else {
             Picasso.with(mContext)
                     .load(mPhotoUri)
@@ -80,6 +84,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
     public void refill(User users) {
         mUsers.add(users);
+        Log.d("users", String.valueOf(users));
         notifyDataSetChanged();
     }
 
@@ -120,9 +125,10 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         public ImageView getUserAvatar() {
             return mUserAvatar;
         }
-        public TextView getUserDisplayName() {
-            return mUserDisplayName;
+        public ImageView getUserNonAvatar() {
+            return mUserAvatar;
         }
+        public TextView getUserDisplayName() {return mUserDisplayName;}
         public TextView getStatusConnection() {
             return mStatusConnection;
         }
@@ -133,7 +139,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
             try {
                 String chatRef = null;
                 User user = mUsers.get(getLayoutPosition());
-                Log.d("mUserDisplayName", String.valueOf(user.getDisplayName()));
                 if (user != null && mCurrentUserCreatedAt != null && mCurrentUserEmail != null) {
                     chatRef = user.createUniqueChatRef(mCurrentUserCreatedAt, mCurrentUserEmail);
                 }
