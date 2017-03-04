@@ -220,16 +220,15 @@ public class ListUsers extends Fragment {
                             User currentUser = dataSnapshot.getValue(User.class);
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
                                     currentUser.getCreatedAt(), currentUser.getPhotoUri());
+                            Log.d("getCreatedAt", String.valueOf(currentUser.getCreatedAt()));
                             Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
+                            Log.d("getNonAvatarId", String.valueOf(currentUser.getNonAvatarId()));
                             Log.d("mUsersKeyList photo", String.valueOf(currentUser.getPhotoUri()));
 
                         } else {
                             User recipient = dataSnapshot.getValue(User.class);
                             recipient.setRecipientId(userUid);;
                             mUsersKeyList.add(userUid);
-                            Log.d("recipient UsersKeyList", String.valueOf(mUsersKeyList.add(userUid)));
-                            Log.d("recipient email", String.valueOf(recipient.getPhotoUri()));
-                            Log.d("recipient username", String.valueOf(recipient.getDisplayName()));
                             mUsersChatAdapter.refill(recipient);
                         }
                     }

@@ -8,11 +8,10 @@ public class User {
     private String email;
     private String connection;
     //private int avatarId;
-    private String photoUrl;
+    private String photoUri;
     private long createdAt;
     private int nonAvatarId;
     private String mRecipientId;
-    private String mPhotoUrl;
 
     public User() {
     }
@@ -21,7 +20,7 @@ public class User {
         this.displayName = displayName;
         this.email = email;
         this.connection = connection;
-        this.photoUrl = photoUri;
+        this.photoUri = photoUri;
         this.createdAt = createdAt;
         this.nonAvatarId = nonAvatarId;
     }
@@ -57,7 +56,7 @@ public class User {
     }
 
     public String getPhotoUri() {
-        return photoUrl;
+        return photoUri;
     }
 
     public long getCreatedAt() {
@@ -65,9 +64,7 @@ public class User {
     }
 
     public int getNonAvatarId() {return nonAvatarId;}
-
-    public void setPhotoUri(String photoUri) { this.mPhotoUrl = photoUri;}
-
+    
     @Exclude
     public String getRecipientId() {
         return mRecipientId;

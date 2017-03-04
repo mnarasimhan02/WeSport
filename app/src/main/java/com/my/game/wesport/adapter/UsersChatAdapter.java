@@ -99,11 +99,11 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         notifyDataSetChanged();
     }
 
-    public void setCurrentUserInfo(String userUid, String email, long createdAt, String photoUrl) {
+    public void setCurrentUserInfo(String userUid, String email, long createdAt, String photoUri) {
         mCurrentUserId = userUid;
         mCurrentUserEmail = email;
         mCurrentUserCreatedAt = createdAt;
-        mPhotoUrl=photoUrl;
+        mPhotoUrl=photoUri;
     }
 
     public void clear() {
