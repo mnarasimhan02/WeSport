@@ -11,18 +11,17 @@ public class User {
     private String photoUrl;
     private long createdAt;
     private int nonAvatarId;
-
-
     private String mRecipientId;
+    private String mPhotoUrl;
 
     public User() {
     }
 
-    public User(String displayName, String email, String connection,  String photoUrl, long createdAt, int nonAvatarId) {
+    public User(String displayName, String email, String connection,  String photoUri, long createdAt, int nonAvatarId) {
         this.displayName = displayName;
         this.email = email;
         this.connection = connection;
-        this.photoUrl = photoUrl;
+        this.photoUrl = photoUri;
         this.createdAt = createdAt;
         this.nonAvatarId = nonAvatarId;
     }
@@ -37,19 +36,13 @@ public class User {
         return uniqueChatRef;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
 
     private String cleanEmailAddress(String email){
         //replace dot with comma since firebase does not allow dot
         return email.replace(".","-");
     }
 
-    private String getUserEmail() {
-        //Log.e("user email  ", userEmail);
-        return email;
-    }
+    private String getUserEmail() {return email;}
 
     public String getDisplayName() {
         return displayName;
@@ -67,14 +60,17 @@ public class User {
         return photoUrl;
     }
 
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
     public int getNonAvatarId() {return nonAvatarId;}
+
+    public void setPhotoUri(String photoUri) { this.mPhotoUrl = photoUri;}
 
     @Exclude
     public String getRecipientId() {
         return mRecipientId;
     }
-
-    public void setRecipientId(String recipientId) {
-        this.mRecipientId = recipientId;
-    }
+    public void setRecipientId(String recipientId) {this.mRecipientId = recipientId;}
 }

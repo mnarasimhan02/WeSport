@@ -30,7 +30,8 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     private Context mContext;
     private String mCurrentUserEmail;
     private Long mCurrentUserCreatedAt;
-    private String mCurrentUserId;
+    private String mCurrentUserId,mPhotoUrl;
+
 
     public UsersChatAdapter(Context context, List<User> fireChatUsers) {
         mUsers = fireChatUsers;
@@ -51,16 +52,21 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         // Set avatar
         String mPhotoUri= null;
         mPhotoUri = fireChatUser.getPhotoUri();
-//        Log.d("mPhotoUri", mPhotoUri);
-        if (mPhotoUri == null) {
-            Drawable avatarDrawable = ContextCompat.getDrawable(mContext,userAvatarId);
-            holder.getUserNonAvatar().setImageDrawable(avatarDrawable);
-            //holder.getUserAvatar().setVisibility(View.GONE);
-        } else {
-            Picasso.with(mContext)
-                    .load(mPhotoUri)
-                    .into(holder.mUserAvatar);
+      //  Log.d("mPhotoUri",mPhotoUri);
+        try {
+            if (mPhotoUri == null) {
+                Drawable avatarDrawable = ContextCompat.getDrawable(mContext, userAvatarId);
+                holder.getUserNonAvatar().setImageDrawable(avatarDrawable);
+                //holder.getUserAvatar().setVisibility(View.GONE);
+            } else {
+                Picasso.with(mContext)
+                        .load(mPhotoUri)
+                        .into(holder.mUserAvatar);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
+        //holder.getUserAvatar().setVisibility(View.GONE);
 
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
@@ -93,11 +99,11 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         notifyDataSetChanged();
     }
 
-    public void setCurrentUserInfo(String userUid, String email, long createdAt) {
+    public void setCurrentUserInfo(String userUid, String email, long createdAt, String photoUrl) {
         mCurrentUserId = userUid;
         mCurrentUserEmail = email;
         mCurrentUserCreatedAt = createdAt;
-
+        mPhotoUrl=photoUrl;
     }
 
     public void clear() {

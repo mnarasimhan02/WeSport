@@ -167,7 +167,8 @@ public class ListUsers extends Fragment {
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         // user is now signed out
-                        startActivity(new Intent(getActivity(), SigninActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                        startActivity(new Intent(getActivity(), SigninActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                         getActivity().finish();
                     }
                 });
@@ -217,14 +218,18 @@ public class ListUsers extends Fragment {
                         String userUid = dataSnapshot.getKey();
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
                             User currentUser = dataSnapshot.getValue(User.class);
-                            mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(), currentUser.getCreatedAt());
+                            mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
+                                    currentUser.getCreatedAt(), currentUser.getPhotoUri());
                             Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
+                            Log.d("mUsersKeyList photo", String.valueOf(currentUser.getPhotoUri()));
 
                         } else {
                             User recipient = dataSnapshot.getValue(User.class);
-                            recipient.setRecipientId(userUid);
+                            recipient.setRecipientId(userUid);;
                             mUsersKeyList.add(userUid);
                             Log.d("recipient UsersKeyList", String.valueOf(mUsersKeyList.add(userUid)));
+                            Log.d("recipient email", String.valueOf(recipient.getPhotoUri()));
+                            Log.d("recipient username", String.valueOf(recipient.getDisplayName()));
                             mUsersChatAdapter.refill(recipient);
                         }
                     }

@@ -1,7 +1,6 @@
 package com.my.game.wesport.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +82,6 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
-        Log.d("adapter size", String.valueOf(mChatList.size()));
         return mChatList.size();
     }
 
