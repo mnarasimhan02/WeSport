@@ -44,6 +44,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public void onBindViewHolder(ViewHolderUsers holder, int position) {
 
         User fireChatUser = mUsers.get(position);
+        Log.d("fireChatUser", fireChatUser.getDisplayName());
         // Set avatar
         Uri mPhotoUri= fireChatUser.getAvatarId();
        // Drawable  avatarDrawable = ContextCompat.getDrawable(mContext,userAvatarId);
