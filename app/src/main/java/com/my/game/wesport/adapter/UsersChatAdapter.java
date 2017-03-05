@@ -48,16 +48,18 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
         User fireChatUser = mUsers.get(position);
         int userAvatarId= ChatHelper.getDrawableAvatarId(fireChatUser.getNonAvatarId());
-        Log.d("fireChatUser", fireChatUser.getDisplayName());
         // Set avatar
-        String mPhotoUri= null;
+        String mPhotoUri;
         mPhotoUri = fireChatUser.getPhotoUri();
-      //  Log.d("mPhotoUri",mPhotoUri);
+        Log.d("mPhotoUri", mPhotoUri);
         try {
-            if (mPhotoUri == null) {
+            if (mPhotoUri==null) {
                 Drawable avatarDrawable = ContextCompat.getDrawable(mContext, userAvatarId);
-                holder.getUserNonAvatar().setImageDrawable(avatarDrawable);
-                //holder.getUserAvatar().setVisibility(View.GONE);
+                Log.d("holder.getUserAvatar()", String.valueOf(holder.getUserAvatar()));
+                //holder.getUserAvatar().setImageDrawable(avatarDrawable);
+                Picasso.with(mContext)
+                        .load(String.valueOf(avatarDrawable))
+                        .into(holder.mUserAvatar);
             } else {
                 Picasso.with(mContext)
                         .load(mPhotoUri)
@@ -66,8 +68,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         } catch (Exception e){
             e.printStackTrace();
         }
-        //holder.getUserAvatar().setVisibility(View.GONE);
-
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
 
@@ -90,7 +90,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
 
     public void refill(User users) {
         mUsers.add(users);
-        Log.d("users", String.valueOf(users));
         notifyDataSetChanged();
     }
 

@@ -64,7 +64,7 @@ public class User {
     }
 
     public int getNonAvatarId() {return nonAvatarId;}
-    
+
     @Exclude
     public String getRecipientId() {
         return mRecipientId;
