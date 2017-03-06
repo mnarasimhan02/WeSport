@@ -1,8 +1,11 @@
 package com.my.game.wesport.ui;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +19,13 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.appinvite.AppInvite;
+import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.android.gms.appinvite.AppInviteInvitationResult;
+import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,10 +46,16 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ListUsers extends Fragment {
+import static android.app.Activity.RESULT_OK;
+
+public class ListUsers extends Fragment implements
+        GoogleApiClient.OnConnectionFailedListener {
 
 
+    private static final int REQUEST_INVITE = 0;
     private static String TAG =  ListUsers.class.getSimpleName();
+    private GoogleApiClient mGoogleApiClient;
+
 
     @BindView(R.id.progress_bar_users) ProgressBar mProgressBarForUsers;
     @BindView(R.id.recycler_view_users) RecyclerView mUsersRecyclerView;
@@ -67,7 +83,49 @@ public class ListUsers extends Fragment {
         setUsersKeyList();
         setAuthListener();
         setHasOptionsMenu(true);
+        // Invite button click listener
+        //findViewById(R.id.invite_button).setOnClickListener(this);
+
+        //DeepLinkManager deepLinkManager = new DeepLinkManager(this, this);
+        //deepLinkManager.checkForInvites(true);
+
+        // Create an auto-managed GoogleApiClient with access to App Invites.
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addApi(AppInvite.API)
+                .enableAutoManage(getActivity(), this)
+                .build();
+        boolean autoLaunchDeepLink = true;
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, getActivity(), autoLaunchDeepLink)
+                .setResultCallback(
+                        new ResultCallback<AppInviteInvitationResult>() {
+                            @Override
+                            public void onResult(AppInviteInvitationResult result) {
+                                Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
+                                if (result.getStatus().isSuccess()) {
+                                    // Extract information from the intent
+                                    Intent intent = result.getInvitationIntent();
+                                    String deepLink = AppInviteReferral.getDeepLink(intent);
+                                    String invitationId = AppInviteReferral.getInvitationId(intent);
+
+                                }
+                            }
+                        });
+
+        // Setup FAB to open EditorActivity
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onInviteClicked();
+            }
+        });
         return rootView;
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        showMessage(getString(R.string.google_play_services_error));
     }
 
     private void setAuthInstance() {
@@ -285,4 +343,46 @@ public class ListUsers extends Fragment {
         }
         return username;
     }
+
+    /**
+     * User has clicked the 'Invite' button, launch the invitation UI with the proper
+     * title, message, and deep link
+     */
+    private void onInviteClicked() {
+        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                .setMessage(getString(R.string.invitation_message))
+                .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
+                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                .setCallToActionText(getString(R.string.invitation_cta))
+                .build();
+        startActivityForResult(intent, REQUEST_INVITE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Get the invitation IDs of all sent messages
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                for (String id : ids) {
+                    Log.d(TAG, "onActivityResult: sent invitation " + id);
+                }
+            } else {
+                // Sending failed or it was canceled, show failure message to the user
+                // [START_EXCLUDE]
+                showMessage(getString(R.string.send_failed));
+                // [END_EXCLUDE]
+            }
+        }
+    }
+
+    private void showMessage(String msg) {
+        ViewGroup container = (ViewGroup) getActivity().findViewById(R.id.snackbar_layout);
+        Snackbar.make(container, msg, Snackbar.LENGTH_SHORT).show();
+    }
+
+
 }
+

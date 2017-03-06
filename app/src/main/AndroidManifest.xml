@@ -113,6 +113,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.my.game.wesport.MapsActivity"/>
         </activity>
+
+        <activity android:name="com.my.game.wesport.userinvites.DeepLinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:host="example.com" android:scheme="http"/>
+                <data android:host="example.com" android:scheme="https"/>
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
