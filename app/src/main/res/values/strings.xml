@@ -196,4 +196,5 @@
     <!-- Calendar-->
     <string name="calendar_add_game">Game Added to Calendar</string>
     <string name="title_activity_my_games">MyGames</string>
+    <string name="miles_away">miles away</string>
 </resources>

@@ -24,6 +24,7 @@ import com.my.game.wesport.ui.ChatActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.Locale;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -76,7 +77,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         Log.d("display name",fireChatUser.getDisplayName());
 
         // Set Location to distance
-        holder.getUserLocation().setText(getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude()));
+        holder.getUserLocation().setText(getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude())+ " " + mContext.getString(R.string.miles_away));
 
         // Set presence status
         holder.getStatusConnection().setText(fireChatUser.getConnection());
@@ -92,7 +93,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     }
 
     private String getDistance(String lat, String lon) {
-        float distance = 0;
+        double distance = 0;
         Location mCurrentLocation = new Location("mCurrentLocation");
         //Instiantiate background task to download places list and address list for respective locations
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -105,11 +106,11 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
             // Fail
             newLocation.setLatitude(Double.parseDouble(lat));
             newLocation.setLongitude(Double.parseDouble(lon));
-            distance = mCurrentLocation.distanceTo(newLocation) / 1000; // in km
+            distance =  ((mCurrentLocation.distanceTo(newLocation) / 1000)/1.6); // in miles
             Log.d("distance", String.valueOf(distance));
-            return String.valueOf(distance);
+            return String.format(Locale.US, "%.0f", distance);
         }
-        return String.valueOf(distance);
+        return String.format(Locale.US, "%.0f", distance);
     }
 
     @Override

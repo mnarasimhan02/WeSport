@@ -85,18 +85,6 @@ public class User {
 
     public int getNonAvatarId() {return nonAvatarId;}
 
-    public void setLatitude(String latitude) {
-        this.mLatitude = latitude;
-    }
-
-    public void setLongitude(String longitude) {
-
-        this.mLongitude = longitude;
-    }
-
-    public void setLocation(String distance) {
-        this.mDistance = distance;
-    }
 
     @Exclude
     public String getRecipientId() {
