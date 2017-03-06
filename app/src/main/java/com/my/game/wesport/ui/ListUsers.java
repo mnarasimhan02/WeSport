@@ -225,8 +225,8 @@ public class ListUsers extends Fragment {
                             Log.d("getCreatedAt", String.valueOf(currentUser.getCreatedAt()));
                             Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
                             Log.d("getNonAvatarId", String.valueOf(currentUser.getNonAvatarId()));
-                            Log.d("mUsersKeyList photo", String.valueOf(currentUser.getLat()));
-                            Log.d("receiver latitude", String.valueOf(currentUser.getLon()));
+                            Log.d("getLatreceiver", String.valueOf(currentUser.getLat()));
+                            Log.d("getLonreceiver", String.valueOf(currentUser.getLon()));
                             Log.d("distanceto", currentUser.getDistance());
 
                         } else {

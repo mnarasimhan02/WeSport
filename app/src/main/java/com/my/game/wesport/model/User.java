@@ -11,7 +11,7 @@ public class User {
     private String photoUri;
     private long createdAt;
     private int nonAvatarId;
-    private String mRecipientId;
+    private String mRecipientId,mLatitude, mLongitude, mDistance;
     private String latitude;
     private String longitude;
     private String distance;
@@ -84,6 +84,19 @@ public class User {
     }
 
     public int getNonAvatarId() {return nonAvatarId;}
+
+    public void setLatitude(String latitude) {
+        this.mLatitude = latitude;
+    }
+
+    public void setLongitude(String longitude) {
+
+        this.mLongitude = longitude;
+    }
+
+    public void setLocation(String distance) {
+        this.mDistance = distance;
+    }
 
     @Exclude
     public String getRecipientId() {

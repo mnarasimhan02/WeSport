@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -224,18 +225,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void updateLocationtoFirebase(String lat, String lon) {
         String mCurrentUserUid = null;
         FirebaseUser user = null;
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();
             float distance = 0;
-            mDatabase = FirebaseDatabase.getInstance().getReference();
             mCurrentUserUid = user.getUid();
-
             Log.d("mlat firebase", lat);
             Log.d("mlong firebase", lon);
-            //Instiantiate background task to download places list and address list for respective locations
+            //Instiantiate  task to update lat , lon with actual values and distance as 0 for each user
             mDatabase.child("users").child(mCurrentUserUid).child("latitude").setValue(lat);
             mDatabase.child("users").child(mCurrentUserUid).child("longitude").setValue(lon);
             mDatabase.child("users").child(mCurrentUserUid).child("distance").setValue(String.valueOf(distance));
             Log.d("distance", String.valueOf(distance));
+        }
     }
 
 

@@ -73,6 +73,8 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
 
+        Log.d("display name",fireChatUser.getDisplayName());
+
         // Set Location to distance
         holder.getUserLocation().setText(getDistance(fireChatUser.getLat(),fireChatUser.getLon()));
 
@@ -109,8 +111,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         }
         return String.valueOf(distance);
     }
-
-
 
     @Override
     public int getItemCount() {
