@@ -16,6 +16,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/newgamelogo"
+            tools:ignore="RtlHardcoded"/>
+
         <ProgressBar
             android:id="@+id/progress_bar_users"
             style="?android:attr/progressBarStyleLarge"

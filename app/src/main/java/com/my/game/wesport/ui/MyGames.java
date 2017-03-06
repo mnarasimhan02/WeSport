@@ -103,11 +103,11 @@ public class MyGames extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch(position) {
                 case 0:
-                    CatalogActivity catFragment = new CatalogActivity();
-                    return catFragment;
-                case 1:
                     ListUsers lstuserFragment = new ListUsers();
                     return lstuserFragment;
+                case 1:
+                    CatalogActivity catFragment = new CatalogActivity();
+                    return catFragment;
             }
             return null;
         }
@@ -122,9 +122,9 @@ public class MyGames extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Games";
-                case 1:
                     return "Chat";
+                case 1:
+                    return "Game details";
             }
             return null;
         }

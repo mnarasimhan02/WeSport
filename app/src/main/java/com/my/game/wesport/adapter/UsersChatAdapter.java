@@ -76,7 +76,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         Log.d("display name",fireChatUser.getDisplayName());
 
         // Set Location to distance
-        holder.getUserLocation().setText(getDistance(fireChatUser.getLat(),fireChatUser.getLon()));
+        holder.getUserLocation().setText(getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude()));
 
         // Set presence status
         holder.getStatusConnection().setText(fireChatUser.getConnection());

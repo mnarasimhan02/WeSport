@@ -220,13 +220,13 @@ public class ListUsers extends Fragment {
                             User currentUser = dataSnapshot.getValue(User.class);
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
                                     currentUser.getCreatedAt(), currentUser.getPhotoUri(),
-                                    currentUser.getLat(), currentUser.getLon(),
+                                    currentUser.getLatitude(), currentUser.getLongitude(),
                                             currentUser.getDistance());
                             Log.d("getCreatedAt", String.valueOf(currentUser.getCreatedAt()));
                             Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
                             Log.d("getNonAvatarId", String.valueOf(currentUser.getNonAvatarId()));
-                            Log.d("getLatreceiver", String.valueOf(currentUser.getLat()));
-                            Log.d("getLonreceiver", String.valueOf(currentUser.getLon()));
+                            Log.d("getLatreceiver", String.valueOf(currentUser.getLatitude()));
+                            Log.d("getLonreceiver", String.valueOf(currentUser.getLongitude()));
                             Log.d("distanceto", currentUser.getDistance());
 
                         } else {

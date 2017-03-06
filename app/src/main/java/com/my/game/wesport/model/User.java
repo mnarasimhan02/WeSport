@@ -67,11 +67,11 @@ public class User {
         return photoUri;
     }
 
-    public String getLat() {
+    public String getLatitude() {
         return latitude;
     }
 
-    public String getLon() {
+    public String getLongitude() {
         return longitude;
     }
 
