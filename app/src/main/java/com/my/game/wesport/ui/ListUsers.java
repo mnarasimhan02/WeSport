@@ -219,11 +219,15 @@ public class ListUsers extends Fragment {
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
                             User currentUser = dataSnapshot.getValue(User.class);
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
-                                    currentUser.getCreatedAt(), currentUser.getPhotoUri());
+                                    currentUser.getCreatedAt(), currentUser.getPhotoUri(),
+                                    currentUser.getLat(), currentUser.getLon(),
+                                            currentUser.getDistance());
                             Log.d("getCreatedAt", String.valueOf(currentUser.getCreatedAt()));
                             Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
                             Log.d("getNonAvatarId", String.valueOf(currentUser.getNonAvatarId()));
-                            Log.d("mUsersKeyList photo", String.valueOf(currentUser.getPhotoUri()));
+                            Log.d("mUsersKeyList photo", String.valueOf(currentUser.getLat()));
+                            Log.d("receiver latitude", String.valueOf(currentUser.getLon()));
+                            Log.d("distanceto", currentUser.getDistance());
 
                         } else {
                             User recipient = dataSnapshot.getValue(User.class);
@@ -236,6 +240,7 @@ public class ListUsers extends Fragment {
                     e.printStackTrace();
                 }
             }
+
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {

@@ -93,7 +93,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Hashtable<String, String> rating;
     private Hashtable<String, String> vicinity;
 
-
     //private List<String> photoReference = new ArrayList<String>();
 
     private int photoReferenceSize = 0;
@@ -194,6 +193,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             selectedGame = chGame.getString("chosenGame", "Other");
             setUserMarker(new LatLng(mLat, mLon));
+
         } catch (Exception e){
             e.printStackTrace();
         }

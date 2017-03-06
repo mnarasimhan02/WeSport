@@ -12,17 +12,25 @@ public class User {
     private long createdAt;
     private int nonAvatarId;
     private String mRecipientId;
+    private String latitude;
+    private String longitude;
+    private String distance;
+
 
     public User() {
     }
 
-    public User(String displayName, String email, String connection,  String photoUri, long createdAt, int nonAvatarId) {
+    public User(String displayName, String email, String connection,  String photoUri, long createdAt,
+                int nonAvatarId, String latitude, String longitude, String distance) {
         this.displayName = displayName;
         this.email = email;
         this.connection = connection;
         this.photoUri = photoUri;
         this.createdAt = createdAt;
         this.nonAvatarId = nonAvatarId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.distance = distance;
     }
 
      public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
@@ -57,6 +65,18 @@ public class User {
 
     public String getPhotoUri() {
         return photoUri;
+    }
+
+    public String getLat() {
+        return latitude;
+    }
+
+    public String getLon() {
+        return longitude;
+    }
+
+    public String getDistance() {
+        return distance;
     }
 
     public long getCreatedAt() {

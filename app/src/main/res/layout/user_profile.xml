@@ -24,6 +24,7 @@
         android:layout_toEndOf="@+id/img_avatar"
         android:layout_marginBottom="26dp"/>
 
+
     <TextView
         android:id="@+id/text_view_connection_status"
         android:layout_width="wrap_content"
@@ -32,5 +33,18 @@
         android:layout_alignTop="@+id/img_avatar"
         android:paddingEnd="@dimen/connection_status_padding"
         android:layout_alignParentEnd="true"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_view_location"
+        android:layout_below="@+id/text_view_connection_status"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif"
+        android:paddingTop="16dp"
+        android:text="@string/empty_view_subtitle_text"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:textColor="#A2AAB0"/>
 
 </RelativeLayout>

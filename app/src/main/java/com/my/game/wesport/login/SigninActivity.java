@@ -54,6 +54,9 @@ public class SigninActivity extends AppCompatActivity {
     private StorageReference mChatPhotosStorageReference;
     private View mLayout;
     private boolean mActivity=false;
+    private String mLatitude=null;
+    private String mLongitude=null;
+    private String mDistance=null;
 
     private static final String TAG = SigninActivity.class.getSimpleName();
     //@BindView(R.id.edit_text_email_login)
@@ -202,6 +205,8 @@ public class SigninActivity extends AppCompatActivity {
         Log.d("Avatar", String.valueOf(ChatHelper.generateRandomAvatarForUser()));
         Log.d("datetime", String.valueOf(new Date().getTime()));
         Log.d("getUserPhotoUri", String.valueOf(getUserPhotoUri()));
+        Log.d("getUserPhotoUri", String.valueOf(getUserPhotoUri()));
+
 
         return new User(
                 loginUser,
@@ -209,7 +214,10 @@ public class SigninActivity extends AppCompatActivity {
                 com.my.game.wesport.adapter.UsersChatAdapter.ONLINE,
                 getUserPhotoUri(),
                 new Date().getTime(),
-                com.my.game.wesport.FireChatHelper.ChatHelper.generateRandomAvatarForUser()
+                com.my.game.wesport.FireChatHelper.ChatHelper.generateRandomAvatarForUser(),
+                mLatitude,
+                mLongitude,
+                mDistance
                 );
     }
 

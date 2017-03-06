@@ -17,6 +17,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -26,6 +27,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import static android.support.design.widget.Snackbar.make;
 
@@ -39,6 +43,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private View mLayout;
     private String chosenGame;
+    private DatabaseReference mDatabase;
+    private FirebaseDatabase mFirebaseDatabase;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +218,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             exception.printStackTrace();
         }
         storeprefs(lat, lon);
+        updateLocationtoFirebase(lat, lon);
     }
+
+    private void updateLocationtoFirebase(String lat, String lon) {
+        String mCurrentUserUid = null;
+        FirebaseUser user = null;
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            float distance = 0;
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            mCurrentUserUid = user.getUid();
+
+            Log.d("mlat firebase", lat);
+            Log.d("mlong firebase", lon);
+            //Instiantiate background task to download places list and address list for respective locations
+            mDatabase.child("users").child(mCurrentUserUid).child("latitude").setValue(lat);
+            mDatabase.child("users").child(mCurrentUserUid).child("longitude").setValue(lon);
+            mDatabase.child("users").child(mCurrentUserUid).child("distance").setValue(String.valueOf(distance));
+            Log.d("distance", String.valueOf(distance));
+    }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -220,13 +247,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
     }
 
-
     @Override
     public void onLocationChanged(Location location) {
         // New location has now been determined
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
         storeprefs(lat, lon);
+        updateLocationtoFirebase(lat, lon);
     }
 
     private void storeprefs(String lat, String lon) {
@@ -235,4 +262,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         editor.putString("latitude", lat).apply();
         editor.putString("longtitude", lon).apply();
     }
+
 }
