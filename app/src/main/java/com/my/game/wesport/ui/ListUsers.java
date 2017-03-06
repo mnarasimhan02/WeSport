@@ -344,6 +344,7 @@ public class ListUsers extends Fragment implements
         return username;
     }
 
+
     /**
      * User has clicked the 'Invite' button, launch the invitation UI with the proper
      * title, message, and deep link
@@ -351,8 +352,8 @@ public class ListUsers extends Fragment implements
     private void onInviteClicked() {
         Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
                 .setMessage(getString(R.string.invitation_message))
-                .setDeepLink(Uri.parse(getString(R.string.invitation_deep_link)))
-                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                .setDeepLink(Uri.parse("https://w2mkk.app.goo.gl/b2OT"))
+                .setCustomImage(Uri.parse("android.resource://"+getActivity().getPackageName()+"/mipmap/ic_launcher"))
                 .setCallToActionText(getString(R.string.invitation_cta))
                 .build();
         startActivityForResult(intent, REQUEST_INVITE);
