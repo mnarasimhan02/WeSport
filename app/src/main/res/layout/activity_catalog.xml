@@ -2,10 +2,10 @@
 <!-- Layout for the list of games -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".CatalogActivity">
 
     <ListView
@@ -50,22 +50,22 @@
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="#A2AAB0"/>
 
+        <Space
+            android:id="@+id/space_view"
+            android:layout_width="1dp"
+            android:layout_below="@+id/empty_title_text"
+            android:layout_height="10dp"/>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
+            android:layout_below="@+id/space_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_marginRight="16dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
             android:src="@drawable/newgamelogo"
+            app:pressedTranslationZ="12dp"
             tools:ignore="RtlHardcoded"/>
 
-        <View
-            android:id="@+id/empty_space"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/empty_title_text"
-            android:layout_alignParentBottom="true">
-        </View>
-
     </RelativeLayout>
-    </RelativeLayout>
+</RelativeLayout>

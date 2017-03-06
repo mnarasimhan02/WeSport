@@ -111,29 +111,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Restoring the markers on configuration changes
-        setContentView(R.layout.activity_maps);
-        mLayout = findViewById(android.R.id.content);
-        myContentsView = getLayoutInflater().inflate(R.layout.custom_info_content, null);
-        setUpMapIfNeeded();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        // Retrieve the PlaceAutocompleteFragment.
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setHint(getString(R.string.autocomplete_hint));
+        try {
+            setContentView(R.layout.activity_maps);
+            mLayout = findViewById(android.R.id.content);
+            myContentsView = getLayoutInflater().inflate(R.layout.custom_info_content, null);
+            setUpMapIfNeeded();
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+            // Retrieve the PlaceAutocompleteFragment.
+            PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                    getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+            autocompleteFragment.setHint(getString(R.string.autocomplete_hint));
 
-        // Register a listener to receive callbacks when a place has been selected or an error has
-        // occurred and set Filter to retreive only places with precise address
-        autocompleteFragment.setOnPlaceSelectedListener(this);
-        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
-                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
-                .build();
-        autocompleteFragment.setFilter(typeFilter);
+            // Register a listener to receive callbacks when a place has been selected or an error has
+            // occurred and set Filter to retreive only places with precise address
+            autocompleteFragment.setOnPlaceSelectedListener(this);
+            AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                    .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                    .build();
+            autocompleteFragment.setFilter(typeFilter);
 
-        if(!EventBus.getDefault().hasSubscriberForEvent(GetAddressTask.class)) {
-            EventBus.getDefault().register(this);
+            if (!EventBus.getDefault().hasSubscriberForEvent(GetAddressTask.class)) {
+                EventBus.getDefault().register(this);
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
         }
-
     }
 
     public void setUserMarker(LatLng latLng) {
@@ -417,27 +421,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        LatLng latLng = marker.getPosition();
-        Double marLat = latLng.latitude;
-        Double marLon = latLng.longitude;
-        //new GetAddressTask(this,marLat,marLon).execute();
-        //mMenu.getItem(0).setVisible(true);
-        vicinitystr= vicinity.get(marker.getId());
-        address=vicinitystr;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        prefs.edit().putString("games", address).apply();
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                getString(R.string.save_game_text),Snackbar.LENGTH_SHORT)
-                .addCallback(new Snackbar.Callback() {
-                    @Override
-                    public void onDismissed(Snackbar transientBottomBar,
-                                            int event) {
-                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                            Intent intent = new Intent(MapsActivity.this, MyGames.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);                        }
-                    }
-                }).show();
+        try {
+            LatLng latLng = marker.getPosition();
+            Double marLat = latLng.latitude;
+            Double marLon = latLng.longitude;
+            //new GetAddressTask(this,marLat,marLon).execute();
+            //mMenu.getItem(0).setVisible(true);
+            vicinitystr = vicinity.get(marker.getId());
+            address = vicinitystr;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            prefs.edit().putString("games", address).apply();
+            Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
+                    getString(R.string.save_game_text), Snackbar.LENGTH_SHORT)
+                    .addCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar transientBottomBar,
+                                                int event) {
+                            if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
+                                Intent intent = new Intent(MapsActivity.this, MyGames.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        }
+                    }).show();
 
+        } catch (Exception e){
+            e.printStackTrace();
+    }
     }
 }
