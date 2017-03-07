@@ -24,6 +24,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -106,6 +107,10 @@ public class EditorActivity extends AppCompatActivity implements
     private String nameString="";
 
     private String sdString="";
+
+    private String sttring="";
+
+    private String etString="";
 
     private String notesString="";
 
@@ -226,6 +231,10 @@ public class EditorActivity extends AppCompatActivity implements
                 mDateAndTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mDateAndTime.set(Calendar.MINUTE, minute);
                 updateTimeDisplay(mstartTime);
+                mDateAndTime.add(Calendar.HOUR, 2);
+                //Log.d("mDateAndTime.add",String.valueOf(mDateAndTime.add(Calendar.HOUR, 2));
+                mDateAndTime.set(Calendar.MINUTE, minute);
+                updateTimeDisplay(mendTime);
             }
         };
 
@@ -252,18 +261,17 @@ public class EditorActivity extends AppCompatActivity implements
 
     private void updateTimeDisplay(TextView mtextview) {
         mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
-        if (!mendTime.getText().toString().isEmpty() &&
+        /*if (!mendTime.getText().toString().isEmpty() &&
                 !TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
                 ) {
             Snackbar.make(mLayout, getString(R.string.date_compare_string),
                     Snackbar.LENGTH_LONG).show();
             mendTime.setText("");
-        }
+        }*/
 
     }
 
     private void updateDateDisplay(TextView mtextview) {
-        //mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_DATE));
         long today = mDateAndTime.getTimeInMillis();
         SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM dd", Locale.getDefault());
         String dateString = sdfDate.format(today);
@@ -411,29 +419,49 @@ public class EditorActivity extends AppCompatActivity implements
                         Snackbar.LENGTH_LONG).show();
             }
         }
-        writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, notesString);
+        writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, sttring, etString, notesString);
     }
 
-    private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString, String notesString) {
+    private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString,
+                                    String sttring, String etString, String notesString) {
+
+        SimpleDateFormat calstDatFormat;
         final ContentValues event = new ContentValues();
         final Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
-        SimpleDateFormat calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
-        sdString = sdString + " " + yy;
-        long stdateInLong = 0;
+
+        if (sttring==null) {
+            calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
+            etString = sdString + " "+ yy;
+            sdString = sdString +" "+ yy;
+
+        } else {
+            calstDatFormat = new SimpleDateFormat("MMMMM dd h:mm a yyyy", Locale.getDefault());
+            etString = sdString + " " + etString+" "+ yy;
+            sdString = sdString + " " + sttring +" "+ yy;
+        }
+        Log.d("sdString", String.valueOf(sdString));
+        Log.d("etString", String.valueOf(etString));
+
+        long stdateInLong = 0, etdateInLong=0;
         try {
             Date BEGIN_TIME = calstDatFormat.parse(sdString);
+            Date END_TIME = calstDatFormat.parse(etString);
             stdateInLong = BEGIN_TIME.getTime();
+            etdateInLong = END_TIME.getTime();
 
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        Log.d("startTime", String.valueOf(stdateInLong));
+        Log.d("endTime", String.valueOf(etdateInLong));
+
         event.put(Events.CALENDAR_ID, 1);
         event.put(Events.EVENT_LOCATION, gameaddress);
         event.put(Events.TITLE, selectedGame);
         event.put(Events.DESCRIPTION, nameString + " "+ notesString);
         event.put(Events.DTSTART, stdateInLong);//startTimeMillis
-        event.put(Events.DTEND, stdateInLong);//endTimeMillis
+        event.put(Events.DTEND, etdateInLong);//endTimeMillis
         event.put(Events.ALL_DAY, 0); // 0 for false, 1 for true
         String timeZone = TimeZone.getDefault().getID();
         event.put(Events.EVENT_TIMEZONE, timeZone);

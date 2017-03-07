@@ -54,7 +54,7 @@
             android:id="@+id/space_view"
             android:layout_width="1dp"
             android:layout_below="@+id/empty_title_text"
-            android:layout_height="10dp"/>
+            android:layout_height="32dp"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
