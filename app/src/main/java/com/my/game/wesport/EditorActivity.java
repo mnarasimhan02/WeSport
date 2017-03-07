@@ -104,16 +104,6 @@ public class EditorActivity extends AppCompatActivity implements
 
     private String mUserName = "";
 
-    private String nameString="";
-
-    private String sdString="";
-
-    private String sttring="";
-
-    private String etString="";
-
-    private String notesString="";
-
     private AlertDialog alert;
 
 
@@ -347,14 +337,17 @@ public class EditorActivity extends AppCompatActivity implements
     private void saveGames() {
 
         String[] selectionArgs;
+        String sttring=null;
+        String etString=null;
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
-        nameString = mNameEditText.getText().toString().trim();
-        sdString = mstartDate.getText().toString().trim();
-        String sttring = mstartTime.getText().toString().trim();
-        String etString = mendTime.getText().toString().trim();
-        notesString = mnotesEditText.getText().toString().trim();
+        String nameString = mNameEditText.getText().toString().trim();
+        String sdString = mstartDate.getText().toString().trim();
+        sttring = mstartTime.getText().toString().trim();
+        etString = mendTime.getText().toString().trim();
+        String notesString = mnotesEditText.getText().toString().trim();
+
 
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
@@ -419,6 +412,8 @@ public class EditorActivity extends AppCompatActivity implements
                         Snackbar.LENGTH_LONG).show();
             }
         }
+        Log.d("sttring",sttring);
+        Log.d("etString",etString);
         writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, sttring, etString, notesString);
     }
 
@@ -430,18 +425,18 @@ public class EditorActivity extends AppCompatActivity implements
         final Calendar c = Calendar.getInstance();
         int yy = c.get(Calendar.YEAR);
 
-        if (sttring==null) {
+        if (sttring.equals("")) {
             calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
             etString = sdString + " "+ yy;
-            sdString = sdString +" "+ yy;
+            sdString = sdString + " "+ yy;
+            Log.d("etString",etString);
+            Log.d("sdString",sdString);
 
         } else {
             calstDatFormat = new SimpleDateFormat("MMMMM dd h:mm a yyyy", Locale.getDefault());
             etString = sdString + " " + etString+" "+ yy;
             sdString = sdString + " " + sttring +" "+ yy;
         }
-        Log.d("sdString", String.valueOf(sdString));
-        Log.d("etString", String.valueOf(etString));
 
         long stdateInLong = 0, etdateInLong=0;
         try {
@@ -465,6 +460,7 @@ public class EditorActivity extends AppCompatActivity implements
         event.put(Events.ALL_DAY, 0); // 0 for false, 1 for true
         String timeZone = TimeZone.getDefault().getID();
         event.put(Events.EVENT_TIMEZONE, timeZone);
+
         Uri baseUri;
         if (VERSION.SDK_INT >= 8) {
             baseUri = Uri.parse("content://com.android.calendar/events");
