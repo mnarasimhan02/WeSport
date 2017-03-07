@@ -9,7 +9,6 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +22,15 @@ import com.my.game.wesport.model.User;
 import com.my.game.wesport.ui.ChatActivity;
 import com.squareup.picasso.Picasso;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
-public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.ViewHolderUsers> {
+
+public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.ViewHolderUsers>  {
 
     public static final String ONLINE = "online";
     public static final String OFFLINE = "offline";
@@ -40,10 +42,13 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     private String mlatitude;
     private String mlongitude;
     private String mUserdistance;
+    private double mLat;
+    private double mLon;
+
 
     public UsersChatAdapter(Context context, List<User> fireChatUsers) {
         mUsers = fireChatUsers;
-        mContext = context;
+        mContext = context;;
     }
 
     @Override
@@ -55,6 +60,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public void onBindViewHolder(ViewHolderUsers holder, int position) {
 
         User fireChatUser = mUsers.get(position);
+
         int userAvatarId= ChatHelper.getDrawableAvatarId(fireChatUser.getNonAvatarId());
         // Set avatar
         String mPhotoUri;
@@ -74,10 +80,14 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
 
-        Log.d("display name",fireChatUser.getDisplayName());
+        //Arrays.sort(mUsers, UsersChatAdapter.distComparator);
 
         // Set Location to distance
-        holder.getUserLocation().setText(getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude())+ " " + mContext.getString(R.string.miles_away));
+        holder.getUserLocation().setText(
+                getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude())
+                + " " + mContext.getString(R.string.miles_away));
+
+        //holder.getUserLocation().setText(getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude())+ " " + mContext.getString(R.string.miles_away));
 
         // Set presence status
         holder.getStatusConnection().setText(fireChatUser.getConnection());
@@ -92,22 +102,39 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         }
     }
 
+    public static List<User> sortLocations(List<User> mUsers, final double mLat,final double mLon) {
+        Comparator<User> comp = new Comparator<User>() {
+            @Override
+            public int compare(User o, User o2) {
+                float[] result1 = new float[3];
+                android.location.Location.distanceBetween(mLat, mLon, Double.parseDouble(o.getLatitude()),
+                        Double.parseDouble(o.getLongitude()), result1);
+                Float distance1 = result1[0];
+                float[] result2 = new float[3];
+                android.location.Location.distanceBetween(mLat, mLon, Double.parseDouble(o2.getLatitude()),
+                        Double.parseDouble(o2.getLongitude()), result2);
+                Float distance2 = result2[0];
+                return distance1.compareTo(distance2);
+            }
+        };
+        Collections.sort(mUsers, comp);
+        return mUsers;
+    }
+
+
     private String getDistance(String lat, String lon) {
         double distance = 0;
         Location mCurrentLocation = new Location("mCurrentLocation");
-        //Instiantiate background task to download places list and address list for respective locations
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        mLat = Double.parseDouble(preferences.getString("latitude", ""));
+        mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         mCurrentLocation.setLatitude(mLat);
         mCurrentLocation.setLongitude(mLon);
         Location newLocation = new Location("newlocation");
         if ( lat != null || lon != null ) {
-            // Fail
             newLocation.setLatitude(Double.parseDouble(lat));
             newLocation.setLongitude(Double.parseDouble(lon));
             distance =  ((mCurrentLocation.distanceTo(newLocation) / 1000)/1.6); // in miles
-            Log.d("distance", String.valueOf(distance));
             return String.format(Locale.US, "%.0f", distance);
         }
         return String.format(Locale.US, "%.0f", distance);
@@ -142,6 +169,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public void clear() {
         mUsers.clear();
     }
+
 
 
     /* ViewHolder for RecyclerView */

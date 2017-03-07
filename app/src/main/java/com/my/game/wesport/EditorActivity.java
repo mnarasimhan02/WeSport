@@ -24,7 +24,6 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -222,7 +221,6 @@ public class EditorActivity extends AppCompatActivity implements
                 mDateAndTime.set(Calendar.MINUTE, minute);
                 updateTimeDisplay(mstartTime);
                 mDateAndTime.add(Calendar.HOUR, 2);
-                //Log.d("mDateAndTime.add",String.valueOf(mDateAndTime.add(Calendar.HOUR, 2));
                 mDateAndTime.set(Calendar.MINUTE, minute);
                 updateTimeDisplay(mendTime);
             }
@@ -412,8 +410,6 @@ public class EditorActivity extends AppCompatActivity implements
                         Snackbar.LENGTH_LONG).show();
             }
         }
-        Log.d("sttring",sttring);
-        Log.d("etString",etString);
         writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, sttring, etString, notesString);
     }
 
@@ -429,8 +425,6 @@ public class EditorActivity extends AppCompatActivity implements
             calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
             etString = sdString + " "+ yy;
             sdString = sdString + " "+ yy;
-            Log.d("etString",etString);
-            Log.d("sdString",sdString);
 
         } else {
             calstDatFormat = new SimpleDateFormat("MMMMM dd h:mm a yyyy", Locale.getDefault());
@@ -448,8 +442,6 @@ public class EditorActivity extends AppCompatActivity implements
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Log.d("startTime", String.valueOf(stdateInLong));
-        Log.d("endTime", String.valueOf(etdateInLong));
 
         event.put(Events.CALENDAR_ID, 1);
         event.put(Events.EVENT_LOCATION, gameaddress);

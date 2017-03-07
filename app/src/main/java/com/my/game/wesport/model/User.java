@@ -2,6 +2,7 @@ package com.my.game.wesport.model;
 
 import com.google.firebase.database.Exclude;
 
+
 public class User {
 
     private String displayName;
@@ -11,7 +12,7 @@ public class User {
     private String photoUri;
     private long createdAt;
     private int nonAvatarId;
-    private String mRecipientId,mLatitude, mLongitude, mDistance;
+    private String mRecipientId;
     private String latitude;
     private String longitude;
     private String distance;
@@ -42,7 +43,6 @@ public class User {
         }
         return uniqueChatRef;
     }
-
 
     private String cleanEmailAddress(String email){
         //replace dot with comma since firebase does not allow dot

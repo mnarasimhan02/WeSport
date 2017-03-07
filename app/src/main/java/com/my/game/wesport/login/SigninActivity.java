@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,7 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.my.game.wesport.FireChatHelper.ChatHelper;
 import com.my.game.wesport.IntroActivity;
 import com.my.game.wesport.MainActivity;
 import com.my.game.wesport.R;
@@ -199,14 +197,6 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private User buildNewUser() {
-        Log.d("loginUser",loginUser);
-        Log.d("getUserEmail",getUserEmail());
-        Log.d("Status",com.my.game.wesport.adapter.UsersChatAdapter.ONLINE);
-        Log.d("Avatar", String.valueOf(ChatHelper.generateRandomAvatarForUser()));
-        Log.d("datetime", String.valueOf(new Date().getTime()));
-        Log.d("getUserPhotoUri", String.valueOf(getUserPhotoUri()));
-        Log.d("getUserPhotoUri", String.valueOf(getUserPhotoUri()));
-
 
         return new User(
                 loginUser,
