@@ -9,7 +9,6 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +79,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         // Set display name
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
 
+
         //Arrays.sort(mUsers, UsersChatAdapter.distComparator);
 
         // Set Location to distance
@@ -105,14 +105,8 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     private String getDistance(String lat, String lon) {
         double distance = 0;
         Location mCurrentLocation = new Location("mCurrentLocation");
-        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        //mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        //mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         mCurrentLocation.setLatitude(mLat);
         mCurrentLocation.setLongitude(mLon);
-        Log.d("distance1.mLat", String.valueOf(mLat));
-        Log.d("distance1.mLon", String.valueOf(mLon));
-        //compareDistance(mUsers, mLat, mLon);
         Location newLocation = new Location("newlocation");
         if ( lat != null || lon != null ) {
             newLocation.setLatitude(Double.parseDouble(lat));
@@ -143,11 +137,9 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
                                 o2.getLongitude() != null ? Double.parseDouble(o2.getLongitude()) : 0, result2);
                         distance2 = result2[0];
                     }
-                    //Log.d("distance1.compareTo", String.valueOf(distance1.compareTo(distance2)));
                  else if((o2.getLatitude() == null || o2.getLongitude() == null )){
                     distance2= Float.valueOf(0);
                 }
-                Log.d("distance1.compareTo", String.valueOf(distance1.compareTo(distance2)));
                 return distance1.compareTo(distance2);
             }
         };
@@ -166,8 +158,6 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         mLat = Double.parseDouble(preferences.getString("latitude", ""));
         mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         compareDistance(mUsers, mLat, mLon);
-        Log.d("compareDistance.mUsers", String.valueOf(mUsers));
-        Log.d("users", String.valueOf(mUsers.size()));
         notifyDataSetChanged();
     }
 

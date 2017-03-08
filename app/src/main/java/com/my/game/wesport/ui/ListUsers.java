@@ -41,8 +41,6 @@ import com.my.game.wesport.login.SigninActivity;
 import com.my.game.wesport.model.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -98,7 +96,6 @@ public class ListUsers extends Fragment implements
                         new ResultCallback<AppInviteInvitationResult>() {
                             @Override
                             public void onResult(AppInviteInvitationResult result) {
-                                Log.d(TAG, "getInvitation:onResult:" + result.getStatus());
                                 if (result.getStatus().isSuccess()) {
                                     // Extract information from the intent
                                     Intent intent = result.getInvitationIntent();
@@ -272,16 +269,13 @@ public class ListUsers extends Fragment implements
                         String userUid = dataSnapshot.getKey();
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
                             User currentUser = dataSnapshot.getValue(User.class);
+
+                            Log.d("loginUser",loginUser);
+                            Log.d("getUserEmail()",currentUser.getEmail());
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
                                     currentUser.getCreatedAt(), currentUser.getPhotoUri(),
                                     currentUser.getLatitude(), currentUser.getLongitude(),
                                             currentUser.getDistance());
-                            Log.d("getCreatedAt", String.valueOf(currentUser.getCreatedAt()));
-                            Log.d("mUsersKeyList email", String.valueOf(currentUser.getEmail()));
-                            Log.d("getNonAvatarId", String.valueOf(currentUser.getNonAvatarId()));
-                            Log.d("getLatreceiver", String.valueOf(currentUser.getLatitude()));
-                            Log.d("getLonreceiver", String.valueOf(currentUser.getLongitude()));
-                            Log.d("distanceto", currentUser.getDistance());
 
                         } else {
                             User recipient = dataSnapshot.getValue(User.class);
@@ -293,34 +287,6 @@ public class ListUsers extends Fragment implements
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-
-            private List<User> compareDistance(List<User> mUsers, final double mLat, final double mLon) {
-                Comparator<User> distance = new Comparator<User>() {
-                    @Override
-                    public int compare(User o, User o2) {
-                        float[] result1 = new float[3];
-                        Float distance1 = null;
-                        if (!o.getLatitude().equals("") || !o.getLongitude().equals("")) {
-                            android.location.Location.distanceBetween(mLat, mLon,
-                                    o.getLatitude() != null ? Double.parseDouble(o.getLatitude()) : 0,
-                                    o.getLongitude() != null ? Double.parseDouble(o.getLongitude()) : 0, result1);
-                            distance1 = result1[0];
-                        }
-                        float[] result2 = new float[3];
-                        Float distance2 = null;
-                        if (!o2.getLatitude().equals("") || !o2.getLongitude().equals("")) {
-                            android.location.Location.distanceBetween(mLat, mLon,
-                                    o2.getLatitude() != null ? Double.parseDouble(o2.getLatitude()) : 0,
-                                    o2.getLongitude() != null ? Double.parseDouble(o2.getLongitude()) : 0, result2);
-                            distance2 = result2[0];
-                            //Log.d("distance1.compareTo", String.valueOf(distance1.compareTo(distance2)));
-                        }
-                        return distance1.compareTo(distance2);
-                    }
-                };
-                Collections.sort(mUsers, distance);
-                return mUsers;
             }
 
             @Override
@@ -391,7 +357,6 @@ public class ListUsers extends Fragment implements
                 // Get the invitation IDs of all sent messages
                 String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
                 for (String id : ids) {
-                    Log.d(TAG, "onActivityResult: sent invitation " + id);
                 }
             } else {
                 // Sending failed or it was canceled, show failure message to the user

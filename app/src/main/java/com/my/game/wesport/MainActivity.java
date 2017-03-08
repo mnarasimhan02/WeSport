@@ -17,7 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -230,13 +229,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             mDatabase = FirebaseDatabase.getInstance().getReference();
             float distance = 0;
             mCurrentUserUid = user.getUid();
-            Log.d("mlat firebase", lat);
-            Log.d("mlong firebase", lon);
             //Instiantiate  task to update lat , lon with actual values and distance as 0 for each user
             mDatabase.child("users").child(mCurrentUserUid).child("latitude").setValue(lat);
             mDatabase.child("users").child(mCurrentUserUid).child("longitude").setValue(lon);
             mDatabase.child("users").child(mCurrentUserUid).child("distance").setValue(String.valueOf(distance));
-            Log.d("distance", String.valueOf(distance));
         }
     }
 

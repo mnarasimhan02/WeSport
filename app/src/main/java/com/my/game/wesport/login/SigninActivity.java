@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -151,12 +152,11 @@ public class SigninActivity extends AppCompatActivity {
                         onAuthSuccess(firebaseAuth.getCurrentUser());
                         setUserOnline();
                     } else {
-//                        Log.d("user displayname",user.getDisplayName());
+                        Log.d("user displayname",user.getDisplayName());
                         loginUser = onSignedInInitialize(getString(R.string.email_user));
                         onAuthSuccess(firebaseAuth.getCurrentUser());
                         setUserOnline();
                     }
-
                     // User is signed in
                 } else {
                     // User is signed out
@@ -197,7 +197,6 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private User buildNewUser() {
-
         return new User(
                 loginUser,
                 getUserEmail(),
