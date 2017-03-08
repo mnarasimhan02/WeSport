@@ -9,6 +9,7 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,12 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     @Override
     public void onBindViewHolder(ViewHolderUsers holder, int position) {
 
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        mLat = Double.parseDouble(preferences.getString("latitude", ""));
+        mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        compareDistance(mUsers, mLat, mLon);
+
         User fireChatUser = mUsers.get(position);
 
         int userAvatarId= ChatHelper.getDrawableAvatarId(fireChatUser.getNonAvatarId());
@@ -102,34 +109,18 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         }
     }
 
-    public static List<User> sortLocations(List<User> mUsers, final double mLat,final double mLon) {
-        Comparator<User> comp = new Comparator<User>() {
-            @Override
-            public int compare(User o, User o2) {
-                float[] result1 = new float[3];
-                android.location.Location.distanceBetween(mLat, mLon, Double.parseDouble(o.getLatitude()),
-                        Double.parseDouble(o.getLongitude()), result1);
-                Float distance1 = result1[0];
-                float[] result2 = new float[3];
-                android.location.Location.distanceBetween(mLat, mLon, Double.parseDouble(o2.getLatitude()),
-                        Double.parseDouble(o2.getLongitude()), result2);
-                Float distance2 = result2[0];
-                return distance1.compareTo(distance2);
-            }
-        };
-        Collections.sort(mUsers, comp);
-        return mUsers;
-    }
-
-
     private String getDistance(String lat, String lon) {
         double distance = 0;
         Location mCurrentLocation = new Location("mCurrentLocation");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+        //SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        //mLat = Double.parseDouble(preferences.getString("latitude", ""));
+        //mLon = Double.parseDouble(preferences.getString("longtitude", ""));
         mCurrentLocation.setLatitude(mLat);
         mCurrentLocation.setLongitude(mLon);
+        Log.d("distance1.mUsers", String.valueOf(mUsers));
+        Log.d("distance1.mLat", String.valueOf(mLat));
+        Log.d("distance1.mLon", String.valueOf(mLon));
+        //compareDistance(mUsers, mLat, mLon);
         Location newLocation = new Location("newlocation");
         if ( lat != null || lon != null ) {
             newLocation.setLatitude(Double.parseDouble(lat));
@@ -138,6 +129,32 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
             return String.format(Locale.US, "%.0f", distance);
         }
         return String.format(Locale.US, "%.0f", distance);
+    }
+
+    private static List<User> compareDistance(List<User> mUsers, final double mLat,final double mLon) {
+        Comparator<User> distance = new Comparator<User>() {
+            @Override
+            public int compare(User o, User o2) {
+                float[] result1 = new float[3];
+                android.location.Location.distanceBetween(mLat, mLon, Double.parseDouble(o.getLatitude()),
+                        Double.parseDouble(o.getLongitude()), result1);
+                Float distance1 = result1[0];
+                float[] result2 = new float[3];
+                Float distance2 = null;
+                Log.d("o.getLatitude()",o.getLatitude());
+                if (!o.getLatitude().equals("") || !o2.getLatitude().equals("")) {
+                    android.location.Location.distanceBetween(mLat, mLon, Double.parseDouble(o2.getLatitude()),
+                            Double.parseDouble(o2.getLongitude()), result2);
+                    distance2 = result2[0];
+                    //Log.d("distance1.compareTo", String.valueOf(distance1.compareTo(distance2)));
+                } else if(o.getLatitude().equals("") || (o2.getLatitude().equals(""))){
+                    distance2= Float.valueOf(0);
+                }
+                return distance1.compareTo(distance2);
+            }
+        };
+        Collections.sort(mUsers, distance);
+        return mUsers;
     }
 
     @Override
