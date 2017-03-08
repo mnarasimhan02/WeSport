@@ -41,6 +41,8 @@ import com.my.game.wesport.login.SigninActivity;
 import com.my.game.wesport.model.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -83,11 +85,7 @@ public class ListUsers extends Fragment implements
         setUsersKeyList();
         setAuthListener();
         setHasOptionsMenu(true);
-        // Invite button click listener
-        //findViewById(R.id.invite_button).setOnClickListener(this);
 
-        //DeepLinkManager deepLinkManager = new DeepLinkManager(this, this);
-        //deepLinkManager.checkForInvites(true);
 
         // Create an auto-managed GoogleApiClient with access to App Invites.
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
@@ -124,7 +122,6 @@ public class ListUsers extends Fragment implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
         showMessage(getString(R.string.google_play_services_error));
     }
 
@@ -136,6 +133,7 @@ public class ListUsers extends Fragment implements
         mUserRefDatabase = FirebaseDatabase.getInstance().getReference().child("users");
     }
     private void setUserRecyclerView() {
+        //to be updated
         mUsersChatAdapter = new UsersChatAdapter(getActivity(), new ArrayList<User>());
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mUsersRecyclerView.setHasFixedSize(true);
@@ -200,7 +198,6 @@ public class ListUsers extends Fragment implements
     public void onStop() {
         super.onStop();
         clearCurrentUsers();
-
         if (mChildEventListener != null) {
             mUserRefDatabase.removeEventListener(mChildEventListener);
         }
@@ -208,7 +205,6 @@ public class ListUsers extends Fragment implements
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
-
     }
 
     private void clearCurrentUsers() {
@@ -299,6 +295,33 @@ public class ListUsers extends Fragment implements
                 }
             }
 
+            private List<User> compareDistance(List<User> mUsers, final double mLat, final double mLon) {
+                Comparator<User> distance = new Comparator<User>() {
+                    @Override
+                    public int compare(User o, User o2) {
+                        float[] result1 = new float[3];
+                        Float distance1 = null;
+                        if (!o.getLatitude().equals("") || !o.getLongitude().equals("")) {
+                            android.location.Location.distanceBetween(mLat, mLon,
+                                    o.getLatitude() != null ? Double.parseDouble(o.getLatitude()) : 0,
+                                    o.getLongitude() != null ? Double.parseDouble(o.getLongitude()) : 0, result1);
+                            distance1 = result1[0];
+                        }
+                        float[] result2 = new float[3];
+                        Float distance2 = null;
+                        if (!o2.getLatitude().equals("") || !o2.getLongitude().equals("")) {
+                            android.location.Location.distanceBetween(mLat, mLon,
+                                    o2.getLatitude() != null ? Double.parseDouble(o2.getLatitude()) : 0,
+                                    o2.getLongitude() != null ? Double.parseDouble(o2.getLongitude()) : 0, result2);
+                            distance2 = result2[0];
+                            //Log.d("distance1.compareTo", String.valueOf(distance1.compareTo(distance2)));
+                        }
+                        return distance1.compareTo(distance2);
+                    }
+                };
+                Collections.sort(mUsers, distance);
+                return mUsers;
+            }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
