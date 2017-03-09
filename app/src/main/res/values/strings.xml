@@ -26,15 +26,18 @@
     <string name="third_screen">Store Game information</string>
     <string name="fourth_screen">Game details and information</string>
     <string name="seven_screen">Chat with near by users </string>
+    <string name="eight_screen">Share and invite friends </string>
+
 
     <!-- Intro slides descriptions-->
     <string name="scr1_desc">WeSport allows people to connect with each other to play games and stay active</string>
     <string name="scr2_desc">Recommends play places around user\'s location</string>
-    <string name="scr2a_desc">view park name, rating, location information</string>
+    <string name="scr2a_desc">View park name, rating, location information</string>
     <string name="scr3_desc">Add game details for every games and access the same from widget</string>
     <string name="scr4_desc">View all game information and store games to your calendar</string>
-    <string name="scr5_desc">Help coordinate and communicate with each other</string>
-    <string name="scr7_desc">Check WeSport online users , communicate with each other and plan for the game</string>
+    <string name="scr7_desc">Chat with online users, communicate and plan for the game</string>
+    <string name="scr8_desc">Invite friends via email or mobile number</string>
+
 
 
     <!-- Locations permissions strings-->
@@ -205,4 +208,5 @@
     <string name="invite_dialog_title">You got an invitation!</string>
 
     <string name="google_play_services_error">Google Play Services Error</string>
+    <string name="invite_friends">Invite friends</string>
 </resources>

@@ -25,6 +25,9 @@ public class IntroActivity extends AppIntro {
         addSlide(AppIntroFragment.newInstance(getString(R.string.fourth_screen), getString(R.string.scr4_desc), R.drawable.screen5, ContextCompat.getColor(getApplicationContext(), R.color.colorAccent)));
         addSlide(AppIntroFragment.newInstance(getString(R.string.seven_screen), getString(R.string.scr7_desc),
                 R.drawable.screen7, ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
+        addSlide(AppIntroFragment.newInstance(getString(R.string.eight_screen),
+                getString(R.string.scr8_desc), R.drawable.screen8, ContextCompat.getColor(getApplicationContext(), R.color.colorAccent)));
+
         // Hide Skip/Done button.
         showSkipButton(false);
         setProgressButtonEnabled(true);
