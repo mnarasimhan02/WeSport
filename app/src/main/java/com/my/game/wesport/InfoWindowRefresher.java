@@ -5,11 +5,8 @@ import android.util.Log;
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Callback;
 
-/**
- * Created by MaheshN on 2/20/17.
- */
-public class InfoWindowRefresher implements Callback {
-    private Marker markerToRefresh;
+class InfoWindowRefresher implements Callback {
+    private final Marker markerToRefresh;
 
 
     public InfoWindowRefresher(Marker marker) {

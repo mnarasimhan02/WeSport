@@ -13,5 +13,5 @@
             android:textAppearance="?android:textAppearanceLarge"
             android:textSize = "24sp"
             android:paddingTop="8dp"
-            android:gravity="left"/>
+            android:gravity="start"/>
 </LinearLayout>

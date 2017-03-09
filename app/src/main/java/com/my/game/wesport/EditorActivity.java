@@ -38,7 +38,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.my.game.wesport.data.GameContract.GameEntry;
 
 import java.text.ParseException;
@@ -67,7 +66,6 @@ public class EditorActivity extends AppCompatActivity implements
     private EditText mendTime;
     private final Calendar mDateAndTime = Calendar.getInstance();
     private View mLayout;
-    public static final int MY_PERMISSIONS_REQUEST_WRITE_CALENDAR = 123;
     /**
      * Content URI for the existing game (null if it's a new game)
      */
@@ -103,8 +101,6 @@ public class EditorActivity extends AppCompatActivity implements
 
     private String mUserName = "";
 
-    private AlertDialog alert;
-
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -117,11 +113,6 @@ public class EditorActivity extends AppCompatActivity implements
             return false;
         }
     };
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @SuppressWarnings("UnusedAssignment")
     public EditorActivity() {
@@ -266,28 +257,30 @@ public class EditorActivity extends AppCompatActivity implements
         mtextview.setText(dateString);
     }
 
-    private boolean TimeValidator(String time1, String time2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-        boolean b = false;
-        try {
-            Date startTime = sdf.parse(time1);
-            Date endTime = sdf.parse(time2);
-            long difference = endTime.getTime() - startTime.getTime();
-
-            if (difference < 0) {
-                difference = (endTime.getTime() - startTime.getTime()) + (endTime.getTime() - startTime.getTime());
-            }
-            int days = (int) (difference / (1000 * 60 * 60 * 24));
-            int hours = (int) ((difference - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
-            int min = (int) (difference - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60);
-            //boolean mindiff = (min < 0 ? false : true);
-            b = !(hours < 0 || min < 0);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return b;
-    }
+// --Commented out by Inspection START (3/8/17, 4:16 PM):
+//    private boolean TimeValidator(String time1, String time2) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+//        boolean b = false;
+//        try {
+//            Date startTime = sdf.parse(time1);
+//            Date endTime = sdf.parse(time2);
+//            long difference = endTime.getTime() - startTime.getTime();
+//
+//            if (difference < 0) {
+//                difference = (endTime.getTime() - startTime.getTime()) + (endTime.getTime() - startTime.getTime());
+//            }
+//            int days = (int) (difference / (1000 * 60 * 60 * 24));
+//            int hours = (int) ((difference - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
+//            int min = (int) (difference - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60);
+//            //boolean mindiff = (min < 0 ? false : true);
+//            b = !(hours < 0 || min < 0);
+//        } catch (ParseException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        return b;
+//    }
+// --Commented out by Inspection STOP (3/8/17, 4:16 PM)
 
     /**
      * Setup the dropdown spinner that allows the user to select the skill for the game.
@@ -335,8 +328,8 @@ public class EditorActivity extends AppCompatActivity implements
     private void saveGames() {
 
         String[] selectionArgs;
-        String sttring=null;
-        String etString=null;
+        String sttring;
+        String etString;
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space

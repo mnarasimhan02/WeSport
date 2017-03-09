@@ -19,11 +19,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
 import com.my.game.wesport.adapter.MessageChatAdapter;
-import com.my.game.wesport.adapter.UsersChatAdapter;
 import com.my.game.wesport.model.ChatMessage;
 
 import java.util.ArrayList;
@@ -39,10 +37,6 @@ public class ChatActivity extends AppCompatActivity {
     private static final int RC_PHOTO_PICKER = 2;
     private String mUsername;
     private DatabaseReference mMessagesDatabaseReference;
-    private ChildEventListener mChildEventListener;
-    private StorageReference mChatPhotosStorageReference;
-    private DatabaseReference mUserRefDatabase;
-    private UsersChatAdapter mUsersChatAdapter;
 
 
     private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
@@ -69,7 +63,6 @@ public class ChatActivity extends AppCompatActivity {
         FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
         FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
         FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
-        mChatPhotosStorageReference = mFirebaseStorage.getReference().child("chat_photos");
 
         if(getActionBar() != null){
             getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -82,6 +75,7 @@ public class ChatActivity extends AppCompatActivity {
         getSupportActionBar().setCustomView(R.layout.chat_username);
         //actionBar.setCustomView(addView,new ActionBar.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         TextView label = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.username);
+        //noinspection deprecation
         getSupportActionBar().setTitle(
                 Html.fromHtml("<font color=\"white\">" + mUsername + " - "
                         + "</font>"));
@@ -115,11 +109,10 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d ("onStart", String.valueOf(messageChatDatabase));
         messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
-                    try{
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
+                try{
                     if (dataSnapshot.exists()) {
                         ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
                         if (newMessage.getSender().equals(mCurrentUserId)) {
@@ -130,31 +123,31 @@ public class ChatActivity extends AppCompatActivity {
                         messageChatAdapter.refillAdapter(newMessage);
                         mChatRecyclerView.scrollToPosition(messageChatAdapter.getItemCount() - 1);
                     }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                }
+            }
 
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                }
+            }
 
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
-        }
+            }
+        });
+    }
 
     @Override
     protected void onStop() {

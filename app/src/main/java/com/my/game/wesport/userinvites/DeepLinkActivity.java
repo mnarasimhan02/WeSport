@@ -1,9 +1,9 @@
 package com.my.game.wesport.userinvites;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -42,6 +42,7 @@ public class DeepLinkActivity extends AppCompatActivity implements
     // [END deep_link_on_start]
 
     // [START process_referral_intent]
+    @SuppressLint("StringFormatInvalid")
     private void processReferralIntent(Intent intent) {
         // Extract referral information from the intent
         String invitationId = AppInviteReferral.getInvitationId(intent);
@@ -49,7 +50,6 @@ public class DeepLinkActivity extends AppCompatActivity implements
 
         // Display referral information
         // [START_EXCLUDE]
-        Log.d(TAG, "Found Referral: " + invitationId + ":" + deepLink);
         ((TextView) findViewById(R.id.deep_link_text))
                 .setText(getString(R.string.deep_link_fmt, deepLink));
         ((TextView) findViewById(R.id.invitation_id_text))

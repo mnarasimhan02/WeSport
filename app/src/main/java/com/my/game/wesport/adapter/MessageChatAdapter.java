@@ -106,7 +106,7 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public class ViewHolderSender extends RecyclerView.ViewHolder {
 
-        private TextView mSenderMessageTextView;
+        private final TextView mSenderMessageTextView;
 
         public ViewHolderSender(View itemView) {
             super(itemView);
@@ -120,7 +120,7 @@ public class MessageChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     /*ViewHolder for Recipient*/
     public class ViewHolderRecipient extends RecyclerView.ViewHolder {
 
-        private TextView mRecipientMessageTextView;
+        private final TextView mRecipientMessageTextView;
 
         public ViewHolderRecipient(View itemView) {
             super(itemView);

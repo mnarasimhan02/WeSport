@@ -40,6 +40,6 @@
             android:layout_marginRight="16dp"
             app:pressedTranslationZ="12dp"
             android:src="@drawable/share"
-            tools:ignore="RtlHardcoded"/>
+            tools:ignore="RelativeOverlap,RtlHardcoded"/>
 
     </RelativeLayout>

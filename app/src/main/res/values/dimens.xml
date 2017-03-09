@@ -48,12 +48,7 @@
     <dimen name="forecast_widget_text_width">38dp</dimen>
 
 
-    <dimen name="log_in_margin">40dp</dimen>
     <dimen name="connection_status_padding">8dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
     <!-- Tabbed activity-->
-   <dimen name="tab_max_width">264dp</dimen>
-        <dimen name="tab_padding_bottom">16dp</dimen>
-        <dimen name="tab_label">14sp</dimen>
-        <dimen name="custom_tab_layout_height">72dp</dimen>
 </resources>

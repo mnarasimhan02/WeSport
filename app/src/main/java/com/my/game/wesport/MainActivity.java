@@ -43,8 +43,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
     private View mLayout;
     private String chosenGame;
-    private DatabaseReference mDatabase;
-    private FirebaseDatabase mFirebaseDatabase;
+    // --Commented out by Inspection (3/8/17, 4:16 PM):private FirebaseDatabase mFirebaseDatabase;
 
 
 
@@ -97,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         buildGoogleApiClient();
     }
 
-    public static boolean isLocationEnabled(Context context) {
+    @SuppressWarnings("UnusedAssignment")
+    private static boolean isLocationEnabled(Context context) {
         int locationMode = 0;
         String locationProviders;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
@@ -221,12 +221,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         updateLocationtoFirebase(lat, lon);
     }
 
+    @SuppressWarnings("UnusedAssignment")
     private void updateLocationtoFirebase(String lat, String lon) {
         String mCurrentUserUid = null;
         FirebaseUser user = null;
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            mDatabase = FirebaseDatabase.getInstance().getReference();
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
             float distance = 0;
             mCurrentUserUid = user.getUid();
             //Instiantiate  task to update lat , lon with actual values and distance as 0 for each user

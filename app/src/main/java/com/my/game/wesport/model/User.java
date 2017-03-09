@@ -21,7 +21,8 @@ public class User {
     public User() {
     }
 
-    public User(String displayName, String email, String connection,  String photoUri, long createdAt,
+    @SuppressWarnings("SameParameterValue")
+    public User(String displayName, String email, String connection, String photoUri, long createdAt,
                 int nonAvatarId, String latitude, String longitude, String distance) {
         this.displayName = displayName;
         this.email = email;
@@ -34,6 +35,7 @@ public class User {
         this.distance = distance;
     }
 
+     @SuppressWarnings("UnusedAssignment")
      public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
         String uniqueChatRef="";
         if(createdAtCurrentUser > getCreatedAt()){

@@ -1,14 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">WeSport</string>
-    <string name="action_deep_link">
-    com.google.android.gms.samples.appinvite.DEEP_LINK_ACTION
-    </string>
 
     <string name="app_intro">Introduction</string>
 
     <string name="title_activity_maps">Map</string>
     <string name="sign_out">Sign Out</string>
-    <string name="send_button_label">Send</string>
 
     <!-- GridView selection items-->
 
@@ -16,7 +12,6 @@
 
 
     <!-- Menu items-->
-    <string name="next_menu">Next</string>
 
     <!-- Autocomplete hint-->
 
@@ -27,16 +22,20 @@
 
     <string name="first_screen">Welcome to WeSport</string>
     <string name="second_screen">Select existing places or search places by address</string>
+    <string name="seconda_screen">View park info</string>
     <string name="third_screen">Store Game information</string>
     <string name="fourth_screen">Game details and information</string>
-    <string name="fifth_screen">Chat room</string>
+    <string name="seven_screen">Chat with near by users </string>
 
     <!-- Intro slides descriptions-->
     <string name="scr1_desc">WeSport allows people to connect with each other to play games and stay active</string>
     <string name="scr2_desc">Recommends play places around user\'s location</string>
+    <string name="scr2a_desc">view park name, rating, location information</string>
     <string name="scr3_desc">Add game details for every games and access the same from widget</string>
-    <string name="scr4_desc">View all game information and access chat room</string>
+    <string name="scr4_desc">View all game information and store games to your calendar</string>
     <string name="scr5_desc">Help coordinate and communicate with each other</string>
+    <string name="scr7_desc">Check WeSport online users , communicate with each other and plan for the game</string>
+
 
     <!-- Locations permissions strings-->
 
@@ -150,8 +149,6 @@
 
     <string name="empty_game_list">No Game Information Available</string>
 
-    <string name="date_compare_string">End time should be after Start time</string>
-
 
     <!-- chat activity strings-->
 
@@ -173,53 +170,37 @@
 
     <!-- Log messages-->
 
-    <string name="accessibility_image">upload image</string>
     <string name="accessibility_grid">select games from grid</string>
     <string name="accessibility_widget">widget image</string>
     <string name="accessibility_emptygame">empty game</string>
-    <string name="accessibility_photopicker">photo picker image</string>
     <string name="accessibility_chatbox">image for chatroom</string>
     <string name="sensor_param">false</string>
     <string name="get_address">retrieving address</string>
     <string name="map_help">Tap any park to find out more information and then click info window/search to retrieve address</string>
-    <string name="next">NEXT</string>
     <string name="loc_not_enable">Turn on location settings</string>
-    <string name="gps_network_not_enabled">GPS not enabled</string>
-    <string name="open_location_settings">location not enabled</string>
-    <string name="Cancel">cancel</string>
     <string name="accessibility_place">park image</string>
-
-    <string name="action_settings">Settings</string>
 
 
     <!-- LogInActivity-->
-    <string name="login_error_message">Please make sure you enter a username and password!</string>
-    <string name="login_error_title">Checking</string>
     <string name="title_activity_chat">Chat</string>
 
     <!-- Calendar-->
     <string name="calendar_add_game">Game Added to Calendar</string>
     <string name="title_activity_my_games">MyGames</string>
-    <string name="miles_away">miles away</string>
+    <string name="miles_away">mile(s) away</string>
 
     <!-- Firebase Invites-->
 
-    <string name="invite">Send invitations!</string>
-    <string name="welcome">Invites</string>
-    <string name="referrer_hint">Deep link not provided</string>
     <string name="deep_link_default">Deep link not set</string>
     <string name="invitation_id_default">Invitation ID not set</string>
-    <string name="invite_friends">Invite Friends</string>
 
-    <string name="invitation_title">Send App Invite Quickstart Invitation</string>
-    <string name="invitation_message">WeSport is great, give it a try</string>
-    <string name="invitation_deep_link">http://example.com/offer/five_dollar_offer</string>
+    <string name="invitation_title">WeSport is great, give it a try</string>
+    <string name="invitation_message">Download WeSport, find near by parks, play buddies. Review and rate the app</string>
     <string name="invitation_cta">Install!</string>
 
-    <string name="deep_link_fmt" formatted="false">Deep Link: %s</string>
-    <string name="invitation_id_fmt" formatted="false">Invitation ID: %s</string>
+    <string name="deep_link_fmt" formatted="false" tools:ignore="StringFormatInvalid">Deep Link: %s</string>
+    <string name="invitation_id_fmt" formatted="false" tools:ignore="StringFormatInvalid">Invitation ID: %s</string>
 
-    <string name="sent_invitations_fmt" formatted="false">Sent %d invitations</string>
     <string name="send_failed">Sending invitations failed</string>
     <string name="invite_dialog_title">You got an invitation!</string>
 

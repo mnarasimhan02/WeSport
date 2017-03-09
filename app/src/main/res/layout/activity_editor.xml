@@ -175,7 +175,6 @@
                 android:id="@+id/edit_game_notes"
                 style="@style/EditorFieldStyle"
                 android:hint="@string/hint_game_notes"
-                android:focusable="false"
                 android:inputType="text"/>
 
         </LinearLayout>

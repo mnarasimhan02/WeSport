@@ -35,13 +35,10 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public static final String ONLINE = "online";
     public static final String OFFLINE = "offline";
     private final List<User> mUsers;
-    private Context mContext;
+    private final Context mContext;
     private String mCurrentUserEmail;
     private Long mCurrentUserCreatedAt;
-    private String mCurrentUserId,mPhotoUrl;
-    private String mlatitude;
-    private String mlongitude;
-    private String mUserdistance;
+    private String mCurrentUserId;
     private double mLat;
     private double mLon;
 
@@ -80,15 +77,10 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         holder.getUserDisplayName().setText(fireChatUser.getDisplayName());
 
 
-        //Arrays.sort(mUsers, UsersChatAdapter.distComparator);
-
-        // Set Location to distance
-        holder.getUserLocation().setText(
-                getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude())
-                        + " " + mContext.getString(R.string.miles_away));
-
-        //holder.getUserLocation().setText(getDistance(fireChatUser.getLatitude(),fireChatUser.getLongitude())+ " " + mContext.getString(R.string.miles_away));
-
+            // Set Location to distance
+            holder.getUserLocation().setText(
+                    getDistance(fireChatUser.getLatitude(), fireChatUser.getLongitude())
+                            + " " + mContext.getString(R.string.miles_away));
         // Set presence status
         holder.getStatusConnection().setText(fireChatUser.getConnection());
 
@@ -111,12 +103,13 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         if ( lat != null || lon != null ) {
             newLocation.setLatitude(Double.parseDouble(lat));
             newLocation.setLongitude(Double.parseDouble(lon));
-            distance =  ((mCurrentLocation.distanceTo(newLocation) / 1000)/1.6); // in miles
-            return String.format(Locale.US, "%.0f", distance);
+            distance =  ((mCurrentLocation.distanceTo(newLocation) / 1000)/1.6);
+                return String.format(Locale.US, "%.0f", distance);
         }
         return String.format(Locale.US, "%.0f", distance);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     private static List<User> compareDistance(List<User> mUsers, final double mLat,final double mLon) {
         Comparator<User> distance = new Comparator<User>() {
             @Override
@@ -131,14 +124,14 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
                 }
                 float[] result2 = new float[3];
                 Float distance2 = null;
-                    if (o2.getLatitude() != null && o2.getLongitude() != null ) {
-                        android.location.Location.distanceBetween(mLat, mLon,
-                                o2.getLatitude() != null ? Double.parseDouble(o2.getLatitude()) : 0,
-                                o2.getLongitude() != null ? Double.parseDouble(o2.getLongitude()) : 0, result2);
-                        distance2 = result2[0];
-                    }
-                 else if((o2.getLatitude() == null || o2.getLongitude() == null )){
-                    distance2= Float.valueOf(0);
+                if (o2.getLatitude() != null && o2.getLongitude() != null ) {
+                    android.location.Location.distanceBetween(mLat, mLon,
+                            o2.getLatitude() != null ? Double.parseDouble(o2.getLatitude()) : 0,
+                            o2.getLongitude() != null ? Double.parseDouble(o2.getLongitude()) : 0, result2);
+                    distance2 = result2[0];
+                }
+                else if((o2.getLatitude() == null || o2.getLongitude() == null )){
+                    distance2= (float)0;
                 }
                 return distance1.compareTo(distance2);
             }
@@ -166,15 +159,12 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         notifyDataSetChanged();
     }
 
-    public void setCurrentUserInfo(String userUid, String email, long createdAt, String photoUri,String latitude,
+    @SuppressWarnings("UnusedParameters")
+    public void setCurrentUserInfo(String userUid, String email, long createdAt, String photoUri, String latitude,
                                    String longitude, String distance) {
         mCurrentUserId = userUid;
         mCurrentUserEmail = email;
         mCurrentUserCreatedAt = createdAt;
-        mPhotoUrl=photoUri;
-        mlatitude=latitude;
-        mlongitude=longitude;
-        mUserdistance= distance;
     }
 
     public void clear() {
@@ -187,10 +177,10 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
     public class ViewHolderUsers extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private final ImageView mUserAvatar;
-        private TextView mUserDisplayName;
+        private final TextView mUserDisplayName;
         private final TextView mStatusConnection;
-        private Context mContextViewHolder;
-        private TextView mStatusLocation;
+        private final Context mContextViewHolder;
+        private final TextView mStatusLocation;
 
 
         public ViewHolderUsers(Context context, View itemView) {
@@ -206,9 +196,11 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
         public ImageView getUserAvatar() {
             return mUserAvatar;
         }
-        public ImageView getUserNonAvatar() {
-            return mUserAvatar;
-        }
+// --Commented out by Inspection START (3/8/17, 4:18 PM):
+//        public ImageView getUserNonAvatar() {
+//            return mUserAvatar;
+//        }
+// --Commented out by Inspection STOP (3/8/17, 4:18 PM)
         public TextView getUserDisplayName() {return mUserDisplayName;}
         public TextView getStatusConnection() {
             return mStatusConnection;
@@ -227,6 +219,7 @@ public class UsersChatAdapter extends RecyclerView.Adapter<UsersChatAdapter.View
                 }
                 Intent chatIntent = new Intent(mContextViewHolder, ChatActivity.class);
                 chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, mCurrentUserId);
+                assert user != null;
                 chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, user.getRecipientId());
                 chatIntent.putExtra(ExtraIntent.EXTRA_CHAT_REF, chatRef);
                 chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME, user.getDisplayName());

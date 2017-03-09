@@ -1,6 +1,7 @@
 package com.my.game.wesport.ui;
 
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -54,7 +55,6 @@ public class ListUsers extends Fragment implements
 
     private static final int REQUEST_INVITE = 0;
     private static String TAG =  ListUsers.class.getSimpleName();
-    private GoogleApiClient mGoogleApiClient;
 
 
     @BindView(R.id.progress_bar_users) ProgressBar mProgressBarForUsers;
@@ -72,7 +72,7 @@ public class ListUsers extends Fragment implements
 
     @Override
     public View onCreateView (LayoutInflater inflater, ViewGroup container,
-                                Bundle savedInstanceState) {
+                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.activity_list_users, container, false);
         ButterKnife.bind(this, rootView);
@@ -83,19 +83,20 @@ public class ListUsers extends Fragment implements
         setUsersKeyList();
         setAuthListener();
         setHasOptionsMenu(true);
+        updateRecylerview();
 
 
         // Create an auto-managed GoogleApiClient with access to App Invites.
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(AppInvite.API)
                 .enableAutoManage(getActivity(), this)
                 .build();
         boolean autoLaunchDeepLink = true;
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, getActivity(), autoLaunchDeepLink)
+        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, getActivity(), true)
                 .setResultCallback(
                         new ResultCallback<AppInviteInvitationResult>() {
                             @Override
-                            public void onResult(AppInviteInvitationResult result) {
+                            public void onResult(@NonNull AppInviteInvitationResult result) {
                                 if (result.getStatus().isSuccess()) {
                                     // Extract information from the intent
                                     Intent intent = result.getInvitationIntent();
@@ -117,8 +118,12 @@ public class ListUsers extends Fragment implements
         return rootView;
     }
 
+    private void updateRecylerview() {
+
+    }
+
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         showMessage(getString(R.string.google_play_services_error));
     }
 
@@ -269,17 +274,13 @@ public class ListUsers extends Fragment implements
                         String userUid = dataSnapshot.getKey();
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
                             User currentUser = dataSnapshot.getValue(User.class);
-
-                            Log.d("loginUser",loginUser);
-                            Log.d("getUserEmail()",currentUser.getEmail());
                             mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
                                     currentUser.getCreatedAt(), currentUser.getPhotoUri(),
                                     currentUser.getLatitude(), currentUser.getLongitude(),
-                                            currentUser.getDistance());
-
+                                    currentUser.getDistance());
                         } else {
                             User recipient = dataSnapshot.getValue(User.class);
-                            recipient.setRecipientId(userUid);;
+                            recipient.setRecipientId(userUid);
                             mUsersKeyList.add(userUid);
                             mUsersChatAdapter.refill(recipient);
                         }
@@ -293,14 +294,14 @@ public class ListUsers extends Fragment implements
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 try {
                     if(dataSnapshot.exists()) {
-                    String userUid = dataSnapshot.getKey();
-                    if(!userUid.equals(mCurrentUserUid)) {
-                        User user = dataSnapshot.getValue(User.class);
-                        int index = mUsersKeyList.indexOf(userUid);
-                        if(index > -1) {
-                            mUsersChatAdapter.changeUser(index, user);
+                        String userUid = dataSnapshot.getKey();
+                        if(!userUid.equals(mCurrentUserUid)) {
+                            User user = dataSnapshot.getValue(User.class);
+                            int index = mUsersKeyList.indexOf(userUid);
+                            if(index > -1) {
+                                mUsersChatAdapter.changeUser(index, user);
+                            }
                         }
-                    }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -348,6 +349,7 @@ public class ListUsers extends Fragment implements
         startActivityForResult(intent, REQUEST_INVITE);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -374,4 +376,3 @@ public class ListUsers extends Fragment implements
 
 
 }
-

@@ -18,10 +18,13 @@ public class IntroActivity extends AppIntro {
         // Just set a title, description, background and image. AppIntro will do the rest.
         addSlide(AppIntroFragment.newInstance(getString(R.string.first_screen), getString(R.string.scr1_desc), R.drawable.screen2, ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
         addSlide(AppIntroFragment.newInstance(getString(R.string.second_screen), getString(R.string.scr2_desc), R.drawable.screen3, ContextCompat.getColor(getApplicationContext(), R.color.colorAccent)));
-        addSlide(AppIntroFragment.newInstance(getString(R.string.third_screen), getString(R.string.scr3_desc), R.drawable.screen4a, ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
+        addSlide(AppIntroFragment.newInstance(getString(R.string.seconda_screen), getString(R.string.scr2a_desc), R.drawable.screen3a, ContextCompat.getColor(getApplicationContext(), R.color.colorAccent)));
+        addSlide(AppIntroFragment.newInstance(getString(R.string.third_screen),
+                getString(R.string.scr3_desc), R.drawable.screen4a,
+                ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
         addSlide(AppIntroFragment.newInstance(getString(R.string.fourth_screen), getString(R.string.scr4_desc), R.drawable.screen5, ContextCompat.getColor(getApplicationContext(), R.color.colorAccent)));
-        addSlide(AppIntroFragment.newInstance(getString(R.string.fifth_screen), getString(R.string.scr5_desc), R.drawable.screen6, ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
-
+        addSlide(AppIntroFragment.newInstance(getString(R.string.seven_screen), getString(R.string.scr7_desc),
+                R.drawable.screen7, ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary)));
         // Hide Skip/Done button.
         showSkipButton(false);
         setProgressButtonEnabled(true);

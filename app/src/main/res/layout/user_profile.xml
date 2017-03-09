@@ -10,7 +10,6 @@
         android:id="@+id/img_avatar"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        tools:src="@drawable/headshot_7"
         android:layout_margin="10dp"/>
 
     <TextView
@@ -32,7 +31,8 @@
         tools:text="Online"
         android:layout_alignTop="@+id/img_avatar"
         android:paddingEnd="@dimen/connection_status_padding"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        tools:ignore="RelativeOverlap,RtlSymmetry"/>
 
 
     <TextView
