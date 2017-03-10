@@ -4,31 +4,30 @@ WeSport allows people to connect with each other to play games and stay active a
 
 <a href='https://play.google.com/store/apps/details?id=com.my.game.wesport&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
-![screen](../master/art/Screen1.png)
-![screen](../master/art/Screen2.png)
-![screen](../master/art/Screen3.png)
-![screen](../master/art/Screen4.png)
-![screen](../master/art/Screen4a.png)
-![screen](../master/art/Screen4b.png)
-![screen](../master/art/Screen5.png)
-![screen](../master/art/Screen6.png)
-![screen](../master/art/Screen7.png)
+![screen](../master/art/wesportbanner1.png)
 
 
 ## Features
 
 * Recommends play places around user location
 * Select existing places or search places by address
+* Find nearby by users and chat with them
 * Add game details for every games and access the same from widget.
 * View details like Game information, start date and time, end time , skill level and notes.
-* Access chat room , help coordinate and communicate with each other
+
+## V2.0 updates
+
+* Check park/ground information including address, rating and location and a photo of the play area
+* One on one chat with nearby by user. Coordinate games with other nearby WeSport users.
+* Add a game for an upcoming match in the app to your calendar
+* Invite other players (email/mobile number) to join the game.
 
 ## Libraries Used
 
 * [Retrofit](https://github.com/square/retrofit.git)
 * [Glide](https://github.com/bumptech/glide.git)
-* [EventBus Greenrobot](https://github.com/greenrobot/EventBus.git)
 * [AppIntro](https://github.com/apl-devs/AppIntro.git)
+* [FireBase](https://github.com/firebase/FirebaseUI-Android)
 
 
 ## License
