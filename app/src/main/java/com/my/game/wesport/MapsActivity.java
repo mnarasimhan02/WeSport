@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -231,10 +232,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         parkName = response.body().getResults().get(i).getName();
                         widthSize[0] = response.body().getResults().get(i).getPhotos().size();
                         //Get if park is open_now
-                        if (open_now == null) {
+                        if (open_now== null) {
                             open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                            placeOpen = String.valueOf(open_now != null ? "Open now" : "closed");
+                            if (open_now==false) {
+                                placeOpen = "closed";
+                            } else {
+                                placeOpen = "Open now";
+                            }
                         }
+                        Log.d("placeOpen", String.valueOf(placeOpen));
+
                         //Get PhotoMaxWidth
                         if (i < widthSize[0]) {
                             photoWidth[0] = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
@@ -250,16 +257,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     "&photoreference="+ photoReference[0] + "&key=" + getString(R.string.places_api_key));
                         }
                         //Get ratings for parks
-                        ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
-                        vicinitystr=String.valueOf(response.body().getResults().get(i).getVicinity());
+                      /*  if (!(ratingstr==null || ratingstr==""|| ratingstr.equals(null) ||ratingstr.equals(" "))) {
+                            ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                        }
+*/
+                        vicinitystr = String.valueOf(response.body().getResults().get(i).getVicinity());
                         LatLng latLng = new LatLng(lat, lng);
                         Marker parkMarker = map.addMarker(new MarkerOptions()
                                 .title(parkName)
                                 .position(latLng)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-                        markers.put(parkMarker.getId(), placeImageURI);
-                        rating.put(parkMarker.getId(), ratingstr);
+                            markers.put(parkMarker.getId(), placeImageURI);
+                            ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                        if (!(ratingstr.equals("null"))) {
+                            rating.put(parkMarker.getId(), ratingstr);
+                        }
                         vicinity.put(parkMarker.getId(), vicinitystr);
+                        Log.d("new vicinitystr",vicinitystr);
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
                         Snackbar.make(mLayout, getString(R.string.map_help),
                                 Snackbar.LENGTH_LONG).show();
@@ -316,8 +330,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         // declare RatingBar object
         RatingBar infoRating = (RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
+        Log.d("new ratingstr",ratingstr);
         if (!(ratingstr.equals("null"))) {
             try {
+                Log.d("final ratingstr",ratingstr);
                 infoRating.setRating(Float.parseFloat(ratingstr));
             } catch (NumberFormatException e) {
                 e.printStackTrace();
