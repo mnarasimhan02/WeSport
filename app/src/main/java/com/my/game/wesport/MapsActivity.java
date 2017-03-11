@@ -267,8 +267,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .title(parkName)
                                 .position(latLng)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
-                            markers.put(parkMarker.getId(), placeImageURI);
-                            ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                        markers.put(parkMarker.getId(), placeImageURI);
+                        ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
                         if (!(ratingstr.equals("null"))) {
                             rating.put(parkMarker.getId(), ratingstr);
                         }
@@ -463,6 +463,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         } catch (Exception e){
             e.printStackTrace();
-    }
+        }
     }
 }
