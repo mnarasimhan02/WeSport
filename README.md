@@ -27,7 +27,11 @@ WeSport allows people to connect with each other to play games and stay active a
 * [Retrofit](https://github.com/square/retrofit.git)
 * [Glide](https://github.com/bumptech/glide.git)
 * [AppIntro](https://github.com/apl-devs/AppIntro.git)
-* [FireBase](https://github.com/firebase/FirebaseUI-Android)
+* [FireBase UI](https://github.com/firebase/FirebaseUI-Android)
+* [FireBase Auth](Firebase Auth)
+* [FireBase Real Time Database](Firebase Real Time Database)
+
+
 
 
 ## License
