@@ -10,7 +10,7 @@ public class OpeningHours {
 
     @SerializedName("open_now")
     @Expose
-    private Boolean openNow;
+    private String openNow;
     @SerializedName("weekday_text")
     @Expose
     private List<Object> weekdayText = new ArrayList<Object>();
@@ -20,7 +20,7 @@ public class OpeningHours {
      * @return
      * The openNow
      */
-    public Boolean getOpenNow() {
+    public String getOpenNow() {
         return openNow;
     }
 
@@ -29,7 +29,7 @@ public class OpeningHours {
      * @param openNow
      * The open_now
      */
-    public void setOpenNow(Boolean openNow) {
+    public void setOpenNow(String openNow) {
         this.openNow = openNow;
     }
 

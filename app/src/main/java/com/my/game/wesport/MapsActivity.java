@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,6 +71,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String addressResult;
     private View mLayout;
     private int PROXIMITY_RADIUS = 3000;
+    private String OPEN_NOW = "true";
+    private String CLOSED_NOW = "false";
+
     private Menu mMenu;
     private LatLng mlatlng;
 
@@ -82,10 +84,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /*Infowindow*/
     private View myContentsView;
-    private Boolean open_now=null;
-    private String ratingstr, vicinitystr;
+    private String mopen_now=null;
+    private String ratingstr=null, vicinitystr;
     private Uri placeImageURI=null;
-    private String placeOpen;
+    private String placeOpenstr;
     private String parkName;
 
 
@@ -93,6 +95,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Hashtable<String, Uri> markers;
     private Hashtable<String, String> rating;
     private Hashtable<String, String> vicinity;
+
 
     //private List<String> photoReference = new ArrayList<String>();
 
@@ -220,7 +223,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         RetrofitMaps service = retrofit.create(RetrofitMaps.class);
-        Call<Example> call = service.getNearbyPlaces(type, mLat + "," + mLon, PROXIMITY_RADIUS);
+        Call<Example> call = service.getNearbyPlaces(type, mLat + "," + mLon, PROXIMITY_RADIUS, OPEN_NOW);
         call.enqueue(new Callback<Example>() {
             @Override
             public void onResponse(Response<Example> response, Retrofit retrofit) {
@@ -232,16 +235,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         parkName = response.body().getResults().get(i).getName();
                         widthSize[0] = response.body().getResults().get(i).getPhotos().size();
                         //Get if park is open_now
-                        if (open_now== null) {
-                            open_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
-                            if (open_now==false) {
-                                placeOpen = "closed";
-                            } else {
-                                placeOpen = "Open now";
-                            }
-                        }
-                        Log.d("placeOpen", String.valueOf(placeOpen));
-
+                        /*OpeningHours mOpencheck = response.body().getResults().get(i).getOpeningHours();
+                                if(mOpencheck!=null) {
+                                    mopen_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
+                                    if (!mopen_now.equals(null)) {
+                                        if (mopen_now.equals("false")) {
+                                            placeOpenstr = "closed";
+                                        } else {
+                                            placeOpenstr = "Open now";
+                                        }
+                                    }
+                                }
+                                */
                         //Get PhotoMaxWidth
                         if (i < widthSize[0]) {
                             photoWidth[0] = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
@@ -269,11 +274,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
                         markers.put(parkMarker.getId(), placeImageURI);
                         ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
-                        if (!(ratingstr.equals("null"))) {
+                        if (ratingstr!=null) {
                             rating.put(parkMarker.getId(), ratingstr);
                         }
                         vicinity.put(parkMarker.getId(), vicinitystr);
-                        Log.d("new vicinitystr",vicinitystr);
+
+
+                        //placeOpen.put(parkMarker.getId(), placeOpenstr);}
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
                         Snackbar.make(mLayout, getString(R.string.map_help),
                                 Snackbar.LENGTH_LONG).show();
@@ -318,8 +325,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         infoTitle.setText(marker.getTitle());
         TextView infoSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
         infoSnippet.setText(vicinitystr);
-        TextView infoOpennow = (TextView) myContentsView.findViewById(R.id.open_now);
-        infoOpennow.setText(placeOpen);
+        //TextView infoOpennow = (TextView) myContentsView.findViewById(open_now);
+       // infoOpennow.setText(placeOpenstr);
         ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
         if (uri == null) {
             placeImage.setVisibility(View.GONE);
@@ -330,10 +337,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         // declare RatingBar object
         RatingBar infoRating = (RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
-        Log.d("new ratingstr",ratingstr);
         if (!(ratingstr.equals("null"))) {
             try {
-                Log.d("final ratingstr",ratingstr);
                 infoRating.setRating(Float.parseFloat(ratingstr));
             } catch (NumberFormatException e) {
                 e.printStackTrace();

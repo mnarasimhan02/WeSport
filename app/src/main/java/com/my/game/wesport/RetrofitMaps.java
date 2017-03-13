@@ -11,6 +11,7 @@ interface RetrofitMaps {
      * And our method that will return us details of park.
      */
     @GET("api/place/nearbysearch/json?&key=AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE")
-    Call<Example> getNearbyPlaces(@Query("type") String type, @Query("location") String location, @Query("radius") int radius);
+    Call<Example> getNearbyPlaces(@Query("type") String type, @Query("location") String location, @Query("radius") int radius,
+                                  @Query("openow") String open);
 
 }
