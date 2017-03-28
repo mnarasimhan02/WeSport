@@ -9,7 +9,7 @@ WeSport allows people to connect with each other to play games and stay active a
 
 ## Features
 
-* Recommends play places around user location
+* Recommends play places around userModel location
 * Select existing places or search places by address
 * Find nearby by users and chat with them
 * Add game details for every games and access the same from widget.
@@ -18,7 +18,7 @@ WeSport allows people to connect with each other to play games and stay active a
 ## V2.0 updates
 
 * Check park/ground information including address, rating and location and a photo of the play area
-* One on one chat with nearby by user. Coordinate games with other nearby WeSport users.
+* One on one chat with nearby by userModel. Coordinate games with other nearby WeSport users.
 * Add a game for an upcoming match in the app to your calendar
 * Invite other players (email/mobile number) to join the game.
 
