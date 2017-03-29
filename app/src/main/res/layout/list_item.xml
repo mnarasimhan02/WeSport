@@ -1,52 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Layout for a single list item in the list of games -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!-- Layout for a single list item in the list of games -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
     android:padding="@dimen/activity_margin">
 
-
-    <TextView
-        android:id="@+id/name"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:textAppearance="?android:textAppearanceMedium"
-        android:textColor="#2B3D4D" />
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/startdate"
+        <ImageView
+            android:id="@+id/chatimage"
+            android:layout_width="70dp"
+            android:layout_height="65dp"
+            android:layout_marginRight="10dp"
+            android:adjustViewBounds="false"
+            android:contentDescription="@string/accessibility_chatbox"
+            android:src="@drawable/cricket"
+            tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="#2B3D4D"  />
+        android:orientation="vertical"
+        android:paddingLeft="20dp">
 
-    <TextView
-        android:id="@+id/summary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:textAppearance="?android:textAppearanceSmall"
-        android:textColor="@color/colorAccent"  />
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="#2B3D4D"
+            tools:text="Cricket" />
 
+
+        <TextView
+            android:id="@+id/startdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="#2B3D4D"
+            tools:text="23/04/2017" />
+
+        <TextView
+            android:id="@+id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textColor="@color/colorAccent"
+            tools:text="Win" />
+    </LinearLayout>
 
 </LinearLayout>
-    <ImageView
-        android:id="@+id/chatimage"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_marginRight="10dp"
-        android:src="@drawable/ic_chat"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:adjustViewBounds="false"
-        android:contentDescription="@string/accessibility_chatbox"
-        tools:ignore="RtlHardcoded"/>
-    </RelativeLayout>

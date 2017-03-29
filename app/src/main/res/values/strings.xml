@@ -31,13 +31,12 @@
 
     <!-- Intro slides descriptions-->
     <string name="scr1_desc">WeSport allows people to connect with each other to play games and stay active</string>
-    <string name="scr2_desc">Recommends play places around user\'s location</string>
+    <string name="scr2_desc">Recommends play places around userModel\'s location</string>
     <string name="scr2a_desc">View park name, rating, location information</string>
     <string name="scr3_desc">Add game details for every games and access the same from widget</string>
     <string name="scr4_desc">View all game information and store games to your calendar</string>
     <string name="scr7_desc">Chat with online users, communicate and plan for the game</string>
     <string name="scr8_desc">Invite friends via email or mobile number</string>
-
 
 
     <!-- Locations permissions strings-->
@@ -48,8 +47,11 @@
 
     <!-- Label for Google API Web-services and Google Maps key-->
     <string name="type_param">park</string>
-    <string name="google_maps_key">AIzaSyA6VmyUcYdESQJJbATsA316c7S854W6a8U</string>
-    <string name="places_api_key">AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE</string>
+    <!--<string name="google_maps_key">AIzaSyA6VmyUcYdESQJJbATsA316c7S854W6a8U</string>
+    <string name="places_api_key">AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE</string>-->
+
+    <string name="google_maps_key">AIzaSyAupE3BWQpqy8P3SyiECZYVPmrbYBKJM8c</string>
+    <string name="places_api_key">AIzaSyAupE3BWQpqy8P3SyiECZYVPmrbYBKJM8c</string>
 
     <!-- Games array-->
 
@@ -65,18 +67,18 @@
     </string-array>
 
 
-    <!-- Label for overflow menu option that inserts fake Game data into the app [CHAR LIMIT=20] -->
+    <!-- Label for overflow menu option that inserts fake GameModel data into the app [CHAR LIMIT=20] -->
 
-    <!-- Label for overflow menu option that deletes all Game data in the app [CHAR LIMIT=20] -->
+    <!-- Label for overflow menu option that deletes all GameModel data in the app [CHAR LIMIT=20] -->
     <string name="action_delete_all_entries">Delete All Games</string>
 
-    <!-- Title text for the empty view, which describes the empty Game image [CHAR LIMIT=50] -->
+    <!-- Title text for the empty view, which describes the empty GameModel image [CHAR LIMIT=50] -->
     <string name="empty_view_title_text" tools:ignore="TypographyEllipsis">Let\'s play together...</string>
 
-    <!-- Subtitle text for the empty view that prompts the user to add a Game [CHAR LIMIT=50] -->
+    <!-- Subtitle text for the empty view that prompts the userModel to add a GameModel [CHAR LIMIT=50] -->
     <string name="empty_view_subtitle_text">Get started by adding a new Game</string>
 
-    <!-- Title for the activity to add a new Game [CHAR LIMIT=20] -->
+    <!-- Title for the activity to add a new GameModel [CHAR LIMIT=20] -->
     <string name="editor_activity_title_new_game">Add a Game</string>
 
     <!-- Title for the activity to edit an existing game [CHAR LIMIT=20] -->
@@ -99,10 +101,10 @@
     <!-- Toast message in editor when current game has failed to be updated [CHAR LIMIT=NONE] -->
     <string name="editor_update_game_failed">Error with updating Game</string>
 
-    <!-- Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <!-- Dialog message when userModel is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
     <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
 
-    <!-- Dialog button text for the option to discard a user's changes [CHAR LIMIT=20] -->
+    <!-- Dialog button text for the option to discard a userModel's changes [CHAR LIMIT=20] -->
     <string name="discard">Discard</string>
 
     <!-- Dialog button text for the option to keep editing the current game [CHAR LIMIT=20] -->
@@ -113,7 +115,7 @@
     <!-- Toast message in editor when current game has failed to be deleted [CHAR LIMIT=NONE] -->
     <string name="editor_delete_game_failed">Error with deleting Game</string>
 
-    <!-- Dialog message to ask the user to confirm deleting the current game [CHAR LIMIT=NONE] -->
+    <!-- Dialog message to ask the userModel to confirm deleting the current game [CHAR LIMIT=NONE] -->
     <string name="delete_dialog_msg">Delete this Game?</string>
 
     <!-- Dialog button text for the option to confirm deleting the current game [CHAR LIMIT=20] -->
@@ -157,16 +159,17 @@
 
     <string name="signin_string">Signed in! </string>
     <string name="signin_cancel">Sign in canceled</string>
-    <string name="email_user">Email user</string>
+    <string name="email_user">Email userModel</string>
     <string name="email_sign">Email Sign</string>
     <string name="email_signout">Signout</string>
 
 
     <string name="editor_insert_game_params">Game description and Start date both are required</string>
+    <string name="editor_insert_event_params">Event title, date and time are required</string>
 
     <!-- accessibility strings-->
 
-    <string name="place_error"> Zero results. Please type exact address </string>
+    <string name="place_error"> Zero parkModels. Please type exact address </string>
     <string name="save_game"> game at  </string>
     <string name="save_game_text"> saved  </string>
 
@@ -189,6 +192,7 @@
 
     <!-- Calendar-->
     <string name="calendar_add_game">Game Added to Calendar</string>
+    <string name="calendar_add_event">Event Added</string>
     <string name="title_activity_my_games">MyGames</string>
     <string name="miles_away">mile(s) away</string>
 
@@ -209,4 +213,42 @@
 
     <string name="google_play_services_error">Google Play Services Error</string>
     <string name="invite_friends">Invite friends</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="openDrawer">open_drawer</string>
+    <string name="closeDrawer">close_drawer</string>
+
+    <!-- Navigation Drawer menu labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_photos">Photos</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about_us">About Us</string>
+
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string-array name="nav_item_activity_titles">
+        <item>Home</item>
+        <item>Photos</item>
+        <item>Movies</item>
+        <item>Notifications</item>
+        <item>Settings</item>
+    </string-array>
+
+    <string name="activity_title_about_us">About Us</string>
+    <string name="activity_title_privacy_policy">Privacy Policy</string>
+    <string name="action_clear_all">Clear All</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_mark_all_read">Mark All as Read</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="cancelling_required_permissions_denied">Cancelling Required Permission Denied</string>
+    <string name="logout">Logout</string>
+    <string name="invitations">Invitations</string>
+    <string name="event_description">Event Description</string>
 </resources>
+
+
+
+
