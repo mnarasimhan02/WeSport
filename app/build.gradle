@@ -29,6 +29,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
+        debug {
+            testCoverageEnabled = true
+        }
     }
     configurations.all {
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
@@ -40,21 +43,25 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.0'
-    compile 'com.android.support:cardview-v7:25.3.0'
-    compile 'com.android.support:recyclerview-v7:25.3.0'
-    compile 'com.android.support:gridlayout-v7:25.3.0'
-    compile 'com.android.support:design:25.3.0'
+
+    //Firebase dependencies
+    //App intro library
+    //Display Images
+    //Event bus
+    //Retrofit
 
 
+    compile 'com.android.support:appcompat-v7:25.2.0'
+    compile 'com.android.support:cardview-v7:25.2.0'
+    compile 'com.android.support:recyclerview-v7:25.2.0'
+    compile 'com.android.support:gridlayout-v7:25.2.0'
+    compile 'com.android.support:design:25.2.0'
     compile 'com.google.apis:google-api-services-people:v1-rev63-1.22.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.1'
     compile 'com.google.android.gms:play-services-maps:10.2.0'
     compile 'com.google.android.gms:play-services-places:10.2.0'
     compile 'com.google.android.gms:play-services-location:10.2.0'
-    testCompile 'junit:junit:4.12'
     compile 'com.google.firebase:firebase-core:10.2.0'
-    //Firebase dependencies
     compile 'com.google.firebase:firebase-database:10.2.0'
     compile 'com.google.firebase:firebase-auth:10.2.0'
     compile 'com.google.firebase:firebase-storage:10.2.0'
@@ -62,13 +69,9 @@ dependencies {
     compile 'com.google.firebase:firebase-config:10.2.0'
     compile 'com.google.firebase:firebase-invites:10.2.0'
     compile 'com.firebaseui:firebase-ui-auth:1.2.0'
-    //App intro library
     compile 'com.github.paolorotolo:appintro:4.1.0'
-    //Display Images
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    //Event bus
     compile 'org.greenrobot:eventbus:3.0.0'
-    //Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta2'
@@ -76,6 +79,8 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.android.support:multidex:1.0.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.1'
+    testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }
 apply plugin: 'com.google.gms.google-services'
