@@ -9,7 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.my.game.wesport.CatalogActivity;
+import com.my.game.wesport.GameListFragment;
 import com.my.game.wesport.R;
 
 public class MyGames extends AppCompatActivity {
@@ -23,11 +23,10 @@ public class MyGames extends AppCompatActivity {
         setContentView(R.layout.activity_my_games);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowTitleEnabled(true);
-
         }
         getSupportActionBar().setTitle(R.string.app_name);
         // Create the adapter that will return a fragment for each of the three
@@ -100,11 +99,13 @@ public class MyGames extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            switch(position) {
+            switch (position) {
                 case 0:
-                    return new ListUsers();
+                    return new UserChatListFragment();
                 case 1:
-                    return new CatalogActivity();
+                    return GameListFragment.newInstance(false);
+                case 2:
+                    return GameListFragment.newInstance(true);
             }
             return null;
         }
@@ -112,7 +113,7 @@ public class MyGames extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 2;
+            return 3;
         }
 
         @Override
@@ -121,7 +122,9 @@ public class MyGames extends AppCompatActivity {
                 case 0:
                     return "Chat";
                 case 1:
-                    return "Game details";
+                    return "My Games";
+                case 2:
+                    return "All Games";
             }
             return null;
         }

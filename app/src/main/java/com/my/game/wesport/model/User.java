@@ -16,6 +16,7 @@ public class User {
     private String latitude;
     private String longitude;
     private String distance;
+    private String Bio;
 
 
     public User() {
@@ -23,7 +24,7 @@ public class User {
 
     @SuppressWarnings("SameParameterValue")
     public User(String displayName, String email, String connection, String photoUri, long createdAt,
-                int nonAvatarId, String latitude, String longitude, String distance) {
+                int nonAvatarId, String latitude, String longitude, String distance, String Bio) {
         this.displayName = displayName;
         this.email = email;
         this.connection = connection;
@@ -33,6 +34,7 @@ public class User {
         this.latitude = latitude;
         this.longitude = longitude;
         this.distance = distance;
+        this.Bio = Bio;
     }
 
      @SuppressWarnings("UnusedAssignment")
@@ -87,6 +89,21 @@ public class User {
 
     public int getNonAvatarId() {return nonAvatarId;}
 
+    public String getBio() {
+        return Bio;
+    }
+
+    public void setBio(String bio) {
+        Bio = bio;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void setPhotoUri(String photoUri) {
+        this.photoUri = photoUri;
+    }
 
     @Exclude
     public String getRecipientId() {

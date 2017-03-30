@@ -53,7 +53,8 @@ class GetAddressTask extends AsyncTask<String, Integer, String> {
         Uri.Builder builder = new Uri.Builder();
         publishProgress(0);
 
-        final String BASE_URL =
+        final String
+                BASE_URL =
                 "http://maps.googleapis.com";
         final String SENSOR_PARAM = "sensor";
         Uri builtUri = Uri.parse(BASE_URL)

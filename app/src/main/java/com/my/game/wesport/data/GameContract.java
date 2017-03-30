@@ -89,35 +89,35 @@ public final class GameContract {
         public final static String _ID = BaseColumns._ID;
 
         /**
-         * Game Nam
+         * GameModel Nam
          * <p>
          * Type: TEXT
          */
         public final static String COLUMN_GAME_NAME = "gamename";
 
         /**
-         * Game Description
+         * GameModel Description
          * <p>
          * Type: TEXT
          */
         public final static String COLUMN_GAME_DESC = "name";
 
         /**
-         * Game startdate
+         * GameModel startdate
          * <p>
          * Type: TEXT
          */
         public final static String COLUMN_START_DATE = "startdate";
 
         /**
-         * Game starttime
+         * GameModel starttime
          * <p>
          * Type: TEXT
          */
         public final static String COLUMN_START_TIME = "starttime";
 
         /**
-         * Game endtime
+         * GameModel endtime
          * <p>
          * Type: TEXT
          */
@@ -135,14 +135,14 @@ public final class GameContract {
 
 
         /**
-         * Storing Username and Location for the Game.
+         * Storing Username and Location for the GameModel.
          */
         public final static String COLUMN_USER_NAME = "username";
 
         public final static String COLUMN_GAME_ADDRESS = "address";
 
         /**
-         * Possible values for the Skilllevel for the Game.
+         * Possible values for the Skilllevel for the GameModel.
          */
         public static final int SKILL_ROOKIES = 0;
         public static final int SKILL_VET = 1;

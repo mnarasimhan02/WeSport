@@ -18,7 +18,7 @@ import com.my.game.wesport.data.GameContract.GameEntry;
 
 /**
  * {@link GameCursorAdapter} is an adapter for a list view
- * that uses a {@link Cursor} of Game data as its data source. This adapter knows
+ * that uses a {@link Cursor} of GameModel data as its data source. This adapter knows
  * how to create list items for each row of game data in the {@link Cursor}.
  */
 @SuppressWarnings("ALL")
@@ -68,7 +68,7 @@ public class GameCursorAdapter extends CursorAdapter {
         String gameaddress = cursor.getString(locColumnIndex);
         String notes = cursor.getString(notesIndex);
 
-        // Update the TextViews with the attributes for the current Game
+        // Update the TextViews with the attributes for the current GameModel
         nameTextView.setText(selectedGame + "\n" + gameDesc);
         startdate.setText(stDate + " " + stTime + " " + "at " + gameaddress);
         summaryTextView.setText(notes);
@@ -131,7 +131,7 @@ public class GameCursorAdapter extends CursorAdapter {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), ListUsers.class);
+                Intent intent = new Intent(v.getContext(), ListUsersFragment.class);
                 v.getContext().startActivity(intent);
             }
         });*/

@@ -26,10 +26,13 @@ import com.my.game.wesport.R;
 import com.my.game.wesport.UserProfileActivity;
 import com.my.game.wesport.model.ChatListItem;
 import com.my.game.wesport.model.ChatMessage;
+import com.my.game.wesport.model.GridImageModel;
+import com.my.game.wesport.model.GridImages;
 import com.my.game.wesport.model.UserModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by sabeeh on 18-Mar-17.
@@ -123,6 +126,45 @@ public class FirebaseHelper {
         });
     }
 
+    public static String uploadGameImage(final String gameKey, Uri imageUri, final FileUploadListener listener) {
+        StorageReference photoRef;
+        String fileName = String.valueOf(new Date().getTime()) + ".jpg";
+        photoRef = FirebaseStorage.getInstance().getReference().child("gameGrids").child(gameKey).child(fileName);
+
+        Bitmap bitmap;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(App.getInstance().getContentResolver(), imageUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, "uploadThumbImage: " + e.getLocalizedMessage());
+            return fileName;
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        byte[] data1 = baos.toByteArray();
+
+
+//        photoRef.getName().equals(photoRef.getName());
+        UploadTask uploadTask = photoRef.putBytes(data1);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.d(TAG, "onFailure: " + exception.getMessage());
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Uri subDownloadUrl = taskSnapshot.getDownloadUrl();
+                if (listener != null) {
+                    listener.imageUploaded(subDownloadUrl);
+                }
+            }
+        });
+
+        return fileName;
+    }
+
     public interface ChatListItemListener {
         void onGetChatListItem(ChatListItem chatListItem);
     }
@@ -155,6 +197,14 @@ public class FirebaseHelper {
         return FirebaseDatabase.getInstance().getReference().child("games");
     }
 
+    public static DatabaseReference getEventRef(String gameKey) {
+        return FirebaseDatabase.getInstance().getReference().child("events").child(gameKey);
+    }
+
+    public static DatabaseReference getGameImagesRef(String gameKey) {
+        return FirebaseDatabase.getInstance().getReference().child("gameImages").child(gameKey);
+    }
+
     public static void inviteFriends(Activity activity, int requestCode) {
         Intent intent = new AppInviteInvitation.IntentBuilder(activity.getString(R.string.invitation_title))
                 .setMessage(activity.getString(R.string.invitation_message))
@@ -163,5 +213,10 @@ public class FirebaseHelper {
                 .setCallToActionText(activity.getString(R.string.invitation_cta))
                 .build();
         activity.startActivityForResult(intent, requestCode);
+    }
+
+
+    public interface FileUploadListener{
+        void imageUploaded(Uri fileUri);
     }
 }

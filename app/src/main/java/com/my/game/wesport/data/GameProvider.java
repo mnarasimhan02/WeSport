@@ -148,19 +148,19 @@ public class GameProvider extends ContentProvider {
     }
 
     /**
-     * Insert a Game into the database with the given content values. Return the new content URI
+     * Insert a GameModel into the database with the given content values. Return the new content URI
      * for that specific row in the database.
      */
     private Uri insertGame(Uri uri, ContentValues values) {
         // Check that the name is not null
         String name = values.getAsString(GameEntry.COLUMN_GAME_DESC);
         if (name == null) {
-            throw new IllegalArgumentException("Game requires a description");
+            throw new IllegalArgumentException("GameModel requires a description");
         }
 
         String startdate = values.getAsString(GameEntry.COLUMN_START_DATE);
         if (startdate == null) {
-            throw new IllegalArgumentException("Game requires a start date");
+            throw new IllegalArgumentException("GameModel requires a start date");
         }
 
         // Get writeable database
@@ -211,14 +211,14 @@ public class GameProvider extends ContentProvider {
         if (values.containsKey(GameEntry.COLUMN_GAME_DESC)) {
             String name = values.getAsString(GameEntry.COLUMN_GAME_DESC);
             if (name == null) {
-                throw new IllegalArgumentException("Game requires a name");
+                throw new IllegalArgumentException("GameModel requires a name");
             }
         }
 
         if (values.containsKey(GameEntry.COLUMN_START_DATE)) {
             String startdate = values.getAsString(GameEntry.COLUMN_START_DATE);
             if (startdate == null) {
-                throw new IllegalArgumentException("Game requires a valid start date");
+                throw new IllegalArgumentException("GameModel requires a valid start date");
             }
         }
 
@@ -226,7 +226,7 @@ public class GameProvider extends ContentProvider {
         if (values.containsKey(GameEntry.COLUMN_GAME_SKILL)) {
             Integer skill = values.getAsInteger(GameEntry.COLUMN_GAME_SKILL);
             if (skill == null || !GameEntry.isValidskill(skill)) {
-                throw new IllegalArgumentException("Game requires a skill level");
+                throw new IllegalArgumentException("GameModel requires a skill level");
             }
         }
 

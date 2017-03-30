@@ -33,8 +33,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
 import com.my.game.wesport.adapter.UsersChatListAdapter;
@@ -53,8 +51,7 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 
-public class UserChatListFragment extends Fragment implements
-        GoogleApiClient.OnConnectionFailedListener {
+public class UserChatListFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
 
 
     private static final int REQUEST_INVITE = 0;
@@ -67,20 +64,17 @@ public class UserChatListFragment extends Fragment implements
     private List<String> mUsersKeyList;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference mUserRefDatabase;
     private ChildEventListener mChildEventListener;
     private UsersChatListAdapter mUsersChatListAdapter;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.activity_list_users, container, false);
         ButterKnife.bind(this, rootView);
         mUsersRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_users);
         setAuthInstance();
-        setUsersDatabase();
         setUserRecyclerView();
         setUsersKeyList();
         setAuthListener();
@@ -131,10 +125,6 @@ public class UserChatListFragment extends Fragment implements
         mAuth = FirebaseAuth.getInstance();
     }
 
-    private void setUsersDatabase() {
-        mUserRefDatabase = FirebaseDatabase.getInstance().getReference().child("users");
-    }
-
     private void setUserRecyclerView() {
         //to be updated
         mUsersChatListAdapter = new UsersChatListAdapter(getActivity(), new ArrayList<ChatListItem>());
@@ -158,13 +148,12 @@ public class UserChatListFragment extends Fragment implements
 
     private void queryAllUsers() {
         mChildEventListener = getChildEventListener();
-        mUserRefDatabase.limitToFirst(50).addChildEventListener(mChildEventListener);
+        FirebaseHelper.getUserRef().limitToFirst(50).addChildEventListener(mChildEventListener);
 
 //        listener to update chat counter when user chat updated
         FirebaseHelper.getCurrentUserConversationRef().addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
@@ -221,7 +210,7 @@ public class UserChatListFragment extends Fragment implements
         super.onStop();
         clearCurrentUsers();
         if (mChildEventListener != null) {
-            mUserRefDatabase.removeEventListener(mChildEventListener);
+            FirebaseHelper.getUserRef().removeEventListener(mChildEventListener);
         }
     }
 
@@ -248,7 +237,7 @@ public class UserChatListFragment extends Fragment implements
     private void setUserOffline() {
         if (mAuth.getCurrentUser() != null) {
             String userId = mAuth.getCurrentUser().getUid();
-            mUserRefDatabase.child(userId).child("connection").setValue(UsersChatListAdapter.OFFLINE);
+            FirebaseHelper.getUserRef().child(userId).child("connection").setValue(UsersChatListAdapter.OFFLINE);
         }
     }
 

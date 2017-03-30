@@ -2,9 +2,11 @@ package com.my.game.wesport.adapter;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,23 +16,26 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.my.game.wesport.R;
+import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.GameHelper;
+import com.my.game.wesport.model.DataSnapWithFlag;
 import com.my.game.wesport.model.GameModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
-    private final List<DataSnapshot> snapshots;
+    private final List<DataSnapWithFlag> dataSnapShotsWithFlag;
     private final Context mContext;
-    private final Calendar mDateAndTime = Calendar.getInstance();
-    GameAdapterListener listener;
+    private GameAdapterListener listener;
+    private String TAG = GameAdapter.class.getSimpleName();
 
-    public GameAdapter(Context mContext, GameAdapterListener listener, List<DataSnapshot> snapshots) {
+    public GameAdapter(Context mContext, GameAdapterListener listener, List<DataSnapWithFlag> dataSnapShotsWithFlag) {
         this.mContext = mContext;
-        this.snapshots = snapshots;
+        this.dataSnapShotsWithFlag = dataSnapShotsWithFlag;
         this.listener = listener;
     }
 
@@ -42,10 +47,10 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
 
     @Override
     public void onBindViewHolder(GameViewHolder holder, final int position) {
-        GameModel gameModel = snapshots.get(position).getValue(GameModel.class);
+        GameModel gameModel = dataSnapShotsWithFlag.get(position).getDataSnapshot().getValue(GameModel.class);
 
         // Set display name
-        holder.getGameDescrription().setText(gameModel.getGameDescription());
+        holder.getGameTitle().setText(gameModel.getGameDescription());
 
         //Set game summery
         holder.getGameSummery().setText(gameModel.getNotes());
@@ -69,37 +74,53 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onGameClick(position, snapshots.get(position));
+                    listener.onGameClick(position, dataSnapShotsWithFlag.get(position));
                 }
             }
         });
+
+        String titleColor = "#2B3D4D";
+        if (dataSnapShotsWithFlag.get(position).isFlag()) {
+            titleColor = "#FF0000";
+        }
+
+        holder.getGameTitle().setTextColor(Color.parseColor(titleColor));
     }
 
     @Override
     public int getItemCount() {
-        return snapshots.size();
+        return dataSnapShotsWithFlag.size();
     }
 
-    public void add(DataSnapshot value) {
-        snapshots.add(value);
-        notifyItemInserted(snapshots.size() - 1);
+    public void add(DataSnapWithFlag value, boolean refreshFlags) {
+        dataSnapShotsWithFlag.add(value);
+        notifyItemInserted(dataSnapShotsWithFlag.size() - 1);
+        if (refreshFlags){
+            refreshFlags();
+        }
     }
 
-    public void update(DataSnapshot snapshot) {
-        for (int i = 0; i < snapshots.size(); i++) {
-            if (snapshots.get(i).getKey().equals(snapshot.getKey())) {
-                snapshots.set(i, snapshot);
+    public void update(DataSnapWithFlag snapshot, boolean refreshFlags) {
+        for (int i = 0; i < dataSnapShotsWithFlag.size(); i++) {
+            if (dataSnapShotsWithFlag.get(i).getDataSnapshot().getKey().equals(snapshot.getDataSnapshot().getKey())) {
+                dataSnapShotsWithFlag.set(i, snapshot);
                 notifyItemChanged(i);
+                if (refreshFlags){
+                    refreshFlags();
+                }
                 break;
             }
         }
     }
 
-    public void remove(DataSnapshot dataSnapshot) {
-        for (int i = 0; i < snapshots.size(); i++) {
-            if (snapshots.get(i).getKey().equals(dataSnapshot.getKey())) {
-                snapshots.remove(i);
+    public void remove(DataSnapWithFlag dataSnapshot, boolean refreshFlags) {
+        for (int i = 0; i < dataSnapShotsWithFlag.size(); i++) {
+            if (dataSnapShotsWithFlag.get(i).getDataSnapshot().getKey().equals(dataSnapshot.getDataSnapshot().getKey())) {
+                dataSnapShotsWithFlag.remove(i);
                 notifyItemRemoved(i);
+                if (refreshFlags){
+                    refreshFlags();
+                }
                 break;
             }
         }
@@ -123,7 +144,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             mContextViewHolder = context;
         }
 
-        public TextView getGameDescrription() {
+        public TextView getGameTitle() {
             return nameTextView;
         }
 
@@ -146,8 +167,122 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
 
     }
 
-    public interface GameAdapterListener {
-        void onGameClick(int position, DataSnapshot snapshot);
+
+    private void refreshFlags() {
+        for (int i = 0; i < dataSnapShotsWithFlag.size(); i++) {
+            boolean flag = false;
+            DataSnapWithFlag currentItem = dataSnapShotsWithFlag.get(i);
+            GameModel currentGame = currentItem.getDataSnapshot().getValue(GameModel.class);
+
+//            if game is from other user then skip it
+            if (!currentGame.getAuthor().equals(FirebaseHelper.getCurrentUser().getUid())) {
+                continue;
+            }
+
+            for (int j = 0; j < dataSnapShotsWithFlag.size(); j++) {
+                DataSnapWithFlag targetItem = dataSnapShotsWithFlag.get(j);
+                GameModel targetGame = targetItem.getDataSnapshot().getValue(GameModel.class);
+
+
+                Log.d(TAG, "refreshFlags: " + currentItem.getDataSnapshot().getKey() + ", " + targetItem.getDataSnapshot().getKey());
+//                if both are not same items and have same date
+                if (!currentItem.getDataSnapshot().getKey().equals(targetItem.getDataSnapshot().getKey())
+                        && currentGame.getGameDate().equals(targetGame.getGameDate())) {
+                    try {
+                        Log.d(TAG, "refreshFlags: start matching time");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a", Locale.US);
+                        Date currentGameStartTime = simpleDateFormat.parse(currentGame.getStartTime());
+                        Date currentGameEndTime = simpleDateFormat.parse(currentGame.getEndTime());
+
+                        Date targetGameStartTime = simpleDateFormat.parse(targetGame.getStartTime());
+                        Date targetGameEndTime = simpleDateFormat.parse(targetGame.getEndTime());
+
+                        if (currentGameStartTime.before(targetGameEndTime) && currentGameStartTime.after(targetGameStartTime)) {
+                            flag = true;
+                        } else if (currentGameEndTime.before(targetGameEndTime) && currentGameEndTime.after(targetGameStartTime)) {
+                            flag = true;
+                        } else if (currentGameStartTime.before(targetGameStartTime) && currentGameEndTime.after(targetGameEndTime)) {
+                            flag = true;
+                        }
+
+//                        if time overlap then break loop
+                        if (flag) {
+                            break;
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "refreshFlags: " + e.getMessage());
+                    }
+                }
+            }   // inner loop end
+
+//            if flag is not correct then update it
+            if (flag != currentItem.isFlag()) {
+                dataSnapShotsWithFlag.get(i).setFlag(flag);
+                notifyItemChanged(i);
+            }
+
+        }   // outer loop end
     }
 
+    public void refreshFlags(List<DataSnapshot> snapshots) {
+        for (int i = 0; i < dataSnapShotsWithFlag.size(); i++) {
+            boolean flag = false;
+            DataSnapWithFlag currentItem = dataSnapShotsWithFlag.get(i);
+            GameModel currentGame = currentItem.getDataSnapshot().getValue(GameModel.class);
+
+//            if game is from other user then skip it
+            if (!currentGame.getAuthor().equals(FirebaseHelper.getCurrentUser().getUid())) {
+                continue;
+            }
+
+            for (int j = 0; j < snapshots.size(); j++) {
+                DataSnapshot targetItem = snapshots.get(j);
+                GameModel targetGame = targetItem.getValue(GameModel.class);
+
+
+                Log.d(TAG, "refreshFlags: " + currentItem.getDataSnapshot().getKey() + ", " + targetItem.getKey());
+//                if both are not same items and have same date
+                if (!currentItem.getDataSnapshot().getKey().equals(targetItem.getKey())
+                        && currentGame.getGameDate().equals(targetGame.getGameDate())) {
+                    try {
+                        Log.d(TAG, "refreshFlags: start matching time");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a", Locale.US);
+                        Date currentGameStartTime = simpleDateFormat.parse(currentGame.getStartTime());
+                        Date currentGameEndTime = simpleDateFormat.parse(currentGame.getEndTime());
+
+                        Date targetGameStartTime = simpleDateFormat.parse(targetGame.getStartTime());
+                        Date targetGameEndTime = simpleDateFormat.parse(targetGame.getEndTime());
+
+                        if (currentGameStartTime.before(targetGameEndTime) && currentGameStartTime.after(targetGameStartTime)) {
+                            flag = true;
+                        } else if (currentGameEndTime.before(targetGameEndTime) && currentGameEndTime.after(targetGameStartTime)) {
+                            flag = true;
+                        } else if (currentGameStartTime.before(targetGameStartTime) && currentGameEndTime.after(targetGameEndTime)) {
+                            flag = true;
+                        }
+
+//                        if time overlap then break loop
+                        if (flag) {
+                            break;
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "refreshFlags: " + e.getMessage());
+                    }
+                }
+            }   // inner loop end
+
+//            if flag is not correct then update it
+            if (flag != currentItem.isFlag()) {
+                dataSnapShotsWithFlag.get(i).setFlag(flag);
+                notifyItemChanged(i);
+            }
+
+        }   // outer loop end
+    }
+
+    public interface GameAdapterListener {
+        void onGameClick(int position, DataSnapWithFlag snapshot);
+    }
 }

@@ -35,9 +35,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.my.game.wesport.R;
-import com.my.game.wesport.adapter.UsersChatAdapter;
+import com.my.game.wesport.adapter.UsersChatListAdapter;
+import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.login.SigninActivity;
-import com.my.game.wesport.model.User;
+import com.my.game.wesport.model.ChatListItem;
+import com.my.game.wesport.model.UserModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,16 +49,15 @@ import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ListUsers extends Fragment implements
+public class ListUsersFragment extends Fragment implements
         GoogleApiClient.OnConnectionFailedListener {
 
 
     private static final int REQUEST_INVITE = 0;
-    private static String TAG =  ListUsers.class.getSimpleName();
+    private static String TAG = ListUsersFragment.class.getSimpleName();
 
-
-    @BindView(R.id.progress_bar_users) ProgressBar mProgressBarForUsers;
-    @BindView(R.id.recycler_view_users) RecyclerView mUsersRecyclerView;
+    @BindView(R.id.recycler_view_users)
+    RecyclerView mUsersRecyclerView;
 
     private String mCurrentUserUid;
     private List<String> mUsersKeyList;
@@ -65,12 +66,12 @@ public class ListUsers extends Fragment implements
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mUserRefDatabase;
     private ChildEventListener mChildEventListener;
-    private UsersChatAdapter mUsersChatAdapter;
+    private UsersChatListAdapter mUsersChatListAdapter;
     private String loginUser;
 
     @Override
-    public View onCreateView (LayoutInflater inflater, ViewGroup container,
-                              Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View rootView = inflater.inflate(R.layout.activity_list_users, container, false);
         ButterKnife.bind(this, rootView);
@@ -105,7 +106,7 @@ public class ListUsers extends Fragment implements
                             }
                         });
 
-        // Setup FAB to open EditorActivity
+        // Setup FAB to open GameEditActivity
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,12 +133,13 @@ public class ListUsers extends Fragment implements
     private void setUsersDatabase() {
         mUserRefDatabase = FirebaseDatabase.getInstance().getReference().child("users");
     }
+
     private void setUserRecyclerView() {
         //to be updated
-        mUsersChatAdapter = new UsersChatAdapter(getActivity(), new ArrayList<User>());
+        mUsersChatListAdapter = new UsersChatListAdapter(getActivity(), new ArrayList<ChatListItem>());
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mUsersRecyclerView.setHasFixedSize(true);
-        mUsersRecyclerView.setAdapter(mUsersChatAdapter);
+        mUsersRecyclerView.setAdapter(mUsersChatListAdapter);
     }
 
     private void setUsersKeyList() {
@@ -149,7 +151,6 @@ public class ListUsers extends Fragment implements
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                hideProgressBarForUsers();
                 FirebaseUser user = mAuth.getCurrentUser();
                 if (user != null) {
                     if (user.getDisplayName() != null) {
@@ -190,7 +191,6 @@ public class ListUsers extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
-        showProgressBarForUsers();
         mAuth.addAuthStateListener(mAuthListener);
     }
 
@@ -201,19 +201,17 @@ public class ListUsers extends Fragment implements
         if (mChildEventListener != null) {
             mUserRefDatabase.removeEventListener(mChildEventListener);
         }
-
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 
     private void clearCurrentUsers() {
-        mUsersChatAdapter.clear();
+        mUsersChatListAdapter.clear();
         mUsersKeyList.clear();
     }
 
     private void logout() {
-        showProgressBarForUsers();
         setUserOffline();
         mAuth.signOut();
         AuthUI.getInstance()
@@ -229,9 +227,9 @@ public class ListUsers extends Fragment implements
     }
 
     private void setUserOffline() {
-        if(mAuth.getCurrentUser()!=null ) {
+        if (mAuth.getCurrentUser() != null) {
             String userId = mAuth.getCurrentUser().getUid();
-            mUserRefDatabase.child(userId).child("connection").setValue(UsersChatAdapter.OFFLINE);
+            mUserRefDatabase.child(userId).child("connection").setValue(UsersChatListAdapter.OFFLINE);
         }
     }
 
@@ -257,16 +255,6 @@ public class ListUsers extends Fragment implements
         }
     }
 
-    private void showProgressBarForUsers(){
-        mProgressBarForUsers.setVisibility(View.VISIBLE);
-    }
-
-    private void hideProgressBarForUsers(){
-        if(mProgressBarForUsers.getVisibility()==View.VISIBLE) {
-            mProgressBarForUsers.setVisibility(View.GONE);
-        }
-    }
-
     private ChildEventListener getChildEventListener() {
         return new ChildEventListener() {
             @Override
@@ -275,16 +263,21 @@ public class ListUsers extends Fragment implements
                     if (dataSnapshot.exists()) {
                         String userUid = dataSnapshot.getKey();
                         if (dataSnapshot.getKey().equals(mCurrentUserUid)) {
-                            User currentUser = dataSnapshot.getValue(User.class);
-                            mUsersChatAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
+                            UserModel currentUser = dataSnapshot.getValue(UserModel.class);
+                            mUsersChatListAdapter.setCurrentUserInfo(userUid, currentUser.getEmail(),
                                     currentUser.getCreatedAt(), currentUser.getPhotoUri(),
                                     currentUser.getLatitude(), currentUser.getLongitude(),
                                     currentUser.getDistance());
                         } else {
-                            User recipient = dataSnapshot.getValue(User.class);
+                            UserModel recipient = dataSnapshot.getValue(UserModel.class);
                             recipient.setRecipientId(userUid);
-                            mUsersKeyList.add(userUid);
-                            mUsersChatAdapter.refill(recipient);
+                            FirebaseHelper.getChatListItem(userUid, recipient, new FirebaseHelper.ChatListItemListener() {
+                                @Override
+                                public void onGetChatListItem(ChatListItem chatListItem) {
+                                    mUsersKeyList.add(chatListItem.getUserUid());
+                                    mUsersChatListAdapter.refill(chatListItem);
+                                }
+                            });
                         }
                     }
                 } catch (Exception e) {
@@ -295,13 +288,18 @@ public class ListUsers extends Fragment implements
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 try {
-                    if(dataSnapshot.exists()) {
+                    if (dataSnapshot.exists()) {
                         String userUid = dataSnapshot.getKey();
-                        if(!userUid.equals(mCurrentUserUid)) {
-                            User user = dataSnapshot.getValue(User.class);
-                            int index = mUsersKeyList.indexOf(userUid);
-                            if(index > -1) {
-                                mUsersChatAdapter.changeUser(index, user);
+                        if (!userUid.equals(mCurrentUserUid)) {
+                            final UserModel user = dataSnapshot.getValue(UserModel.class);
+                            final int index = mUsersKeyList.indexOf(userUid);
+                            if (index > -1) {
+                                FirebaseHelper.getChatListItem(userUid, user, new FirebaseHelper.ChatListItemListener() {
+                                    @Override
+                                    public void onGetChatListItem(ChatListItem chatListItem) {
+                                        mUsersChatListAdapter.changeUser(index, chatListItem);
+                                    }
+                                });
                             }
                         }
                     }
@@ -309,6 +307,7 @@ public class ListUsers extends Fragment implements
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
 
@@ -325,6 +324,7 @@ public class ListUsers extends Fragment implements
             }
         };
     }
+
     private String onSignedInInitialize(String username) {
         String mUsername;
         if (username != null) {
@@ -341,14 +341,8 @@ public class ListUsers extends Fragment implements
      * User has clicked the 'Invite' button, launch the invitation UI with the proper
      * title, message, and deep link
      */
-    private void onInviteClicked() {
-        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
-                .setMessage(getString(R.string.invitation_message))
-                .setDeepLink(Uri.parse("https://w2mkk.app.goo.gl/b2OT"))
-                .setCustomImage(Uri.parse("android.resource://"+getActivity().getPackageName()+"/mipmap/ic_launcher"))
-                .setCallToActionText(getString(R.string.invitation_cta))
-                .build();
-        startActivityForResult(intent, REQUEST_INVITE);
+    public void onInviteClicked() {
+        FirebaseHelper.inviteFriends(getActivity(), REQUEST_INVITE);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

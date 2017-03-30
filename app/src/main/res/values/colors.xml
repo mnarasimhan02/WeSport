@@ -30,6 +30,9 @@
     <color name="divider">#B6B6B6</color>
     <color name="text_color_icon">#212121</color>
     <color name="transparent">#00000000</color>
+    <color name="black">#000000</color>
+    <color name="tabUnSelectedIconColor">#c2c9d7</color>
+    <color name="tabSelectedIconColor">#46a6ea</color>
 
 
 </resources>

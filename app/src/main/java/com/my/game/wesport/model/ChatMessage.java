@@ -10,6 +10,7 @@ public class ChatMessage {
     private String sender;
     private String photoUrl;
     private int mRecipientOrSenderStatus;
+    private boolean seen = true;
 
     public ChatMessage() {
     }
@@ -30,11 +31,11 @@ public class ChatMessage {
         return message;
     }
 
-    public String getRecipient(){
+    public String getRecipient() {
         return recipient;
     }
 
-    public String getSender(){
+    public String getSender() {
         return sender;
     }
 
@@ -44,6 +45,26 @@ public class ChatMessage {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public boolean isSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
 
     @Exclude

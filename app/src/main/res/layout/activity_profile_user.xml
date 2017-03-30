@@ -27,6 +27,8 @@
                 android:layout_height="match_parent">
 
                 <ImageView
+                    android:clickable="true"
+                    android:onClick="onCoverImageClick"
                     android:scaleType="centerCrop"
                     android:id="@+id/user_profile_cover_image"
                     android:layout_width="match_parent"
@@ -82,7 +84,7 @@
 
                 <TextView
                     android:textStyle="bold"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:id="@+id/text_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,7 +92,7 @@
                     android:textColor="#000" />
 
                 <TextView
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textColor="#30d338"
                     android:text="Your Email"
                     android:layout_marginLeft="25sp"
@@ -109,7 +111,7 @@
 
                 <TextView
                     android:textStyle="bold"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:paddingTop="10dp"
                     android:id="@+id/text_name"
                     android:layout_width="wrap_content"
@@ -119,7 +121,7 @@
 
                 <EditText
                     android:hint="Your Name"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:textColor="#30d338"
                     android:layout_marginLeft="15sp"
                     android:id="@+id/edit_user_profile_name"
@@ -137,7 +139,7 @@
 
                 <TextView
                     android:textStyle="bold"
-                    android:textSize="20sp"
+                    android:textSize="17sp"
                     android:id="@+id/text_bio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -147,6 +149,7 @@
 
                 <EditText
                     android:hint="Your Bio"
+                    android:textSize="17sp"
                     android:textColor="#30d338"
                     android:layout_marginLeft="38sp"
                     android:id="@+id/user_bio"

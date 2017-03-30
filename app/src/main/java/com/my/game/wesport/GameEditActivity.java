@@ -3,24 +3,20 @@ package com.my.game.wesport;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.ContentValues;
-import android.content.CursorLoader;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Events;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -37,8 +33,15 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.my.game.wesport.data.GameContract.GameEntry;
+import com.my.game.wesport.helper.DateHelper;
+import com.my.game.wesport.helper.FirebaseHelper;
+import com.my.game.wesport.helper.GameHelper;
+import com.my.game.wesport.model.GameModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,22 +57,18 @@ import static com.my.game.wesport.R.id.start_time;
  * Allows user to create a new game or edit an existing one.
  */
 @SuppressWarnings("UnusedParameters")
-public class EditorActivity extends AppCompatActivity implements
-        LoaderCallbacks<Cursor> {
+public class GameEditActivity extends AppCompatActivity {
 
-    /**
-     * Identifier for the game data loader
-     */
-    private static final int EXISTING_GAME_LOADER = 0;
     private EditText mstartDate;
     private EditText mstartTime;
     private EditText mendTime;
     private final Calendar mDateAndTime = Calendar.getInstance();
     private View mLayout;
+    private String placeId;
     /**
-     * Content URI for the existing game (null if it's a new game)
+     * GameModel for the existing game (null if it's a new game)
      */
-    private Uri mCurrentGameUri;
+    private static DataSnapshot currentGameDataSnapShot = null;
     /**
      * EditText field to enter the game's name
      */
@@ -84,7 +83,7 @@ public class EditorActivity extends AppCompatActivity implements
     private Spinner mSkillSpinner;
 
     /**
-     * Skill for the Game. The possible valid values are in the GameContract.java file:
+     * Skill for the GameModel. The possible valid values are in the GameContract.java file:
      */
     private int mSkill = GameEntry.SKILL_ROOKIES;
 
@@ -98,9 +97,13 @@ public class EditorActivity extends AppCompatActivity implements
     private String gameaddress = "";
 
     private String selectedGame = "";
+    private int selectedGamePosition;
 
-    private String mUserName = "";
-
+    /*if gameDataSnapShot null then its mean create new game*/
+    public static Intent newIntent(Context context, DataSnapshot gameDataSnapShot) {
+        currentGameDataSnapShot = gameDataSnapShot;
+        return new Intent(context, GameEditActivity.class);
+    }
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -114,16 +117,6 @@ public class EditorActivity extends AppCompatActivity implements
         }
     };
 
-    @SuppressWarnings("UnusedAssignment")
-    public EditorActivity() {
-        // Assign current Date and Time Values to Variables
-        final Calendar c = Calendar.getInstance();
-        int mYear = c.get(Calendar.YEAR);
-        int mMonth = c.get(Calendar.MONTH);
-        int mDay = c.get(Calendar.DAY_OF_MONTH);
-        int mHour = c.get(Calendar.HOUR_OF_DAY);
-        int mMinute = c.get(Calendar.MINUTE);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,36 +124,22 @@ public class EditorActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_editor);
         mLayout = findViewById(android.R.id.content);
 
-        //Get Location and Selected Game from sharedpreferences
-
+        //Get Location and Selected GameModel from sharedpreferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        placeId = prefs.getString("place_id", "");
         gameaddress = prefs.getString("games", "Your Location");
-        selectedGame = chGame.getString("chosenGame", "Other");
+        selectedGame = prefs.getString("chosenGame", "Other");
+        selectedGamePosition = prefs.getInt("chosenGame_pos", 0);
 
         //Get Username from sharedpreferences
-        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        mUserName = prefUser.getString("displayName", "");
+//        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//        String mUserName = prefUser.getString("displayName", "");
 
-        // Examine the intent that was used to launch this activity,
-        // in order to figure out if we're creating a new Game or editing an existing one.
-        Intent intent = getIntent();
-        mCurrentGameUri = intent.getData();
-        // If the intent DOES NOT contain a Game content URI, then we know that we are
-        // creating a new game.
-        if (mCurrentGameUri == null) {
-            // This is a new game, so change the app bar to say "Add a Game"
-            setTitle(getString(R.string.editor_activity_title_new_game));
-
-            // Invalidate the options menu, so the "Delete" menu option can be hidden.
-            invalidateOptionsMenu();
-        } else {
-            // Otherwise this is an existing Game, so change app bar to say "Edit Game"
-            setTitle(getString(R.string.editor_activity_title_edit_game));
-
-            // Initialize a loader to read the Game data from the database
-            // and display the current values in the editor
-            getLoaderManager().initLoader(EXISTING_GAME_LOADER, null, this);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Edit Game");
         }
 
         // Find all relevant views that we will need to read user input from
@@ -180,6 +159,25 @@ public class EditorActivity extends AppCompatActivity implements
         mstartDate.setOnTouchListener(mTouchListener);
         mstartTime.setOnTouchListener(mTouchListener);
         mendTime.setOnTouchListener(mTouchListener);
+
+        // Examine the intent that was used to launch this activity,
+        // in order to figure out if we're creating a new GameModel or editing an existing one.
+        // If the intent DOES NOT contain a GameModel content URI, then we know that we are
+        // creating a new game.
+        if (currentGameDataSnapShot == null) {
+            // This is a new game, so change the app bar to say "Add a GameModel"
+            setTitle(getString(R.string.editor_activity_title_new_game));
+
+            // Invalidate the options menu, so the "Delete" menu option can be hidden.
+            invalidateOptionsMenu();
+        } else {
+            // Otherwise this is an existing GameModel, so change app bar to say "Edit GameModel"
+            setTitle(getString(R.string.editor_activity_title_edit_game));
+
+            // and display the current values in the editor
+            setExistingData();
+        }
+
         setupSpinner();
     }
 
@@ -196,7 +194,7 @@ public class EditorActivity extends AppCompatActivity implements
             }
         };
 
-        DatePickerDialog startDate = new DatePickerDialog(EditorActivity.this, mDateListener,
+        DatePickerDialog startDate = new DatePickerDialog(GameEditActivity.this, mDateListener,
                 mDateAndTime.get(Calendar.YEAR),
                 mDateAndTime.get(Calendar.MONTH),
                 mDateAndTime.get(Calendar.DAY_OF_MONTH));
@@ -217,7 +215,7 @@ public class EditorActivity extends AppCompatActivity implements
             }
         };
 
-        new TimePickerDialog(EditorActivity.this, mTimeListener,
+        new TimePickerDialog(GameEditActivity.this, mTimeListener,
                 mDateAndTime.get(Calendar.HOUR_OF_DAY),
                 mDateAndTime.get(Calendar.MINUTE), false).show();
 
@@ -232,28 +230,20 @@ public class EditorActivity extends AppCompatActivity implements
                 updateTimeDisplay(mendTime);
             }
         };
-        new TimePickerDialog(EditorActivity.this, mTimeListener,
+        new TimePickerDialog(GameEditActivity.this, mTimeListener,
                 mDateAndTime.get(Calendar.HOUR_OF_DAY),
                 mDateAndTime.get(Calendar.MINUTE), false).show();
 
     }
 
     private void updateTimeDisplay(TextView mtextview) {
-        mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
-        /*if (!mendTime.getText().toString().isEmpty() &&
-                !TimeValidator(mstartTime.getText().toString(), mendTime.getText().toString())
-                ) {
-            Snackbar.make(mLayout, getString(R.string.date_compare_string),
-                    Snackbar.LENGTH_LONG).show();
-            mendTime.setText("");
-        }*/
-
+        mtextview.setText(DateUtils.formatDateTime(this, mDateAndTime.getTimeInMillis(),
+                DateUtils.FORMAT_SHOW_TIME));
     }
 
     private void updateDateDisplay(TextView mtextview) {
         long today = mDateAndTime.getTimeInMillis();
-        SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM dd", Locale.getDefault());
-        String dateString = sdfDate.format(today);
+        String dateString = DateHelper.getServerDateFormatter().format(today);
         mtextview.setText(dateString);
     }
 
@@ -326,24 +316,21 @@ public class EditorActivity extends AppCompatActivity implements
      * Get user input from editor and save game into database.
      */
     private void saveGames() {
-
-        String[] selectionArgs;
-        String sttring;
-        String etString;
+        String startTime;
+        String endTime;
 
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
-        String nameString = mNameEditText.getText().toString().trim();
-        String sdString = mstartDate.getText().toString().trim();
-        sttring = mstartTime.getText().toString().trim();
-        etString = mendTime.getText().toString().trim();
+        String gameDescription = mNameEditText.getText().toString().trim();
+        String startDate = mstartDate.getText().toString().trim();
+        startTime = mstartTime.getText().toString().trim();
+        endTime = mendTime.getText().toString().trim();
         String notesString = mnotesEditText.getText().toString().trim();
 
 
         // Check if this is supposed to be a new game
         // and check if all the fields in the editor are blank
-        if (mCurrentGameUri == null &&
-                (TextUtils.isEmpty(nameString) || TextUtils.isEmpty(sdString)) &&
+        if (currentGameDataSnapShot == null && (TextUtils.isEmpty(gameDescription) || TextUtils.isEmpty(startDate)) &&
                 mSkill == GameEntry.SKILL_ROOKIES) {
             // Since no fields were modified, we can return early without creating a new game.
             // No need to create ContentValues and no need to do any ContentProvider operations.
@@ -354,56 +341,33 @@ public class EditorActivity extends AppCompatActivity implements
 
         // Create a ContentValues object where column names are the keys,
         // and game attributes from the editor are the values.
-        ContentValues values = new ContentValues();
-        values.put(GameEntry.COLUMN_USER_NAME, mUserName);
-        values.put(GameEntry.COLUMN_GAME_NAME, selectedGame);
-        values.put(GameEntry.COLUMN_GAME_DESC, nameString);
-        values.put(GameEntry.COLUMN_START_DATE, String.valueOf(sdString));
-        values.put(GameEntry.COLUMN_START_TIME, String.valueOf(sttring));
-        values.put(GameEntry.COLUMN_END_TIME, String.valueOf(etString));
-        values.put(GameEntry.COLUMN_GAME_SKILL, mSkill);
-        values.put(GameEntry.COLUMN_GAME_ADDRESS, gameaddress);
-        values.put(GameEntry.COLUMN_GAME_NOTES, notesString);
+        GameModel gameModel = new GameModel(
+                gameDescription,
+                startDate,
+                startTime,
+                endTime,
+                mSkill,
+                notesString,
+                placeId,
+                gameaddress,
+                GameHelper.getGameNameByIndex(selectedGamePosition),
+                FirebaseAuth.getInstance().getCurrentUser().getUid()
+        );
 
-        // Determine if this is a new or existing game by checking if mCurrentGameUri is null or not
-        if (mCurrentGameUri == null) {
-            // This is a NEW game, so insert a new game into the provider,
-            // returning the content URI for the new game.
-            Uri newUri = getContentResolver().insert(GameEntry.CONTENT_URI, values);
 
-            // Show a toast message depending on whether or not the insertion was successful.
-            if (newUri == null) {
-                // If the new content URI is null, then there was an error with insertion.
-                Snackbar.make(mLayout, getString(R.string.editor_insert_game_failed),
-                        Snackbar.LENGTH_LONG).show();
-            } else {
-                // Otherwise, the insertion was successful and we can display a toast.
-                Snackbar.make(mLayout, getString(R.string.editor_insert_game_successful),
-                        Snackbar.LENGTH_LONG).show();
-            }
+        // Determine if this is a new or existing game by checking if currentGameKey is null or not
+        if (currentGameDataSnapShot == null) {
+            // This is a NEW game, so insert a new game,
+            FirebaseHelper.getGamesRef(placeId).push().setValue(gameModel);
+            Snackbar.make(mLayout, getString(R.string.editor_insert_game_successful),
+                    Snackbar.LENGTH_LONG).show();
         } else {
-            // Otherwise this is an EXISTING game, so update the game with content URI: mCurrentGameUri
-            // and pass in the new ContentValues. Pass in null for the selection and selection args
-            // because mCurrentGameUri will already identify the correct row in the database that
+            // Otherwise this is an EXISTING game, so update the game
             // we want to modify.
-            // Construct a selection clause that matches the word that the user entered.
 
-            // Use the user name from shared preferences as the (only) selection argument to filter games only for that user.
-            selectionArgs = new String[]{mUserName};
-            int rowsAffected = getContentResolver().update(mCurrentGameUri, values, GameEntry.COLUMN_USER_NAME, selectionArgs);
-
-            // Show a toast message depending on whether or not the update was successful.
-            if (rowsAffected == 0) {
-                // If no rows were affected, then there was an error with the update.
-                Snackbar.make(mLayout, getString(R.string.editor_update_game_failed),
-                        Snackbar.LENGTH_LONG).show();
-            } else {
-                // Otherwise, the update was successful and we can display a toast.
-                Snackbar.make(mLayout, getString(R.string.editor_update_game_failed),
-                        Snackbar.LENGTH_LONG).show();
-            }
+            FirebaseHelper.getGamesRef(placeId).child(currentGameDataSnapShot.getKey()).setValue(gameModel);
         }
-        writeCalendarEvent(gameaddress, selectedGame, nameString, sdString, sttring, etString, notesString);
+        writeCalendarEvent(gameaddress, selectedGame, gameDescription, startDate, startTime, endTime, notesString);
     }
 
     private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString,
@@ -416,16 +380,16 @@ public class EditorActivity extends AppCompatActivity implements
 
         if (sttring.equals("")) {
             calstDatFormat = new SimpleDateFormat("MMMMM dd yyyy", Locale.getDefault());
-            etString = sdString + " "+ yy;
-            sdString = sdString + " "+ yy;
+            etString = sdString + " " + yy;
+            sdString = sdString + " " + yy;
 
         } else {
             calstDatFormat = new SimpleDateFormat("MMMMM dd h:mm a yyyy", Locale.getDefault());
-            etString = sdString + " " + etString+" "+ yy;
-            sdString = sdString + " " + sttring +" "+ yy;
+            etString = sdString + " " + etString + " " + yy;
+            sdString = sdString + " " + sttring + " " + yy;
         }
 
-        long stdateInLong = 0, etdateInLong=0;
+        long stdateInLong = 0, etdateInLong = 0;
         try {
             Date BEGIN_TIME = calstDatFormat.parse(sdString);
             Date END_TIME = calstDatFormat.parse(etString);
@@ -439,7 +403,7 @@ public class EditorActivity extends AppCompatActivity implements
         event.put(Events.CALENDAR_ID, 1);
         event.put(Events.EVENT_LOCATION, gameaddress);
         event.put(Events.TITLE, selectedGame);
-        event.put(Events.DESCRIPTION, nameString + " "+ notesString);
+        event.put(Events.DESCRIPTION, nameString + " " + notesString);
         event.put(Events.DTSTART, stdateInLong);//startTimeMillis
         event.put(Events.DTEND, etdateInLong);//endTimeMillis
         event.put(Events.ALL_DAY, 0); // 0 for false, 1 for true
@@ -447,11 +411,7 @@ public class EditorActivity extends AppCompatActivity implements
         event.put(Events.EVENT_TIMEZONE, timeZone);
 
         Uri baseUri;
-        if (VERSION.SDK_INT >= 8) {
-            baseUri = Uri.parse("content://com.android.calendar/events");
-        } else {
-            baseUri = Uri.parse("content://calendar/events");
-        }
+        baseUri = Uri.parse("content://com.android.calendar/events");
         getApplicationContext().getContentResolver().insert(baseUri, event);
 
     }
@@ -472,7 +432,7 @@ public class EditorActivity extends AppCompatActivity implements
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         // If this is a new game, hide the "Delete" menu item.
-        if (mCurrentGameUri == null) {
+        if (currentGameDataSnapShot == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setVisible(false);
         }
@@ -481,23 +441,15 @@ public class EditorActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // User clicked on a menu option in the app bar overflow menu
+        // UserModel clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save game to database
                 saveGames();
                 //Show snackbar and then finish activity
-                Snackbar.make(mLayout, R.string.calendar_add_game,Snackbar.LENGTH_SHORT)
-                        .addCallback(new Snackbar.Callback() {
-                            @Override
-                            public void onDismissed(Snackbar transientBottomBar,
-                                                    int event) {
-                                if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                                    EditorActivity.this.finish();
-                                }
-                            }
-                        }).show();
+                Toast.makeText(this, R.string.calendar_add_game, Toast.LENGTH_SHORT).show();
+                GameEditActivity.this.finish();
                 // Exit activity
                 //finish();
                 return true;
@@ -508,10 +460,9 @@ public class EditorActivity extends AppCompatActivity implements
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
-                // If the game hasn't changed, continue with navigating up to parent activity
-                // which is the {@link CatalogActivity}.
+                // which is the {@link GameListFragment}.
                 if (!mGameHasChanged) {
-                    NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                    finish();
                     return true;
                 }
 
@@ -522,8 +473,8 @@ public class EditorActivity extends AppCompatActivity implements
                         new OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                // User clicked "Discard" button, navigate to parent activity.
-                                NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                                // UserModel clicked "Discard" button, navigate to parent activity.
+                                finish();
                             }
                         };
 
@@ -551,7 +502,7 @@ public class EditorActivity extends AppCompatActivity implements
                 new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        // User clicked "Discard" button, close the current activity.
+                        // UserModel clicked "Discard" button, close the current activity.
                         finish();
                     }
                 };
@@ -560,114 +511,39 @@ public class EditorActivity extends AppCompatActivity implements
         showUnsavedChangesDialog(discardButtonClickListener);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // Since the editor shows all game attributes, define a projection that contains
-        // all columns from the game table
-        String[] projection = {
-                GameEntry._ID,
-                GameEntry.COLUMN_USER_NAME,
-                GameEntry.COLUMN_GAME_NAME,
-                GameEntry.COLUMN_GAME_DESC,
-                GameEntry.COLUMN_START_DATE,
-                GameEntry.COLUMN_START_TIME,
-                GameEntry.COLUMN_END_TIME,
-                GameEntry.COLUMN_GAME_SKILL,
-                GameEntry.COLUMN_GAME_ADDRESS,
-                GameEntry.COLUMN_GAME_NOTES,
-        };
 
+    public void setExistingData() {
+        // Extract out the value from the Cursor for the given column index
+        GameModel gameModel = currentGameDataSnapShot.getValue(GameModel.class);
+        String desc = gameModel.getGameDescription();
+        String stdate = gameModel.getGameDate();
+        String sttime = gameModel.getStartTime();
+        String ettime = gameModel.getEndTime();
+        int skill = gameModel.getSkillLevel();
+        String notes = gameModel.getNotes();
 
-        // Defines a string to contain the selection clause
-        String selectionClause = null;
+        // Update the views on the screen with the values from the database
+        mNameEditText.setText(desc);
+        mnotesEditText.setText(notes);
+        mstartDate.setText(stdate);
+        mstartTime.setText(sttime);
+        mendTime.setText(ettime);
 
-        // An array to contain selection arguments
-        String[] selectionArgs = null;
-
-        if (!TextUtils.isEmpty(mUserName)) {
-            // Construct a selection clause that matches the entered username.
-            selectionClause = GameEntry.COLUMN_USER_NAME + " = ?";
-
-            // Use the user name from shared preferences as the (only) selection argument to filter games only for that user.
-            selectionArgs = new String[]{mUserName};
-        }
-        // This loader will execute the ContentProvider's query method on a background thread
-        return new CursorLoader(this,   // Parent activity context
-                mCurrentGameUri,         // Query the content URI for the current game
-                projection,             // Columns to include in the resulting Cursor
-                selectionClause,                   //  selection clause
-                selectionArgs,                   // selection arguments
-                null);                  // Default sort order
-    }
-
-    @SuppressWarnings("UnusedAssignment")
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        // Bail early if the cursor is null or there is less than 1 row in the cursor
-        if (cursor == null || cursor.getCount() < 1) {
-            return;
-        }
-
-        // Proceed with moving to the first row of the cursor and reading data from it
-        // (This should be the only row in the cursor)
-        if (cursor.moveToFirst()) {
-            // Find the columns of game attributes that we're interested in
-            int usernameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_USER_NAME);
-            int gamenameColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NAME);
-            int descColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_DESC);
-            int startDateColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_DATE);
-            int startTimeColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_START_TIME);
-            int endTimeColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_END_TIME);
-            int skillColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_SKILL);
-            int notesColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_NOTES);
-            int locColumnIndex = cursor.getColumnIndex(GameEntry.COLUMN_GAME_ADDRESS);
-
-
-            // Extract out the value from the Cursor for the given column index
-            String username = cursor.getString(usernameColumnIndex);
-            String gamename = cursor.getString(gamenameColumnIndex);
-            String desc = cursor.getString(descColumnIndex);
-            String stdate = cursor.getString(startDateColumnIndex);
-            String sttime = cursor.getString(startTimeColumnIndex);
-            String ettime = cursor.getString(endTimeColumnIndex);
-            int skill = cursor.getInt(skillColumnIndex);
-            String notes = cursor.getString(notesColumnIndex);
-            String location = cursor.getString(locColumnIndex);
-
-            // Update the views on the screen with the values from the database
-
-            mNameEditText.setText(desc);
-            mnotesEditText.setText(notes);
-            mstartDate.setText(stdate);
-            mstartTime.setText(sttime);
-            mendTime.setText(ettime);
-
-            // Skill is a dropdown spinner, so map the constant value from the database
-            // Then call setSelection() so that option is displayed on screen as the current selection.
-            switch (skill) {
-                case GameEntry.SKILL_VET:
-                    mSkillSpinner.setSelection(1);
-                    break;
-                case GameEntry.SKILL_PRO:
-                    mSkillSpinner.setSelection(2);
-                    break;
-                default:
-                    mSkillSpinner.setSelection(0);
-                    break;
-            }
+        // Skill is a dropdown spinner, so map the constant value from the database
+        // Then call setSelection() so that option is displayed on screen as the current selection.
+        switch (skill) {
+            case GameEntry.SKILL_VET:
+                mSkillSpinner.setSelection(1);
+                break;
+            case GameEntry.SKILL_PRO:
+                mSkillSpinner.setSelection(2);
+                break;
+            default:
+                mSkillSpinner.setSelection(0);
+                break;
         }
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        // If the loader is invalidated, clear out all the data from the input fields.
-        mNameEditText.setText("");
-        mnotesEditText.setText("");
-        mstartDate.setText("");
-        mstartTime.setText("");
-        mendTime.setText("");
-        mSkillSpinner.setSelection(0);
-    }
 
     /**
      * Show a dialog that warns the user there are unsaved changes that will be lost
@@ -685,7 +561,7 @@ public class EditorActivity extends AppCompatActivity implements
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);
         builder.setNegativeButton(R.string.keep_editing, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "Keep editing" button, so dismiss the dialog
+                // UserModel clicked the "Keep editing" button, so dismiss the dialog
                 // and continue editing the game.
                 if (dialog != null) {
                     dialog.dismiss();
@@ -708,13 +584,13 @@ public class EditorActivity extends AppCompatActivity implements
         builder.setMessage(R.string.delete_dialog_msg);
         builder.setPositiveButton(R.string.delete, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "Delete" button, so delete the game.
+                // UserModel clicked the "Delete" button, so delete the game.
                 deleteGame();
             }
         });
         builder.setNegativeButton(R.string.cancel, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "Cancel" button, so dismiss the dialog
+                // UserModel clicked the "Cancel" button, so dismiss the dialog
                 // and continue editing the game.
                 if (dialog != null) {
                     dialog.dismiss();
@@ -733,24 +609,16 @@ public class EditorActivity extends AppCompatActivity implements
      */
     private void deleteGame() {
         // Only perform the delete if this is an existing game.
-        if (mCurrentGameUri != null) {
-            // Call the ContentResolver to delete the game at the given content URI.
-            // Pass in null for the selection and selection args because the mCurrentGameUri
-            // content URI already identifies the game that we want.
-            int rowsDeleted = getContentResolver().delete(mCurrentGameUri, null, null);
-
-            // Show a toast message depending on whether or not the delete was successful.
-            if (rowsDeleted == 0) {
-                // If no rows were deleted, then there was an error with the delete.
-                Snackbar.make(mLayout, getString(R.string.editor_delete_game_failed),
-                        Snackbar.LENGTH_LONG).show();
-            } else {
-                // Otherwise, the delete was successful and we can display a toast.
-                Snackbar.make(mLayout, getString(R.string.editor_delete_game_failed),
-                        Snackbar.LENGTH_LONG).show();
-            }
+        if (currentGameDataSnapShot != null) {
+            FirebaseHelper.getGamesRef(currentGameDataSnapShot.getKey()).removeValue();
         }
         // Close the activity
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        currentGameDataSnapShot = null;
     }
 }

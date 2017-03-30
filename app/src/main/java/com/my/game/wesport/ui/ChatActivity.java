@@ -1,28 +1,32 @@
 package com.my.game.wesport.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
+import com.my.game.wesport.App;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
 import com.my.game.wesport.adapter.MessageChatAdapter;
+import com.my.game.wesport.helper.FirebaseHelper;
+import com.my.game.wesport.helper.NotificationHelper;
 import com.my.game.wesport.model.ChatMessage;
+import com.my.game.wesport.model.UserModel;
 
 import java.util.ArrayList;
 
@@ -39,64 +43,75 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mMessagesDatabaseReference;
 
 
-    private static final String TAG = com.my.game.wesport.ui.ChatActivity.class.getSimpleName();
+    private static final String TAG = ChatActivity.class.getSimpleName();
 
-    @BindView(R.id.recycler_view_chat) RecyclerView mChatRecyclerView;
-    @BindView(R.id.edit_text_message) EditText mUserMessageChatText;
+    @BindView(R.id.recycler_view_chat)
+    RecyclerView mChatRecyclerView;
+    @BindView(R.id.edit_text_message)
+    EditText mUserMessageChatText;
 
     private String mRecipientId;
     private String mCurrentUserId;
     private MessageChatAdapter messageChatAdapter;
-    private DatabaseReference messageChatDatabase;
     private ChildEventListener messageChatListener;
+
+    public static String activeUserUid;
+
+    public static Intent newIntent(Context context, UserModel userModel) {
+        String chatRef = userModel.createUniqueChatRef(App.getInstance().getUserModel().getCreatedAt(), App.getInstance().getUserModel().getEmail());
+        Log.d(TAG, "newIntent: " + chatRef);
+        Intent chatIntent = new Intent(context, ChatActivity.class);
+        chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, FirebaseHelper.getCurrentUser().getUid());
+        chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, userModel.getRecipientId());
+        chatIntent.putExtra(ExtraIntent.EXTRA_CHAT_REF, chatRef);
+        chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME, userModel.getDisplayName());
+
+        return chatIntent;
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        bindButterKnife();
-        setDatabaseInstance();
-        setUsersId();
-        setChatRecyclerView();
-        // Initialize Firebase components
-        FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
-        FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
-        FirebaseStorage mFirebaseStorage = FirebaseStorage.getInstance();
 
-        if(getActionBar() != null){
+        bindButterKnife();
+        setUsersId();
+
+        if (TextUtils.isEmpty(mRecipientId) || TextUtils.isEmpty(mUsername)) {
+            Toast.makeText(this, "Invalid user id or username!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        setChatRecyclerView();
+
+        if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        if(getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setDisplayShowCustomEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
+            supportActionBar.setCustomView(R.layout.chat_username);
+            supportActionBar.setTitle(
+                    Html.fromHtml("<font color=\"white\">" + mUsername + " - "
+                            + "</font>"));
+            TextView label = (TextView) supportActionBar.getCustomView().findViewById(R.id.username);
+            label.setText(mUsername);
         }
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.chat_username);
-        //actionBar.setCustomView(addView,new ActionBar.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        TextView label = (TextView) getSupportActionBar().getCustomView().findViewById(R.id.username);
-        //noinspection deprecation
-        getSupportActionBar().setTitle(
-                Html.fromHtml("<font color=\"white\">" + mUsername + " - "
-                        + "</font>"));
-        label.setText(mUsername);
     }
 
     private void bindButterKnife() {
         ButterKnife.bind(this);
     }
-    private void setDatabaseInstance() {
-        String chatRef = getIntent().getStringExtra(ExtraIntent.EXTRA_CHAT_REF);
-        if (chatRef!=null) {
-            messageChatDatabase = FirebaseDatabase.getInstance().getReference().child(chatRef);
-        }
-    }
 
     private void setUsersId() {
         mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
         mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_CURRENT_USER_ID);
-        mUsername=getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME);
-        Log.d("mRecipient mUsername",mUsername);
+        mUsername = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME);
+        Log.d(TAG, "setUsersId: " + mUsername);
     }
 
     private void setChatRecyclerView() {
@@ -109,27 +124,29 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        messageChatListener = messageChatDatabase.limitToFirst(20).addChildEventListener(new ChildEventListener() {
+        messageChatListener = FirebaseHelper.getCurrentUserConversationRef().child(mRecipientId).limitToFirst(20).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
-                try{
-                    if (dataSnapshot.exists()) {
-                        ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
-                        if (newMessage.getSender().equals(mCurrentUserId)) {
-                            newMessage.setRecipientOrSenderStatus(MessageChatAdapter.SENDER);
-                        } else {
-                            newMessage.setRecipientOrSenderStatus(MessageChatAdapter.RECIPIENT);
+                try {
+                    ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
+                    if(newMessage.getSender().equals(mCurrentUserId)) {
+                        newMessage.setRecipientOrSenderStatus(MessageChatAdapter.SENDER);
+                    } else {
+                        if (!newMessage.isSeen()) {
+                            dataSnapshot.child("seen").getRef().setValue(true);
                         }
-                        messageChatAdapter.refillAdapter(newMessage);
-                        mChatRecyclerView.scrollToPosition(messageChatAdapter.getItemCount() - 1);
+                        newMessage.setRecipientOrSenderStatus(MessageChatAdapter.RECIPIENT);
                     }
+                    messageChatAdapter.refillAdapter(newMessage);
+                    mChatRecyclerView.scrollToPosition(messageChatAdapter.getItemCount() - 1);
                 } catch (Exception e) {
+                    Log.d(TAG, "onChildAdded: " + e.getLocalizedMessage());
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
@@ -152,18 +169,16 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(messageChatListener != null) {
-            messageChatDatabase.removeEventListener(messageChatListener);
-        }
         messageChatAdapter.cleanUp();
     }
 
     @OnClick(R.id.btn_send_message)
-    public void btnSendMsgListener(@SuppressWarnings("UnusedParameters") View sendButton){
+    public void btnSendMsgListener(@SuppressWarnings("UnusedParameters") View sendButton) {
         String senderMessage = mUserMessageChatText.getText().toString().trim();
-        if(!senderMessage.isEmpty() && messageChatDatabase!=null){
-            ChatMessage newMessage = new ChatMessage(senderMessage,mCurrentUserId,mRecipientId,null);
-            messageChatDatabase.push().setValue(newMessage);
+        if (!senderMessage.isEmpty()) {
+            ChatMessage newMessage = new ChatMessage(senderMessage, mCurrentUserId, mRecipientId, null);
+            FirebaseHelper.addConversation(newMessage);
+            NotificationHelper.sendMessageByTopic(mRecipientId, App.getInstance().getUserModel().getDisplayName(), senderMessage, "", mCurrentUserId);
             mUserMessageChatText.setText("");
         }
     }
@@ -181,5 +196,17 @@ public class ChatActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        activeUserUid = "";
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        activeUserUid = mRecipientId;
     }
 }

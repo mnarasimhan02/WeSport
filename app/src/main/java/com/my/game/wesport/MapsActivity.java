@@ -7,10 +7,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,7 +18,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -36,8 +41,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.my.game.wesport.POJO.Example;
+import com.my.game.wesport.POJO.ParkModel;
+import com.my.game.wesport.interfaces.InfoWindowRefresherNearBy;
 import com.my.game.wesport.ui.MyGames;
-import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,6 +52,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit.Call;
@@ -58,7 +65,7 @@ import retrofit.Retrofit;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
         InfoWindowAdapter, OnInfoWindowClickListener {
 
-    private static final String LOG_TAG = "GooglePlaces ";
+    private static final String LOG_TAG = "GooglePlaces";
     private final String TAG = "MapActivity";
     FragmentManager fm;
     //Variables to store games and locations from marker click
@@ -74,6 +81,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String OPEN_NOW = "true";
     private String CLOSED_NOW = "false";
 
+
     private Menu mMenu;
     private LatLng mlatlng;
 
@@ -84,17 +92,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     /*Infowindow*/
     private View myContentsView;
-    private String mopen_now=null;
-    private String ratingstr=null, vicinitystr;
-    private Uri placeImageURI=null;
+    private String mopen_now = null;
+    private String ratingstr = null, vicinitystr;
+    private Uri placeImageURI = null;
     private String placeOpenstr;
     private String parkName;
 
 
     private Marker marker;
     private Hashtable<String, Uri> markers;
-    private Hashtable<String, String> rating;
-    private Hashtable<String, String> vicinity;
+    private Hashtable<String, ParkModel> parks = new Hashtable<>();
 
 
     //private List<String> photoReference = new ArrayList<String>();
@@ -122,6 +129,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             setUpMapIfNeeded();
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
+
             // Retrieve the PlaceAutocompleteFragment.
             PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                     getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
@@ -138,8 +146,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (!EventBus.getDefault().hasSubscriberForEvent(GetAddressTask.class)) {
                 EventBus.getDefault().register(this);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -173,7 +180,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
-        if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this,
+                permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         map.setMyLocationEnabled(true);
@@ -202,15 +212,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             selectedGame = chGame.getString("chosenGame", "Other");
             setUserMarker(new LatLng(mLat, mLon));
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
         markers = new Hashtable<String, Uri>();
-        rating = new Hashtable<String, String>();
-        vicinity = new Hashtable<String, String>();
 
         final int[] photoWidth = new int[1];
         final int[] photoRefsize = new int[1];
@@ -228,16 +236,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onResponse(Response<Example> response, Retrofit retrofit) {
                 try {
-                    // This loop will go through all the results and add marker on each location.
-                    for (int i = 0; i < response.body().getResults().size(); i++) {
-                        Double lat = response.body().getResults().get(i).getGeometry().getLocation().getLat();
-                        Double lng = response.body().getResults().get(i).getGeometry().getLocation().getLng();
-                        parkName = response.body().getResults().get(i).getName();
-                        widthSize[0] = response.body().getResults().get(i).getPhotos().size();
+                    // This loop will go through all the parkModels and add marker on each location.
+                    List<ParkModel> parkModels = response.body().getParkModels();
+                    if (parkModels.size() > 0) {
+                        Toast.makeText(MapsActivity.this, R.string.map_help, Toast.LENGTH_LONG).show();
+                    }
+                    for (int i = 0; i < parkModels.size(); i++) {
+                        Double lat = parkModels.get(i).getGeometry().getLocation().getLat();
+                        Double lng = parkModels.get(i).getGeometry().getLocation().getLng();
+                        parkName = parkModels.get(i).getName();
+                        widthSize[0] = parkModels.get(i).getPhotos().size();
                         //Get if park is open_now
-                        /*OpeningHours mOpencheck = response.body().getResults().get(i).getOpeningHours();
+                        /*OpeningHours mOpencheck = response.body().getParkModels().get(i).getOpeningHours();
                                 if(mOpencheck!=null) {
-                                    mopen_now = response.body().getResults().get(i).getOpeningHours().getOpenNow();
+                                    mopen_now = response.body().getParkModels().get(i).getOpeningHours().getOpenNow();
                                     if (!mopen_now.equals(null)) {
                                         if (mopen_now.equals("false")) {
                                             placeOpenstr = "closed";
@@ -249,59 +261,54 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 */
                         //Get PhotoMaxWidth
                         if (i < widthSize[0]) {
-                            photoWidth[0] = response.body().getResults().get(i).getPhotos().get(i).getWidth(i);
-                            photoRefsize[0] = response.body().getResults().get(i).getPhotos().size();
+                            photoWidth[0] = parkModels.get(i).getPhotos().get(i).getWidth(i);
+                            photoRefsize[0] = parkModels.get(i).getPhotos().size();
                         }
                         //Get photoreference of first photo of all parks
-                        photoReferenceSize =response.body().getResults().get(i).getPhotos().size();
-                        if (photoReferenceSize !=0) {
-                            photoReference[0] = (response.body().getResults().get(i).getPhotos().get(0).getPhotoReference());
+                        photoReferenceSize = parkModels.get(i).getPhotos().size();
+                        if (photoReferenceSize != 0) {
+                            photoReference[0] = (parkModels.get(i).getPhotos().get(0).getPhotoReference());
                         }
                         if (!photoReference[0].isEmpty()) {
                             placeImageURI = Uri.parse("https://maps.googleapis.com/maps/api/place/photo?maxwidth=" + photoWidth[0] +
-                                    "&photoreference="+ photoReference[0] + "&key=" + getString(R.string.places_api_key));
+                                    "&photoreference=" + photoReference[0] + "&key=" + getString(R.string.places_api_key));
                         }
                         //Get ratings for parks
                       /*  if (!(ratingstr==null || ratingstr==""|| ratingstr.equals(null) ||ratingstr.equals(" "))) {
-                            ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
+                            ratingstr = String.valueOf(response.body().getParkModels().get(i).getRating());
                         }
 */
-                        vicinitystr = String.valueOf(response.body().getResults().get(i).getVicinity());
+                        vicinitystr = String.valueOf(parkModels.get(i).getVicinity());
                         LatLng latLng = new LatLng(lat, lng);
                         Marker parkMarker = map.addMarker(new MarkerOptions()
                                 .title(parkName)
                                 .position(latLng)
                                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.play_marker)));
                         markers.put(parkMarker.getId(), placeImageURI);
-                        ratingstr = String.valueOf(response.body().getResults().get(i).getRating());
-                        if (ratingstr!=null) {
-                            rating.put(parkMarker.getId(), ratingstr);
-                        }
-                        vicinity.put(parkMarker.getId(), vicinitystr);
-
+                        ratingstr = String.valueOf(parkModels.get(i).getRating());
+                        parks.put(parkMarker.getId(), parkModels.get(i));
 
                         //placeOpen.put(parkMarker.getId(), placeOpenstr);}
                         map.animateCamera(CameraUpdateFactory.zoomTo(12.9f));
-                        Snackbar.make(mLayout, getString(R.string.map_help),
-                                Snackbar.LENGTH_LONG).show();
+                        /*Snackbar.make(mLayout, getString(R.string.map_help),
+                                Snackbar.LENGTH_LONG).show();*/
                     }
-
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e(TAG, "onResponse: " + e.getMessage());
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
+                Log.d(TAG, "onFailure: " + t.getLocalizedMessage());
             }
-
         });
     }
 
     @Override
     public View getInfoContents(Marker marker) {
-        if (MapsActivity.this.marker != null
-                && MapsActivity.this.marker.isInfoWindowShown()) {
+        if (MapsActivity.this.marker != null && MapsActivity.this.marker.isInfoWindowShown()) {
             MapsActivity.this.marker.hideInfoWindow();
             MapsActivity.this.marker.showInfoWindow();
         }
@@ -314,52 +321,62 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Uri uri = null;
         //String ratingstr=null;
         if (marker.getId() != null && markers != null && markers.size() > 0) {
-            if ( markers.get(marker.getId()) != null &&
+            if (markers.get(marker.getId()) != null &&
                     markers.get(marker.getId()) != null) {
                 uri = markers.get(marker.getId());
-                ratingstr= rating.get(marker.getId());
-                vicinitystr= vicinity.get(marker.getId());
+                ratingstr = String.valueOf(parks.get(marker.getId()).getRating());
+                vicinitystr = parks.get(marker.getId()).getVicinity();
             }
         }
+        Log.d(TAG, "getInfoWindow: imageUri: " + uri);
         TextView infoTitle = ((TextView) myContentsView.findViewById(R.id.title));
         infoTitle.setText(marker.getTitle());
         TextView infoSnippet = ((TextView) myContentsView.findViewById(R.id.snippet));
         infoSnippet.setText(vicinitystr);
         //TextView infoOpennow = (TextView) myContentsView.findViewById(open_now);
-       // infoOpennow.setText(placeOpenstr);
+        // infoOpennow.setText(placeOpenstr);
         ImageView placeImage = (ImageView) myContentsView.findViewById(R.id.place_image);
         if (uri == null) {
             placeImage.setVisibility(View.GONE);
         } else {
-            Picasso.with(MapsActivity.this)
+
+            Glide.with(MapsActivity.this)
                     .load(uri)
-                    .into(placeImage, new InfoWindowRefresher(marker));
+                    .listener(new InfoWindowRefresherNearBy(marker))
+                    .into(placeImage);
+//            new InfoWindowRefresher(marker)
         }
         // declare RatingBar object
         RatingBar infoRating = (RatingBar) myContentsView.findViewById(R.id.place_rating);// create RatingBar object
-        if (!(ratingstr.equals("null"))) {
-            try {
-                infoRating.setRating(Float.parseFloat(ratingstr));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
+        if (infoRating != null && ratingstr != null) {
+            if (!(ratingstr.equals("null"))) {
+                try {
+                    infoRating.setRating(Float.parseFloat(ratingstr));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                infoRating.setRating(0.0f);
             }
-        } else {
-            infoRating.setRating(0.0f);
         }
         return myContentsView;
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)    // This method will be called when a GetAddressTask is posted
-    public void onEvent(String address){
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    // This method will be called when a GetAddressTask is posted
+    public void onEvent(String address) {
         // store address details for the game
         if (address.equals("")) {
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyyMMdd", Locale.getDefault());
             address = sdf.format(new Date());
         }
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
+        /*Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address
                         + "  " + getString(R.string.save_game_text),
-                Snackbar.LENGTH_SHORT).show();
+                Snackbar.LENGTH_SHORT).show();*/
+
+        Toast.makeText(MapsActivity.this, mLayout + " " + selectedGame + " " + getString(R.string.save_game)
+                + " " + address
+                + "  " + getString(R.string.save_game_text), Toast.LENGTH_LONG).show();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
     }
@@ -408,20 +425,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onPlaceSelected(Place place) {
         // Either address from marker or address from autocomplete should be the location.
         String address = (String) place.getName();
-        Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                getString(R.string.save_game_text),Snackbar.LENGTH_SHORT)
-                .addCallback(new Snackbar.Callback() {
-                    @Override
-                    public void onDismissed(Snackbar transientBottomBar,
-                                            int event) {
-                        if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                            Intent intent = new Intent(MapsActivity.this, MyGames.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);                        }
-                    }
-                }).show();
+        Toast.makeText(this, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
+                getString(R.string.save_game_text), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(MapsActivity.this, MyGames.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         prefs.edit().putString("games", address).apply();
+        prefs.edit().putString("place_id", place.getId()).apply();
         //mMenu.getItem(0).setVisible(true);
     }
 
@@ -430,8 +441,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onError(Status status) {
-        Snackbar.make(mLayout, getString(R.string.place_error) + status.getStatusMessage(),
-                Snackbar.LENGTH_LONG).show();
+        /*Snackbar.make(mLayout, getString(R.string.place_error) + status.getStatusMessage(),
+                Snackbar.LENGTH_LONG).show();*/
+        Toast.makeText(MapsActivity.this, mLayout + " " + getString(R.string.place_error)
+                + status.getStatusMessage(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -448,25 +461,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Double marLon = latLng.longitude;
             //new GetAddressTask(this,marLat,marLon).execute();
             //mMenu.getItem(0).setVisible(true);
-            vicinitystr = vicinity.get(marker.getId());
+            ParkModel parkModel = parks.get(marker.getId());
+            vicinitystr = parkModel.getVicinity();
             address = vicinitystr;
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             prefs.edit().putString("games", address).apply();
-            Snackbar.make(mLayout, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
-                    getString(R.string.save_game_text), Snackbar.LENGTH_SHORT)
-                    .addCallback(new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar transientBottomBar,
-                                                int event) {
-                            if (event == Snackbar.Callback.DISMISS_EVENT_TIMEOUT) {
-                                Intent intent = new Intent(MapsActivity.this, MyGames.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                            }
-                        }
-                    }).show();
+            prefs.edit().putString("place_id", parkModel.getId()).apply();
 
-        } catch (Exception e){
+            Toast.makeText(this, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
+                    getString(R.string.save_game_text), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MapsActivity.this, MyGames.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

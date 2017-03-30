@@ -17,7 +17,7 @@ public class Example {
     private String nextPageToken;
     @SerializedName("results")
     @Expose
-    private List<Result> results = new ArrayList<Result>();
+    private List<ParkModel> parkModels = new ArrayList<ParkModel>();
     @SerializedName("status")
     @Expose
     private String status;
@@ -61,19 +61,19 @@ public class Example {
     /**
      *
      * @return
-     * The results
+     * The parkModels
      */
-    public List<Result> getResults() {
-        return results;
+    public List<ParkModel> getParkModels() {
+        return parkModels;
     }
 
     /**
      *
-     * @param results
-     * The results
+     * @param parkModels
+     * The parkModels
      */
-    public void setResults(List<Result> results) {
-        this.results = results;
+    public void setParkModels(List<ParkModel> parkModels) {
+        this.parkModels = parkModels;
     }
 
 

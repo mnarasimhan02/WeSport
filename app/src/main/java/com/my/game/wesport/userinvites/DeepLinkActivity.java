@@ -3,12 +3,18 @@ package com.my.game.wesport.userinvites;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.appinvite.AppInviteReferral;
+import com.my.game.wesport.MainActivity;
 import com.my.game.wesport.R;
+import com.my.game.wesport.UserProfileActivity;
 
 /**
  * Activity for displaying information about a receive App Invite invitation.  This activity
@@ -23,6 +29,12 @@ public class DeepLinkActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deep_link);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("");
+        }
 
         // Button click listener
         findViewById(R.id.button_ok).setOnClickListener(this);
@@ -58,6 +70,25 @@ public class DeepLinkActivity extends AppCompatActivity implements
     }
     // [END process_referral_intent]
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_activity_invite_friend, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(DeepLinkActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+        }
+        return true;
+    }
 
     @Override
     public void onClick(View v) {

@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -127,7 +128,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     mCropImageUri = imageUri;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         requestPermissions(new String[]{
-                                android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                                        android.Manifest.permission.READ_EXTERNAL_STORAGE},
                                 CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
                     }
                 } else {
@@ -192,8 +193,13 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         nameText.setText(userModelProfile.getDisplayName());
         emailText.setText(userModelProfile.getEmail());
         bioText.setText(userModelProfile.getBio());
-        Glide.with(this).load(userModelProfile.getPhotoUri()).error(R.drawable.profile).into(userProfileImage);
-        Glide.with(this).load(userModelProfile.getCoverUri()).into(userProfileCoverImage);
+        Glide.with(this)
+                .load(userModelProfile.getPhotoUri())
+                .error(R.drawable.profile)
+                .into(userProfileImage);
+        Glide.with(this)
+                .load(userModelProfile.getCoverUri())
+                .into(userProfileCoverImage);
     }
 
     @Override

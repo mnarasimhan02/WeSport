@@ -161,6 +161,7 @@
             android:name=".GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".EventEditActivity" />
+        <activity android:name=".activity.FullscreenImageActivity"/>
     </application>
 
 </manifest>
