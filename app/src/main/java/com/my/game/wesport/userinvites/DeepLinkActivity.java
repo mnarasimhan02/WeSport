@@ -12,9 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.appinvite.AppInviteReferral;
-import com.my.game.wesport.MainActivity;
+import com.my.game.wesport.activity.MainActivity;
 import com.my.game.wesport.R;
-import com.my.game.wesport.UserProfileActivity;
 
 /**
  * Activity for displaying information about a receive App Invite invitation.  This activity
