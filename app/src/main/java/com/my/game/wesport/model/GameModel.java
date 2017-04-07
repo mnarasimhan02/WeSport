@@ -12,11 +12,12 @@ public class GameModel {
     private String address;
     private String image;
     private String author;
+    private String authorName;
 
     public GameModel() {
     }
 
-    public GameModel(String gameDescription, String gameDate, String startTime, String endTime, int skillLevel, String notes, String parkId, String address, String image, String author) {
+    public GameModel(String gameDescription, String gameDate, String startTime, String endTime, int skillLevel, String notes, String parkId, String address, String image, String author, String authorName) {
 
         this.gameDescription = gameDescription;
         this.gameDate = gameDate;
@@ -28,6 +29,7 @@ public class GameModel {
         this.address = address;
         this.image = image;
         this.author = author;
+        this.authorName = authorName;
     }
 
     public String getGameDescription() {
@@ -85,5 +87,13 @@ public class GameModel {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 }

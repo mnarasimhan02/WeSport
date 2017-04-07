@@ -8,7 +8,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.maps.model.Marker;
 
-class InfoWindowRefresher implements RequestListener<String, GlideDrawable> {
+public class InfoWindowRefresher implements RequestListener<String, GlideDrawable> {
     private final Marker markerToRefresh;
 
 

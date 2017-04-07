@@ -1,6 +1,7 @@
 package com.my.game.wesport.login;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -12,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -39,9 +39,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.my.game.wesport.App;
-import com.my.game.wesport.IntroActivity;
-import com.my.game.wesport.MainActivity;
 import com.my.game.wesport.R;
+import com.my.game.wesport.activity.IntroActivity;
+import com.my.game.wesport.activity.MainActivity;
 import com.my.game.wesport.adapter.UsersChatListAdapter;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.model.UserModel;
@@ -51,6 +51,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class SigninActivity extends AppCompatActivity {
 
     public static final String ANONYMOUS = "anonymous";
@@ -59,8 +61,6 @@ public class SigninActivity extends AppCompatActivity {
 
 
     //private MessageAdapter mMessageAdapter;
-
-    private String mUsername, loginUser;
     private String userBio;
 
     private UserModel userModel;
@@ -124,12 +124,11 @@ public class SigninActivity extends AppCompatActivity {
 
     private void setAuthInstance() {
         setupGoogleAdditionalDetailsLogin();
-        mUsername = ANONYMOUS;
 
         mMessagesDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         //enabling disk persistance
-        if (getCurrentUser() != null) {
+        if (FirebaseHelper.getCurrentUser() != null) {
             firebaseLoginSuccess();
         } else {
             loginWithFirebase();
@@ -173,7 +172,7 @@ public class SigninActivity extends AppCompatActivity {
 
     public UserModel buildNewUser() {
         return new UserModel(
-                loginUser,
+                FirebaseHelper.getCurrentUser().getDisplayName(),
                 getUserEmail(),
                 UsersChatListAdapter.ONLINE,
                 getUserPhotoUri(),
@@ -196,7 +195,7 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     public void firebaseLoginSuccess() {
-        final FirebaseUser currentUser = getCurrentUser();
+        final FirebaseUser currentUser = FirebaseHelper.getCurrentUser();
         mMessagesDatabaseReference.child("users").child(currentUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -249,15 +248,11 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     public String getUserEmail() {
-        return getCurrentUser().getEmail();
-    }
-
-    private FirebaseUser getCurrentUser() {
-        return FirebaseAuth.getInstance().getCurrentUser();
+        return FirebaseHelper.getCurrentUser().getEmail();
     }
 
     private String getUserPhotoUri() {
-        return String.valueOf(getCurrentUser().getPhotoUrl());
+        return String.valueOf(FirebaseHelper.getCurrentUser().getPhotoUrl());
     }
 
     @Override
@@ -371,5 +366,9 @@ public class SigninActivity extends AppCompatActivity {
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+    }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

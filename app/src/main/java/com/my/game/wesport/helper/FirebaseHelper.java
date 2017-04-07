@@ -23,11 +23,10 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
-import com.my.game.wesport.UserProfileActivity;
-import com.my.game.wesport.model.ChatListItem;
+import com.my.game.wesport.activity.UserProfileActivity;
 import com.my.game.wesport.model.ChatMessage;
-import com.my.game.wesport.model.GridImageModel;
-import com.my.game.wesport.model.GridImages;
+import com.my.game.wesport.model.GameInviteModel;
+import com.my.game.wesport.model.UserListItem;
 import com.my.game.wesport.model.UserModel;
 
 import java.io.ByteArrayOutputStream;
@@ -116,7 +115,7 @@ public class FirebaseHelper {
                         unreadCounter++;
                     }
                 }
-                ChatListItem chatListItem = new ChatListItem(userUid, recipient, unreadCounter);
+                UserListItem chatListItem = new UserListItem(userUid, recipient, unreadCounter);
                 listener.onGetChatListItem(chatListItem);
             }
 
@@ -165,8 +164,13 @@ public class FirebaseHelper {
         return fileName;
     }
 
+    public static void removeFromGame(String gameKey, String potentialUserId) {
+        getGameUsersRef(gameKey).child(potentialUserId).removeValue();
+        getInvitesRef(potentialUserId).child(gameKey).removeValue();
+    }
+
     public interface ChatListItemListener {
-        void onGetChatListItem(ChatListItem chatListItem);
+        void onGetChatListItem(UserListItem chatListItem);
     }
 
     public static DatabaseReference getCurrentUserRef() {
@@ -177,8 +181,16 @@ public class FirebaseHelper {
         return FirebaseAuth.getInstance().getCurrentUser();
     }
 
+    public static String getCurrentUserId() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
     public static DatabaseReference getUserRef() {
         return FirebaseDatabase.getInstance().getReference().child("users");
+    }
+
+    public static DatabaseReference getLocationRef() {
+        return FirebaseDatabase.getInstance().getReference().child("locations");
     }
 
     public static DatabaseReference getConversationRef() {
@@ -189,13 +201,22 @@ public class FirebaseHelper {
         return FirebaseDatabase.getInstance().getReference().child("conversations").child(getCurrentUser().getUid());
     }
 
-    public static DatabaseReference getGamesRef(String parkId) {
-        return FirebaseDatabase.getInstance().getReference().child("games").child(parkId);
+    public static DatabaseReference getGamesRef(String userUid) {
+        return FirebaseDatabase.getInstance().getReference().child("games").child(userUid);
+    }
+
+    public static DatabaseReference getGameUsersRef(String gameKey) {
+        return FirebaseDatabase.getInstance().getReference().child("game_users").child(gameKey);
     }
 
     public static DatabaseReference getGamesRef() {
         return FirebaseDatabase.getInstance().getReference().child("games");
     }
+
+    public static DatabaseReference getInvitesRef(String userUid) {
+        return FirebaseDatabase.getInstance().getReference().child("invites_users").child(userUid);
+    }
+
 
     public static DatabaseReference getEventRef(String gameKey) {
         return FirebaseDatabase.getInstance().getReference().child("events").child(gameKey);
@@ -203,6 +224,32 @@ public class FirebaseHelper {
 
     public static DatabaseReference getGameImagesRef(String gameKey) {
         return FirebaseDatabase.getInstance().getReference().child("gameImages").child(gameKey);
+    }
+
+    public static void acceptGameInvitation(String gameKey) {
+        String uid = FirebaseHelper.getCurrentUser().getUid();
+        getGameUsersRef(gameKey).child(uid).setValue(true);
+        getInvitesRef(uid).child(gameKey).child("status").setValue("accepted");
+        getInvitesRefByGame(gameKey).child(uid).removeValue();
+
+    }
+
+    public static void rejectGameInvitation(String gameKey) {
+        String uid = FirebaseHelper.getCurrentUser().getUid();
+        getInvitesRef(uid).child(gameKey).child("status").setValue("rejected");
+        getInvitesRefByGame(gameKey).child(uid).setValue(false);
+    }
+
+    public static void inviteUserInGame(String potentialUserUid, GameInviteModel gameInviteModel) {
+//        store invitation by user reference
+//        user/game
+        getInvitesRef(potentialUserUid).child(gameInviteModel.getGameKey()).setValue(gameInviteModel);
+        //        store invitation by game reference
+        getInvitesRefByGame(gameInviteModel.getGameKey()).child(potentialUserUid).setValue(false);
+    }
+
+    public static DatabaseReference getInvitesRefByGame(String gameKey) {
+        return FirebaseDatabase.getInstance().getReference().child("invites_games").child(gameKey);
     }
 
     public static void inviteFriends(Activity activity, int requestCode) {
@@ -216,7 +263,7 @@ public class FirebaseHelper {
     }
 
 
-    public interface FileUploadListener{
+    public interface FileUploadListener {
         void imageUploaded(Uri fileUri);
     }
 }

@@ -15,7 +15,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
+import com.my.game.wesport.App;
 import com.my.game.wesport.R;
+import com.my.game.wesport.helper.DateHelper;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.GameHelper;
 import com.my.game.wesport.model.DataSnapWithFlag;
@@ -32,28 +34,40 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     private final Context mContext;
     private GameAdapterListener listener;
     private String TAG = GameAdapter.class.getSimpleName();
+    boolean showEditAction = false;
 
-    public GameAdapter(Context mContext, GameAdapterListener listener, List<DataSnapWithFlag> dataSnapShotsWithFlag) {
+    public GameAdapter(Context mContext, GameAdapterListener listener, List<DataSnapWithFlag> dataSnapShotsWithFlag, boolean showEditAction) {
         this.mContext = mContext;
         this.dataSnapShotsWithFlag = dataSnapShotsWithFlag;
         this.listener = listener;
+        this.showEditAction = showEditAction;
     }
 
     @Override
     public GameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new GameViewHolder(mContext, LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item, parent, false));
+        return new GameViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.game_list_item_new, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(GameViewHolder holder, final int position) {
+    public void onBindViewHolder(final GameViewHolder holder, final int position) {
         GameModel gameModel = dataSnapShotsWithFlag.get(position).getDataSnapshot().getValue(GameModel.class);
-
+        if (gameModel == null) {
+            return;
+        }
         // Set display name
         holder.getGameTitle().setText(gameModel.getGameDescription());
 
         //Set game summery
         holder.getGameSummery().setText(gameModel.getNotes());
+        holder.address.setText("at " + gameModel.getAddress());
+        String ownerName = gameModel.getAuthorName();
+
+        if (FirebaseHelper.getCurrentUser().getUid().equals(gameModel.getAuthor())) {
+            ownerName = App.getInstance().getUserModel().getDisplayName();
+        }
+
+        holder.owner.setText("by " + ownerName);
 
         if (TextUtils.isEmpty(gameModel.getImage())) {
             Drawable gameDrawable = null;
@@ -68,7 +82,14 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
                     .into(holder.chatView);
         }
         //get Start Date
-        holder.getGameStartDate().setText(gameModel.getGameDate() + ", " + gameModel.getStartTime() + "-" + gameModel.getEndTime());
+        String date;
+        try {
+            date = DateHelper.getAppDateFormatter().format(DateHelper.getServerDateFormatter().parse(gameModel.getGameDate()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            date = gameModel.getGameDate();
+        }
+        holder.getGameStartDate().setText(date + ", " + gameModel.getStartTime() + "-" + gameModel.getEndTime());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +106,16 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         }
 
         holder.getGameTitle().setTextColor(Color.parseColor(titleColor));
+
+        holder.editAction.setVisibility(showEditAction ? View.VISIBLE : View.GONE);
+        holder.editAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onGameEditClick(position, dataSnapShotsWithFlag.get(position));
+                }
+            }
+        });
     }
 
     @Override
@@ -95,7 +126,15 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     public void add(DataSnapWithFlag value, boolean refreshFlags) {
         dataSnapShotsWithFlag.add(value);
         notifyItemInserted(dataSnapShotsWithFlag.size() - 1);
-        if (refreshFlags){
+        if (refreshFlags) {
+            refreshFlags();
+        }
+    }
+
+    public void addAtFirst(DataSnapWithFlag value, boolean refreshFlags) {
+        dataSnapShotsWithFlag.add(0, value);
+        notifyItemInserted(0);
+        if (refreshFlags) {
             refreshFlags();
         }
     }
@@ -105,7 +144,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             if (dataSnapShotsWithFlag.get(i).getDataSnapshot().getKey().equals(snapshot.getDataSnapshot().getKey())) {
                 dataSnapShotsWithFlag.set(i, snapshot);
                 notifyItemChanged(i);
-                if (refreshFlags){
+                if (refreshFlags) {
                     refreshFlags();
                 }
                 break;
@@ -118,7 +157,20 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             if (dataSnapShotsWithFlag.get(i).getDataSnapshot().getKey().equals(dataSnapshot.getDataSnapshot().getKey())) {
                 dataSnapShotsWithFlag.remove(i);
                 notifyItemRemoved(i);
-                if (refreshFlags){
+                if (refreshFlags) {
+                    refreshFlags();
+                }
+                break;
+            }
+        }
+    }
+
+    public void remove(String gameKey, boolean refreshFlags) {
+        for (int i = 0; i < dataSnapShotsWithFlag.size(); i++) {
+            if (dataSnapShotsWithFlag.get(i).getDataSnapshot().getKey().equals(gameKey)) {
+                dataSnapShotsWithFlag.remove(i);
+                notifyItemRemoved(i);
+                if (refreshFlags) {
                     refreshFlags();
                 }
                 break;
@@ -132,16 +184,20 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         private TextView starttime;
         private TextView summaryTextView;
         private ImageView chatView;
-        private final Context mContextViewHolder;
+        private TextView owner;
+        private TextView address;
+        private ImageView editAction;
 
-        public GameViewHolder(Context context, View itemView) {
+        public GameViewHolder(View itemView) {
             super(itemView);
             nameTextView = (TextView) itemView.findViewById(R.id.name);
             startdate = (TextView) itemView.findViewById(R.id.startdate);
             starttime = (TextView) itemView.findViewById(R.id.start_time);
             summaryTextView = (TextView) itemView.findViewById(R.id.summary);
             chatView = (ImageView) itemView.findViewById(R.id.chatimage);
-            mContextViewHolder = context;
+            editAction = (ImageView) itemView.findViewById(R.id.action_edit);
+            owner = (TextView) itemView.findViewById(R.id.owner);
+            address = (TextView) itemView.findViewById(R.id.address);
         }
 
         public TextView getGameTitle() {
@@ -284,5 +340,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
 
     public interface GameAdapterListener {
         void onGameClick(int position, DataSnapWithFlag snapshot);
+
+        void onGameEditClick(int position, DataSnapWithFlag snapshot);
     }
 }

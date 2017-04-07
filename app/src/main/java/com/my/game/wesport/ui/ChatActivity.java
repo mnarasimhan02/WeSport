@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,7 +19,7 @@ import android.widget.Toast;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.my.game.wesport.App;
 import com.my.game.wesport.FireChatHelper.ExtraIntent;
 import com.my.game.wesport.R;
@@ -33,14 +34,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static com.my.game.wesport.login.SigninActivity.RC_SIGN_IN;
 
 public class ChatActivity extends AppCompatActivity {
-    private static final String ANONYMOUS = "anonymous";
-    private static final int RC_PHOTO_PICKER = 2;
     private String mUsername;
-    private DatabaseReference mMessagesDatabaseReference;
 
 
     private static final String TAG = ChatActivity.class.getSimpleName();
@@ -56,19 +55,26 @@ public class ChatActivity extends AppCompatActivity {
     private ChildEventListener messageChatListener;
 
     public static String activeUserUid;
+    private Query userChatListQuery;
 
-    public static Intent newIntent(Context context, UserModel userModel) {
-        String chatRef = userModel.createUniqueChatRef(App.getInstance().getUserModel().getCreatedAt(), App.getInstance().getUserModel().getEmail());
-        Log.d(TAG, "newIntent: " + chatRef);
+    public static Intent newIntent(Context context, UserModel userModel, String mRecipientId) {
         Intent chatIntent = new Intent(context, ChatActivity.class);
-        chatIntent.putExtra(ExtraIntent.EXTRA_CURRENT_USER_ID, FirebaseHelper.getCurrentUser().getUid());
-        chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, userModel.getRecipientId());
-        chatIntent.putExtra(ExtraIntent.EXTRA_CHAT_REF, chatRef);
+        chatIntent.putExtra(ExtraIntent.EXTRA_USER_ID, FirebaseHelper.getCurrentUser().getUid());
+        chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_ID, mRecipientId);
         chatIntent.putExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME, userModel.getDisplayName());
 
         return chatIntent;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +89,8 @@ public class ChatActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        userChatListQuery = FirebaseHelper.getCurrentUserConversationRef().child(mRecipientId).limitToFirst(20);
 
         setChatRecyclerView();
 
@@ -109,7 +117,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void setUsersId() {
         mRecipientId = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_ID);
-        mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_CURRENT_USER_ID);
+        mCurrentUserId = getIntent().getStringExtra(ExtraIntent.EXTRA_USER_ID);
         mUsername = getIntent().getStringExtra(ExtraIntent.EXTRA_RECIPIENT_USERNAME);
         Log.d(TAG, "setUsersId: " + mUsername);
     }
@@ -124,12 +132,12 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        messageChatListener = FirebaseHelper.getCurrentUserConversationRef().child(mRecipientId).limitToFirst(20).addChildEventListener(new ChildEventListener() {
+        messageChatListener = userChatListQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildKey) {
                 try {
                     ChatMessage newMessage = dataSnapshot.getValue(ChatMessage.class);
-                    if(newMessage.getSender().equals(mCurrentUserId)) {
+                    if (newMessage.getSender().equals(mCurrentUserId)) {
                         newMessage.setRecipientOrSenderStatus(MessageChatAdapter.SENDER);
                     } else {
                         if (!newMessage.isSeen()) {
@@ -166,19 +174,13 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        messageChatAdapter.cleanUp();
-    }
-
     @OnClick(R.id.btn_send_message)
     public void btnSendMsgListener(@SuppressWarnings("UnusedParameters") View sendButton) {
         String senderMessage = mUserMessageChatText.getText().toString().trim();
         if (!senderMessage.isEmpty()) {
             ChatMessage newMessage = new ChatMessage(senderMessage, mCurrentUserId, mRecipientId, null);
             FirebaseHelper.addConversation(newMessage);
-            NotificationHelper.sendMessageByTopic(mRecipientId, App.getInstance().getUserModel().getDisplayName(), senderMessage, "", mCurrentUserId);
+            NotificationHelper.sendMessageByTopic(mRecipientId, App.getInstance().getUserModel().getDisplayName(), senderMessage, "", NotificationHelper.getChatMessage(mCurrentUserId));
             mUserMessageChatText.setText("");
         }
     }
@@ -202,11 +204,19 @@ public class ChatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         activeUserUid = "";
+        if (messageChatListener != null &&  userChatListQuery != null) {
+            userChatListQuery.removeEventListener(messageChatListener);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         activeUserUid = mRecipientId;
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

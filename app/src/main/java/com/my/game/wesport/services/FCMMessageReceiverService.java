@@ -17,10 +17,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.my.game.wesport.MainActivity;
+import com.my.game.wesport.activity.GroupActivity;
+import com.my.game.wesport.activity.MainActivity;
 import com.my.game.wesport.R;
+import com.my.game.wesport.activity.InvitesActivity;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.NotificationHelper;
+import com.my.game.wesport.model.NotificationModel;
 import com.my.game.wesport.model.UserModel;
 import com.my.game.wesport.ui.ChatActivity;
 
@@ -59,18 +62,27 @@ public class FCMMessageReceiverService extends FirebaseMessagingService {
 
 
     private void handleMessage(RemoteMessage remoteMessage) {
+        Log.d(TAG, "handleMessage: ");
         final RemoteMessage.Notification notification = remoteMessage.getNotification();
         if (notification != null && !TextUtils.isEmpty(notification.getTitle())) {
             Log.d(TAG, "Message Notification Body: " + notification.getBody());
             if (remoteMessage.getData().size() > 0 && remoteMessage.getData().containsKey(NotificationHelper.EXTRA_MESSAGE)) {
-                final String userUid = remoteMessage.getData().get(NotificationHelper.EXTRA_MESSAGE);
-                FirebaseHelper.getUserRef().child(userUid).addListenerForSingleValueEvent(new ValueEventListener() {
+                final String jsonMessage = remoteMessage.getData().get(NotificationHelper.EXTRA_MESSAGE);
+                final NotificationModel notificationModel = NotificationHelper.parse(jsonMessage);
+                if (notificationModel == null) {
+                    return;
+                }
+
+                FirebaseHelper.getUserRef().child(notificationModel.getPotentialUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot != null) {
                             UserModel publicProfile = dataSnapshot.getValue(UserModel.class);
-                            if (TextUtils.isEmpty(ChatActivity.activeUserUid) || !ChatActivity.activeUserUid.equals(userUid)) {
-                                sendNotification(notification, publicProfile);
+                            int notiType = notificationModel.getType();
+                            if (notiType == NotificationHelper.TYPE_INVITATION || notiType == NotificationHelper.TYPE_EVENT) {
+                                sendNotification(notification, publicProfile, notificationModel);
+                            } else if (TextUtils.isEmpty(ChatActivity.activeUserUid) || !ChatActivity.activeUserUid.equals(dataSnapshot.getKey())) {
+                                sendNotification(notification, publicProfile, notificationModel);
                             }
                         }
                     }
@@ -84,14 +96,18 @@ public class FCMMessageReceiverService extends FirebaseMessagingService {
         }
     }
 
-    private void sendNotification(RemoteMessage.Notification notification, UserModel profile) {
+    private void sendNotification(RemoteMessage.Notification notification, UserModel profile, NotificationModel notificationModel) {
         Intent intent;
-        profile.setRecipientId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        intent = ChatActivity.newIntent(this, profile);
+        if (notificationModel.getType() == NotificationHelper.TYPE_EVENT) {
+            intent = GroupActivity.newIntent(this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey());
+        } else if (notificationModel.getType() == NotificationHelper.TYPE_INVITATION) {
+            intent = new Intent(this, InvitesActivity.class);
+        } else {
+            intent = ChatActivity.newIntent(this, profile, notificationModel.getPotentialUserId());
+        }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
 
 //        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 //        Uri defaultSoundUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification);

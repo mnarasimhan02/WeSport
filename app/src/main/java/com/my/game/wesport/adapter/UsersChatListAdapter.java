@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.my.game.wesport.R;
 import com.my.game.wesport.helper.LocationHelper;
-import com.my.game.wesport.model.ChatListItem;
+import com.my.game.wesport.model.UserListItem;
 import com.my.game.wesport.model.UserModel;
-import com.my.game.wesport.ui.ChatActivity;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,16 +27,17 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
 
     public static final String ONLINE = "online";
     public static final String OFFLINE = "offline";
-    private final List<ChatListItem> chatListItems;
+    private final List<UserListItem> chatListItems;
     private final Context mContext;
-    private String mCurrentUserEmail;
-    private Long mCurrentUserCreatedAt;
     private double mLat;
     private double mLon;
+    private ChatListInterface listener;
+    private String TAG = UsersChatListAdapter.class.getSimpleName();
 
-    public UsersChatListAdapter(Context context, List<ChatListItem> fireChatUserModels) {
+    public UsersChatListAdapter(Context context, List<UserListItem> fireChatUserModels, ChatListInterface listener) {
         chatListItems = fireChatUserModels;
         mContext = context;
+        this.listener = listener;
     }
 
     @Override
@@ -46,9 +47,9 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderUsers holder, int position) {
+    public void onBindViewHolder(ViewHolderUsers holder, final int position) {
 
-        ChatListItem chatListItem = chatListItems.get(position);
+        final UserListItem chatListItem = chatListItems.get(position);
         UserModel fireChatUserModel = chatListItem.getUser();
         if (chatListItem.getCounter() > 0) {
             holder.chatCounter.setVisibility(View.VISIBLE);
@@ -88,13 +89,31 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
             // Red color
             holder.getStatusConnection().setTextColor(Color.parseColor("#FF0000"));
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onUserItemClick(position, chatListItem);
+                }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (listener != null) {
+                    listener.onUserItemLongClick(position, chatListItem);
+                }
+                return false;
+            }
+        });
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    private static List<ChatListItem> compareDistance(List<ChatListItem> mUserModels, final double mLat, final double mLon) {
-        Comparator<ChatListItem> distance = new Comparator<ChatListItem>() {
+    private static List<UserListItem> compareDistance(List<UserListItem> mUserModels, final double mLat, final double mLon) {
+        Comparator<UserListItem> distance = new Comparator<UserListItem>() {
             @Override
-            public int compare(ChatListItem item1, ChatListItem item2) {
+            public int compare(UserListItem item1, UserListItem item2) {
                 UserModel user1 = item1.getUser();
                 UserModel user2 = item2.getUser();
 
@@ -128,22 +147,30 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
         return chatListItems.size();
     }
 
-    public void refill(ChatListItem chatListItem) {
+    public void refill(UserListItem chatListItem) {
+//        if item already exists then ignore
+        if (indexOf(chatListItem.getUserUid()) != -1) {
+            return;
+        }
         chatListItems.add(chatListItem);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(
                 mContext);
-        mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        mLon = Double.parseDouble(preferences.getString("longtitude", ""));
-        compareDistance(chatListItems, mLat, mLon);
+        try {
+            mLat = Double.parseDouble(preferences.getString("latitude", ""));
+            mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+            compareDistance(chatListItems, mLat, mLon);
+        } catch (Exception e) {
+            Log.d(TAG, "refill: " + e.getMessage());
+        }
         notifyDataSetChanged();
     }
 
-    public void changeUser(int index, ChatListItem chatListItem) {
+    public void changeUser(int index, UserListItem chatListItem) {
         chatListItems.set(index, chatListItem);
         notifyDataSetChanged();
     }
 
-    public void updateUser(ChatListItem chatListItem) {
+    public void updateUser(UserListItem chatListItem) {
         int index = indexOf(chatListItem.getUserUid());
         if (index != -1) {
             chatListItems.set(index, chatListItem);
@@ -151,7 +178,7 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
         }
     }
 
-    public ChatListItem getItem(String userUid) {
+    public UserListItem getItem(String userUid) {
         int index = indexOf(userUid);
 
         if (index != -1) {
@@ -177,19 +204,16 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
         }
     }
 
-    @SuppressWarnings("UnusedParameters")
-    public void setCurrentUserInfo(String userUid, String email, long createdAt, String photoUri, String latitude,
-                                   String longitude, String distance) {
-        mCurrentUserEmail = email;
-        mCurrentUserCreatedAt = createdAt;
-    }
-
     public void clear() {
         chatListItems.clear();
     }
 
+    public boolean contains(String userKey) {
+        return indexOf(userKey) != -1;
+    }
+
     /* ViewHolder for RecyclerView */
-    public class ViewHolderUsers extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolderUsers extends RecyclerView.ViewHolder {
 
         private final ImageView mUserAvatar;
         private final TextView mUserDisplayName;
@@ -209,18 +233,12 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
             bioTextView = (TextView) itemView.findViewById(R.id.text_view_bio);
             chatCounter = (TextView) itemView.findViewById(R.id.text_unread_message_count);
             mContextViewHolder = context;
-            itemView.setOnClickListener(this);
         }
 
         public ImageView getUserAvatar() {
             return mUserAvatar;
         }
 
-        // --Commented out by Inspection START (3/8/17, 4:18 PM):
-//        public ImageView getUserNonAvatar() {
-//            return mUserAvatar;
-//        }
-// --Commented out by Inspection STOP (3/8/17, 4:18 PM)
         public TextView getUserDisplayName() {
             return mUserDisplayName;
         }
@@ -232,18 +250,11 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
         public TextView getUserLocation() {
             return mStatusLocation;
         }
-
-        @Override
-        public void onClick(View view) {
-            try {
-                UserModel userModel = chatListItems.get(getLayoutPosition()).getUser();
-                if (userModel != null && mCurrentUserCreatedAt != null && mCurrentUserEmail != null) {
-                    mContextViewHolder.startActivity(ChatActivity.newIntent(mContextViewHolder, userModel));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
+    public interface ChatListInterface {
+        void onUserItemClick(int position, UserListItem userListItem);
+
+        void onUserItemLongClick(int position, UserListItem userListItem);
+    }
 }

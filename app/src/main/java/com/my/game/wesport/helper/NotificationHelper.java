@@ -7,6 +7,8 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
+import com.my.game.wesport.model.NotificationModel;
 
 import org.json.JSONObject;
 
@@ -20,6 +22,10 @@ import okhttp3.Response;
 
 
 public class NotificationHelper {
+    public static final int TYPE_CHAT = 1;
+    public static final int TYPE_INVITATION = 2;
+    public static final int TYPE_EVENT = 3;
+
     private static final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
     private static final String TAG = NotificationHelper.class.getSimpleName();
     public static final String EXTRA_MESSAGE = "sender";
@@ -30,7 +36,7 @@ public class NotificationHelper {
         sendMessage("/topics/" + topic, title, body, icon, message);
     }
 
-    public static void sendMessage(final String recipients, final String title, final String body, final String icon, final String message) {
+    private static void sendMessage(final String recipients, final String title, final String body, final String icon, final String message) {
         Log.d(TAG, "sendMessage() called with: recipients = [" + recipients + "], title = [" + title + "], body = [" + body + "], icon = [" + icon + "], message = [" + message + "]");
         new AsyncTask<String, String, String>() {
             @Override
@@ -40,7 +46,7 @@ public class NotificationHelper {
                     JSONObject notification = new JSONObject();
                     notification.put("body", body);
                     notification.put("title", title);
-                    notification.put("sound", "notification");
+//                    notification.put("sound", "notification");
                     notification.put("click_action", "OPEN_HOME_ACTIVITY");
                     if (!TextUtils.isEmpty(icon)) {
                         notification.put("icon", icon);
@@ -89,8 +95,8 @@ public class NotificationHelper {
         return response.body().string();
     }
 
-    public static void unsubscribeAndLogout() {
-        Log.d(TAG, "unsubscribeAndLogout: ");
+    public static void unSubscribeAndLogout() {
+        Log.d(TAG, "unSubscribeAndLogout: ");
         try {
             FirebaseMessaging.getInstance().unsubscribeFromTopic(FirebaseAuth.getInstance().getCurrentUser().getUid());
             FirebaseInstanceId.getInstance().deleteInstanceId();
@@ -108,5 +114,37 @@ public class NotificationHelper {
         } catch (Exception e) {
             Log.d(TAG, "subscribe: " + e.getLocalizedMessage());
         }
+    }
+
+    public static String getChatMessage(String potentialUserId) {
+        NotificationModel model = new NotificationModel();
+        model.setPotentialUserId(potentialUserId);
+        model.setType(TYPE_CHAT);
+        return new Gson().toJson(model);
+    }
+
+    public static String getEventMessage(String potentialUserId, String gameKey, String gameAuthorId) {
+        NotificationModel model = new NotificationModel();
+        model.setPotentialUserId(potentialUserId);
+        model.setGameKey(gameKey);
+        model.setGameAuthorKey(gameAuthorId);
+        model.setType(TYPE_EVENT);
+        return new Gson().toJson(model);
+    }
+
+    public static String getInvitationMessage(String potentialUserId) {
+        NotificationModel model = new NotificationModel();
+        model.setPotentialUserId(potentialUserId);
+        model.setType(TYPE_INVITATION);
+        return new Gson().toJson(model);
+    }
+
+    public static NotificationModel parse(String message) {
+        try {
+            return new Gson().fromJson(message, NotificationModel.class);
+        } catch (Exception e) {
+            Log.d(TAG, "parse: " + e.getMessage());
+        }
+        return null;
     }
 }

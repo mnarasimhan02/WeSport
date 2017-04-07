@@ -12,7 +12,6 @@ public class UserModel {
     private String photoUri;
     private String coverUri;
     private long createdAt;
-    private String mRecipientId;
     private String latitude;
     private String longitude;
     private String distance;
@@ -108,10 +107,4 @@ public class UserModel {
     public void setCoverUri(String coverUri) {
         this.coverUri = coverUri;
     }
-
-    @Exclude
-    public String getRecipientId() {
-        return mRecipientId;
-    }
-    public void setRecipientId(String recipientId) {this.mRecipientId = recipientId;}
 }

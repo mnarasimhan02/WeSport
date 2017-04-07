@@ -1,5 +1,7 @@
 package com.my.game.wesport.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -8,11 +10,28 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
-import com.my.game.wesport.GameListFragment;
 import com.my.game.wesport.R;
+import com.my.game.wesport.fragment.GameListFragment;
+import com.my.game.wesport.fragment.UserChatListFragment;
 
-public class MyGames extends AppCompatActivity {
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+public class MyGamesActivity extends AppCompatActivity {
+    private static String EXTRA_KEY_GAME = "key_game";
+    private static String EXTRA_PLACE_ID = "place_id";
+
+    boolean deleteAllGames = false;
+    String placeId;
+    String gameKey;
+
+    public static Intent newIntent(Context context, String gameKey, String placeId) {
+        Intent intent = new Intent(context, MyGamesActivity.class);
+        intent.putExtra(EXTRA_KEY_GAME, gameKey);
+        intent.putExtra(EXTRA_PLACE_ID, placeId);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +50,9 @@ public class MyGames extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.app_name);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
+
+        placeId = getIntent().getStringExtra(EXTRA_PLACE_ID);
+        gameKey = getIntent().getStringExtra(EXTRA_KEY_GAME);
 
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
@@ -61,9 +83,21 @@ public class MyGames extends AppCompatActivity {
     }
     */
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
+
+
     public static class PlaceholderFragment extends Fragment {
         // --Commented out by Inspection (3/8/17, 4:30 PM):private static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -101,12 +135,16 @@ public class MyGames extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return new UserChatListFragment();
+                    deleteAllGames = false;
+                    return UserChatListFragment.newInstance(false, null, null);
                 case 1:
-                    return GameListFragment.newInstance(false);
+                    deleteAllGames = true;
+                    return GameListFragment.newInstance(placeId, GameListFragment.TYPE_USER_GAMES);
                 case 2:
-                    return GameListFragment.newInstance(true);
+                    deleteAllGames = false;
+                    return GameListFragment.newInstance(placeId, GameListFragment.TYPE_ALL_GAMES);
             }
+            invalidateOptionsMenu();
             return null;
         }
 
@@ -124,9 +162,14 @@ public class MyGames extends AppCompatActivity {
                 case 1:
                     return "My Games";
                 case 2:
-                    return "All Games";
+                    return "Nearby Games";
             }
             return null;
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

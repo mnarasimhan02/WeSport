@@ -62,7 +62,6 @@ public class FullscreenImageActivity extends AppCompatActivity {
         if (images.size() > defaultIndex) {
             binding.viewPager.setCurrentItem(defaultIndex);
         }
-
         hide();
     }
 

@@ -18,7 +18,7 @@ import java.net.URL;
 
 
 @SuppressWarnings("ALL")
-class GetAddressTask extends AsyncTask<String, Integer, String> {
+public class GetAddressTask extends AsyncTask<String, Integer, String> {
 
     private String address;
     private double mLat;
