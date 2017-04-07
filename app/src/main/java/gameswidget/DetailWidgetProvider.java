@@ -13,7 +13,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import com.my.game.wesport.R;
-import com.my.game.wesport.ui.MyGames;
+import com.my.game.wesport.ui.MyGamesActivity;
 
 /**
  * Provider for a scrollable weather detail widget
@@ -24,8 +24,8 @@ public class DetailWidgetProvider extends AppWidgetProvider {
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_detail);
-            // Create an Intent to launch MyGames
-            Intent intent = new Intent(context, MyGames.class);
+            // Create an Intent to launch MyGamesActivity
+            Intent intent = new Intent(context, MyGamesActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
@@ -35,7 +35,7 @@ public class DetailWidgetProvider extends AppWidgetProvider {
             } else {
                 setRemoteAdapterV11(context, views);
             }
-            Intent clickIntentTemplate = new Intent(context, MyGames.class);
+            Intent clickIntentTemplate = new Intent(context, MyGamesActivity.class);
             PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
                     .addNextIntentWithParentStack(clickIntentTemplate)
                     .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
