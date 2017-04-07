@@ -3,6 +3,8 @@ package com.my.game.wesport.fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -11,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +34,7 @@ import com.my.game.wesport.adapter.GridRecyclerViewAdapter;
 import com.my.game.wesport.adapter.SpacesItemDecoration;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.model.FGridImage;
+import com.my.game.wesport.model.GridImageModel;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -40,17 +44,22 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 public class GalleryGridFragment extends Fragment implements GridRecyclerViewAdapter.ClickListener, DragSelectRecyclerViewAdapter.SelectionListener {
 
 
-    private static String EXTRA_GAMES_KEY = "game_key";
+    private static String EXTRA_GAME_KEY = "game_key";
+    private static String EXTRA_GAME_AUTHOR_KEY = "author_key";
     private GridRecyclerViewAdapter gridRecyclerViewAdapter;
     private Uri mCropImageUri;
     private RecyclerView recyclerView;
     private String TAG = GalleryGridFragment.class.getSimpleName();
     private String gameKey;
+    private String gameAuthorKey;
     private boolean isFirstInit = true;
 
-    public static GalleryGridFragment newInstance(String gameKey) {
+    private View emptyView;
+
+    public static GalleryGridFragment newInstance(String gameKey, String gameAuthorUid) {
         Bundle args = new Bundle();
-        args.putString(EXTRA_GAMES_KEY, gameKey);
+        args.putString(EXTRA_GAME_KEY, gameKey);
+        args.putString(EXTRA_GAME_AUTHOR_KEY, gameAuthorUid);
         GalleryGridFragment fragment = new GalleryGridFragment();
         fragment.setArguments(args);
         return fragment;
@@ -62,29 +71,38 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_gallery_grid, container, false);
 
-        gameKey = getArguments().getString(EXTRA_GAMES_KEY, "");
+        gameKey = getArguments().getString(EXTRA_GAME_KEY, "");
+        gameAuthorKey = getArguments().getString(EXTRA_GAME_AUTHOR_KEY, "");
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
-        view.findViewById(R.id.add_fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                requestCameraImage();
-            }
-        });
+
+        emptyView = view.findViewById(R.id.empty_view);
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.add_fab);
+        if (gameAuthorKey.equals(FirebaseHelper.getCurrentUser().getUid())) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    requestCameraImage();
+                }
+            });
+        } else {
+            fab.setVisibility(View.GONE);
+        }
+
         setupGridImages();
         return view;
     }
 
     private void setupGridImages() {
-        gridRecyclerViewAdapter = new GridRecyclerViewAdapter(this, getContext());
+        gridRecyclerViewAdapter = new GridRecyclerViewAdapter(this, getActivity());
         gridRecyclerViewAdapter.setSelectionListener(this);
         recyclerView.addItemDecoration(new SpacesItemDecoration(getResources().getDimensionPixelSize(R.dimen.grid_image_space)));
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         recyclerView.setAdapter(gridRecyclerViewAdapter);
         updateGridImagesInList();
     }
@@ -95,6 +113,7 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 gridRecyclerViewAdapter.add(dataSnapshot);
+                emptyView.setVisibility(View.GONE);
             }
 
             @Override
@@ -104,6 +123,9 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 gridRecyclerViewAdapter.remove(dataSnapshot);
+                if (gridRecyclerViewAdapter.getItemCount() < 1) {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -139,7 +161,7 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
     }
 
     private void requestCameraImage() {
-        if (CropImage.isExplicitCameraPermissionRequired(getContext())) {
+        if (CropImage.isExplicitCameraPermissionRequired(getActivity())) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE);
         } else {
             CropImage.startPickImageActivity(getActivity());
@@ -152,7 +174,7 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 CropImage.startPickImageActivity(getActivity());
             } else {
-                Toast.makeText(getContext(), R.string.error_permission_not_granted, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.error_permission_not_granted, Toast.LENGTH_LONG).show();
             }
         }
         if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
@@ -160,7 +182,7 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
                 // required permissions granted, start crop image activity
                 startCropImageActivity(mCropImageUri);
             } else {
-                Toast.makeText(getContext(), R.string.cancelling_required_permissions_denied, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.cancelling_required_permissions_denied, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -169,9 +191,9 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // handle result of pick image chooser
         if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Uri imageUri = CropImage.getPickImageResultUri(getContext(), data);
+            Uri imageUri = CropImage.getPickImageResultUri(getActivity(), data);
             // For API >= 23 we need to check specifically that we have permissions to read external storage.
-            if (CropImage.isReadExternalStoragePermissionsRequired(getContext(), imageUri)) {
+            if (CropImage.isReadExternalStoragePermissionsRequired(getActivity(), imageUri)) {
                 // request permissions and handle the result in onRequestPermissionsResult()
                 mCropImageUri = imageUri;
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
@@ -202,6 +224,7 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
                     }
                 });
                 gridRecyclerViewAdapter.addLocalImage(realPath, uploadedFileName);
+                emptyView.setVisibility(View.GONE);
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Log.d(TAG, "onActivityResult: " + error.getMessage());
@@ -236,7 +259,39 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
 
     @Override
     public void onGridLongClick(int index) {
+        GridImageModel gridModel = gridRecyclerViewAdapter.getItem(index);
+        if (FirebaseHelper.getCurrentUser().getUid().equals(gameAuthorKey) && !TextUtils.isEmpty(gridModel.getFirebaseKeyName())) {
+            showDeleteConfirmationDialog(gridModel.getFirebaseKeyName());
+        }
 
+    }
+
+
+    private void showDeleteConfirmationDialog(final String imageKey) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the postivie and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.delete_image_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                deleteGridImage(imageKey);
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteGridImage(String imageKey) {
+        FirebaseHelper.getGameImagesRef(gameKey).child(imageKey).removeValue();
     }
 
     @Override

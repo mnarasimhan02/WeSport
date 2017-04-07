@@ -53,6 +53,10 @@ public class GridRecyclerViewAdapter extends DragSelectRecyclerViewAdapter<GridR
         }
     }
 
+    public GridImageModel getItem(int position) {
+        return imageModels.get(position);
+    }
+
     public interface ClickListener {
         void onGridClick(int index);
 
@@ -81,7 +85,7 @@ public class GridRecyclerViewAdapter extends DragSelectRecyclerViewAdapter<GridR
         int width = windowManager.getDefaultDisplay().getWidth();
 
         int paddingSpace = context.getResources().getDimensionPixelSize(R.dimen.grid_image_space) * 6;
-        int size = (width - paddingSpace) / 2;
+        int size = (width - paddingSpace) / 3;
         holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(size, size));
 //        holder.itemView.invalidate();
 

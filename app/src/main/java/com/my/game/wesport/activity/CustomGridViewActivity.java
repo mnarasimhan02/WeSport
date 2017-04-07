@@ -1,4 +1,4 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,6 +8,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.my.game.wesport.R;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 class CustomGridViewActivity extends BaseAdapter {
 
