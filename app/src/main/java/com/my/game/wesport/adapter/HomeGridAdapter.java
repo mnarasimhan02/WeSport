@@ -1,4 +1,4 @@
-package com.my.game.wesport;
+package com.my.game.wesport.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,7 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-class HomeGridAdapter extends BaseAdapter {
+import com.my.game.wesport.R;
+
+public class HomeGridAdapter extends BaseAdapter {
 
     private final String[] gridViewString;
     private final int[] gridViewImageId;

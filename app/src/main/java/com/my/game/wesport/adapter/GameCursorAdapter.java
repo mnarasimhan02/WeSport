@@ -1,5 +1,5 @@
 
-package com.my.game.wesport;
+package com.my.game.wesport.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
+import com.my.game.wesport.R;
 import com.my.game.wesport.data.GameContract.GameEntry;
 
 /**
@@ -31,7 +32,7 @@ public class GameCursorAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // Inflate a list item view using the layout specified in list_item.xml
-        return LayoutInflater.from(context).inflate(R.layout.list_item, parent, false);
+        return LayoutInflater.from(context).inflate(R.layout.game_list_item, parent, false);
     }
 
     /**
@@ -125,16 +126,7 @@ public class GameCursorAdapter extends CursorAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-     /*   chatview.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), ListUsersFragment.class);
-                v.getContext().startActivity(intent);
-            }
-        });*/
+        
     }
 
 

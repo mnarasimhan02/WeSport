@@ -1,26 +1,45 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.my.game.wesport.fragment.EventListFragment;
+import com.my.game.wesport.R;
 import com.my.game.wesport.fragment.GalleryGridFragment;
-import com.my.game.wesport.ui.UserChatListFragment;
+import com.my.game.wesport.fragment.UserChatListFragment;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class GroupActivity extends AppCompatActivity {
+    private static final String EXTRA_KEY_GAME = "key_game";
+    private static final String EXTRA_GAME_AUTHOR = "game_author";
     private TabLayout tabLayout;
+//    EventBus eventBus = EventBus.getDefault();
+
+    String gameKey;
+    String gameAuthorId;
+    private EventListFragment eventListFragment;
+    private UserChatListFragment userChatListFragment;
+
+
+    public static Intent newIntent(Context context, String gameKey, String gameAuthorId) {
+        Intent intent = new Intent(context, GroupActivity.class);
+        intent.putExtra(EXTRA_KEY_GAME, gameKey);
+        intent.putExtra(EXTRA_GAME_AUTHOR, gameAuthorId);
+        return intent;
+    }
 
     private int[] tabIcons = {
-            R.drawable.ic_forum_black_24dp,
+            R.drawable.ic_group_black_24dp,
             R.drawable.ic_event_black_24dp,
             R.drawable.ic_image_black_24dp
     };
@@ -39,35 +58,25 @@ public class GroupActivity extends AppCompatActivity {
         }
         getSupportActionBar().setTitle(R.string.app_name);
 
-        GroupSectionsPagerAdapter mSectionsPagerAdapter = new GroupSectionsPagerAdapter(getSupportFragmentManager());
+
+        gameKey = getIntent().getStringExtra(EXTRA_KEY_GAME);
+        gameAuthorId = getIntent().getStringExtra(EXTRA_GAME_AUTHOR);
+
+        GroupSectionsPagerAdapter mSectionsPagerAdapter =
+                new GroupSectionsPagerAdapter(getSupportFragmentManager());
         // Set up the ViewPager with the sections adapter.
         ViewPager mViewPager = (ViewPager) findViewById(R.id.group_activity_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        galleryGridFragment = GalleryGridFragment.newInstance("fleeksoft");
         tabLayout = (TabLayout) findViewById(R.id.group_activity_tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        galleryGridFragment = GalleryGridFragment.newInstance(gameKey, gameAuthorId);
+        userChatListFragment = UserChatListFragment.newInstance(true, gameKey, gameAuthorId);
+        eventListFragment = EventListFragment.newInstance(gameKey, gameAuthorId);
+
         setupTabIcons();
-
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.tabSelectedIconColor);
-                tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.tabUnSelectedIconColor);
-                tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
     }
+
     private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
@@ -90,9 +99,9 @@ public class GroupActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return new UserChatListFragment();
+                    return userChatListFragment;
                 case 1:
-                    return EventListFragment.newInstance("fleeksoft");
+                    return eventListFragment;
                 case 2:
                     return galleryGridFragment;
             }
@@ -121,7 +130,7 @@ public class GroupActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;
@@ -135,5 +144,24 @@ public class GroupActivity extends AppCompatActivity {
             galleryGridFragment.onActivityResult(requestCode, resultCode, data);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        /*if (!eventBus.isRegistered(this)) {
+            eventBus.register(this);
+        }*/
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        eventBus.unregister(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

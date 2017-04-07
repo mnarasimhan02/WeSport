@@ -1,6 +1,7 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -20,14 +21,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.my.game.wesport.helper.FirebaseHelper;
+import com.my.game.wesport.App;
+import com.my.game.wesport.R;
+import com.my.game.wesport.event.ProfileImageUpdateEvent;
+import com.my.game.wesport.event.ProfileUpdatedLocalEvent;
+import com.my.game.wesport.event.UserProfileUpdatedEvent;
 import com.my.game.wesport.model.UserModel;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
@@ -49,6 +59,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     public final static int EDIT_COVER_IMAGE = 1;
     public final static int EDIT_AVATAR = 2;
     private int editImageType;
+
+    EventBus eventBus = EventBus.getDefault();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +150,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
-                FirebaseHelper.uploadPicture(resultUri, editImageType);
+                eventBus.post(new ProfileImageUpdateEvent(resultUri, editImageType));
+                eventBus.post(new ProfileUpdatedLocalEvent(resultUri, editImageType));
                 if (editImageType == EDIT_COVER_IMAGE) {
                     Glide.with(this).load(resultUri).into(userProfileCoverImage);
                 } else {
@@ -199,6 +212,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 .into(userProfileImage);
         Glide.with(this)
                 .load(userModelProfile.getCoverUri())
+                .error(R.drawable.image_placeholder_drawable)
                 .into(userProfileCoverImage);
     }
 
@@ -235,21 +249,43 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         isEditable = state;
         if (state) {
             nameText.setEnabled(true);
-            emailText.setEnabled(true);
             bioText.setEnabled(true);
-            userProfileImage.setEnabled(true);
-            userProfileCoverImage.setEnabled(true);
         } else {
             userModelProfile.setBio(bioText.getText().toString());
             userModelProfile.setDisplayName(nameText.getText().toString());
             userRef.setValue(userModelProfile);
 
             nameText.setEnabled(false);
-            emailText.setEnabled(false);
             bioText.setEnabled(false);
-            userProfileImage.setEnabled(false);
-            userProfileCoverImage.setEnabled(false);
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onUserProfileUpdated(UserProfileUpdatedEvent event) {
+        if (!isEditable) {
+            userModelProfile = App.getInstance().getUserModel();
+            updateViews(userModelProfile);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (eventBus.isRegistered(this)) {
+            eventBus.unregister(this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!eventBus.isRegistered(this)) {
+            eventBus.register(this);
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 }

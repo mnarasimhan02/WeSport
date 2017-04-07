@@ -1,10 +1,12 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
 import android.Manifest.permission;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
@@ -21,9 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
@@ -40,16 +39,20 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.my.game.wesport.GetAddressTask;
 import com.my.game.wesport.POJO.Example;
 import com.my.game.wesport.POJO.ParkModel;
+import com.my.game.wesport.R;
+import com.my.game.wesport.api.RetrofitMaps;
 import com.my.game.wesport.interfaces.InfoWindowRefresherNearBy;
-import com.my.game.wesport.ui.MyGames;
+import com.my.game.wesport.ui.MyGamesActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -60,6 +63,7 @@ import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 @SuppressWarnings("ALL")
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, PlaceSelectionListener,
@@ -107,6 +111,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     //private List<String> photoReference = new ArrayList<String>();
 
     private int photoReferenceSize = 0;
+    public static List<ParkModel> parkModels = new ArrayList<>();
 
 
     public MapsActivity() {
@@ -126,6 +131,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             setContentView(R.layout.activity_maps);
             mLayout = findViewById(android.R.id.content);
             myContentsView = getLayoutInflater().inflate(R.layout.custom_info_content, null);
+
+            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            selectedGame = chGame.getString("chosenGame", "Other");
+
+            Toast.makeText(this, selectedGame + " selected!", Toast.LENGTH_SHORT).show();
+
             setUpMapIfNeeded();
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
@@ -180,7 +191,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setUpMap() {
         map.getUiSettings().setZoomControlsEnabled(false);
-        if (ActivityCompat.checkSelfPermission(this,
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission(this,
                 permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -207,9 +218,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
             Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
             Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
+
             build_retrofit_and_get_response(getString((R.string.type_param)), mLat, mLon);
-            SharedPreferences chGame = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-            selectedGame = chGame.getString("chosenGame", "Other");
             setUserMarker(new LatLng(mLat, mLon));
 
         } catch (Exception e) {
@@ -237,7 +247,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onResponse(Response<Example> response, Retrofit retrofit) {
                 try {
                     // This loop will go through all the parkModels and add marker on each location.
-                    List<ParkModel> parkModels = response.body().getParkModels();
+                    parkModels = response.body().getParkModels();
                     if (parkModels.size() > 0) {
                         Toast.makeText(MapsActivity.this, R.string.map_help, Toast.LENGTH_LONG).show();
                     }
@@ -254,7 +264,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         if (mopen_now.equals("false")) {
                                             placeOpenstr = "closed";
                                         } else {
-                                            placeOpenstr = "Open now";
+                                            placeOpenstr- = "Open now";
                                         }
                                     }
                                 }
@@ -427,7 +437,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         String address = (String) place.getName();
         Toast.makeText(this, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
                 getString(R.string.save_game_text), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(MapsActivity.this, MyGames.class);
+        Intent intent = MyGamesActivity.newIntent(MapsActivity.this, selectedGame, place.getId());
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -470,12 +480,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             Toast.makeText(this, selectedGame + " " + getString(R.string.save_game) + " " + address + "  " +
                     getString(R.string.save_game_text), Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MapsActivity.this, MyGames.class);
+            Intent intent = MyGamesActivity.newIntent(MapsActivity.this, selectedGame, parkModel.getId());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

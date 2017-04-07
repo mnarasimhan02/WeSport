@@ -1,10 +1,10 @@
-package com.my.game.wesport;
+package com.my.game.wesport.api;
 import com.my.game.wesport.POJO.Example;
 import retrofit.http.GET;
 import retrofit.Call;
 import retrofit.http.Query;
 
-interface RetrofitMaps {
+public interface RetrofitMaps {
 
     /*
      * Retrofit get annotation with our URL

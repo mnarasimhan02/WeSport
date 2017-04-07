@@ -1,4 +1,4 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -27,9 +27,13 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.my.game.wesport.R;
+import com.my.game.wesport.event.NewGameEventAdded;
 import com.my.game.wesport.helper.DateHelper;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.model.EventModel;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,10 +42,14 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class EventEditActivity extends AppCompatActivity {
+    private static String EXTRA_GAME_AUTHOR_ID = "game_author";
     private EditText mEventDate;
     private EditText mEventTime;
     private final Calendar mDateAndTime = Calendar.getInstance();
+    EventBus eventBus = EventBus.getDefault();
 
     /**
      * Boolean flag that keeps track of whether the game has been edited (true) or not (false)
@@ -62,6 +70,7 @@ public class EventEditActivity extends AppCompatActivity {
      */
     private EditText mEventDesEditText;
     private String gameKey;
+    private String gameAuthorId;
     private static final String EXTRA_GAME_KEY = "game_key";
 
     /**
@@ -69,11 +78,12 @@ public class EventEditActivity extends AppCompatActivity {
      */
 
     /*if eventDataSnapShot null then its mean create new game*/
-    public static Intent newIntent(Context context, String gameKey, DataSnapshot eventDataSnapShot) {
+    public static Intent newIntent(Context context, String gameKey, String gameAuthorId, DataSnapshot eventDataSnapShot) {
         currentEventDataSnapShot = eventDataSnapShot;
 
         Intent intent = new Intent(context, EventEditActivity.class);
         intent.putExtra(EXTRA_GAME_KEY, gameKey);
+        intent.putExtra(EXTRA_GAME_AUTHOR_ID, gameAuthorId);
         return intent;
     }
 
@@ -103,6 +113,7 @@ public class EventEditActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_GAME_KEY)) {
             gameKey = intent.getStringExtra(EXTRA_GAME_KEY);
+            gameKey = intent.getStringExtra(EXTRA_GAME_AUTHOR_ID);
         } else {
             Toast.makeText(this, "Invalid game!", Toast.LENGTH_SHORT).show();
         }
@@ -216,14 +227,15 @@ public class EventEditActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().getCurrentUser().getUid()
         );
 
-        // Determine if this is a new or existing game by checking if currentGameKey is null or not
+        // Determine if this is a new or existing event by checking if currentEventKey is null or not
         if (currentEventDataSnapShot == null) {
-            // This is a NEW game, so insert a new game,
+            // This is a NEW event, so insert a new event,
             FirebaseHelper.getEventRef(gameKey).push().setValue(eventModel);
-            Snackbar.make(findViewById(android.R.id.content), getString(R.string.editor_insert_game_successful),
+            eventBus.post(new NewGameEventAdded(gameKey, gameAuthorId, eventModel));
+            Snackbar.make(findViewById(android.R.id.content), getString(R.string.editor_insert_event_successful),
                     Snackbar.LENGTH_LONG).show();
         } else {
-            // Otherwise this is an EXISTING game, so update the game
+            // Otherwise this is an EXISTING event, so update the event
             // we want to modify.
 
             FirebaseHelper.getEventRef(gameKey).child(currentEventDataSnapShot.getKey()).setValue(eventModel);
@@ -292,7 +304,7 @@ public class EventEditActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        // If the game hasn't changed, continue with handling back button press
+        // If the event hasn't changed, continue with handling back button press
         if (!eventHasChanged) {
             super.onBackPressed();
             return;
@@ -314,7 +326,7 @@ public class EventEditActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        // If this is a new game, hide the "Delete" menu item.
+        // If this is a new event, hide the "Delete" menu item.
         if (currentEventDataSnapShot == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setVisible(false);
@@ -328,7 +340,7 @@ public class EventEditActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Save game to database
+                // Save event to database
                 saveEvent();
                 //Show snackbar and then finish activity
                 Toast.makeText(this, R.string.calendar_add_event, Toast.LENGTH_SHORT).show();
@@ -343,7 +355,7 @@ public class EventEditActivity extends AppCompatActivity {
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
-                // which is the {@link GameListFragment}.
+                // which is the {@link EventListFragment}.
                 if (!eventHasChanged) {
                     finish();
                     return true;
@@ -385,7 +397,7 @@ public class EventEditActivity extends AppCompatActivity {
         builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // UserModel clicked the "Keep editing" button, so dismiss the dialog
-                // and continue editing the game.
+                // and continue editing the event.
                 if (dialog != null) {
                     dialog.dismiss();
                 }
@@ -405,17 +417,17 @@ public class EventEditActivity extends AppCompatActivity {
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the postivie and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setMessage(R.string.delete_event_dialog_msg);
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // UserModel clicked the "Delete" button, so delete the game.
+                // UserModel clicked the "Delete" button, so delete the event.
                 deleteEvent();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // UserModel clicked the "Cancel" button, so dismiss the dialog
-                // and continue editing the game.
+                // and continue editing the event.
                 if (dialog != null) {
                     dialog.dismiss();
                 }
@@ -428,12 +440,13 @@ public class EventEditActivity extends AppCompatActivity {
     }
 
     /**
-     * Perform the deletion of the game in the database.
+     * Perform the deletion of the event in the database.
      */
     private void deleteEvent() {
-        // Only perform the delete if this is an existing game.
+        // Only perform the delete if this is an existing event.
         if (currentEventDataSnapShot != null) {
-            FirebaseHelper.getGamesRef(currentEventDataSnapShot.getKey()).removeValue();
+//            FirebaseHelper.getEventRef(currentEventDataSnapShot.getKey()).removeValue();
+            currentEventDataSnapShot.getRef().removeValue();
         }
         // Close the activity
         finish();
@@ -443,5 +456,10 @@ public class EventEditActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         currentEventDataSnapShot = null;
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

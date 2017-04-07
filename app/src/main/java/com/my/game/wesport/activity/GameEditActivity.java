@@ -1,4 +1,4 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -37,6 +37,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.my.game.wesport.App;
+import com.my.game.wesport.R;
 import com.my.game.wesport.data.GameContract.GameEntry;
 import com.my.game.wesport.helper.DateHelper;
 import com.my.game.wesport.helper.FirebaseHelper;
@@ -49,6 +51,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static com.my.game.wesport.R.id.start_time;
 
@@ -351,21 +355,22 @@ public class GameEditActivity extends AppCompatActivity {
                 placeId,
                 gameaddress,
                 GameHelper.getGameNameByIndex(selectedGamePosition),
-                FirebaseAuth.getInstance().getCurrentUser().getUid()
+                FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                App.getInstance().getUserModel().getDisplayName()
         );
 
 
         // Determine if this is a new or existing game by checking if currentGameKey is null or not
         if (currentGameDataSnapShot == null) {
             // This is a NEW game, so insert a new game,
-            FirebaseHelper.getGamesRef(placeId).push().setValue(gameModel);
+            FirebaseHelper.getGamesRef(FirebaseHelper.getCurrentUser().getUid()).push().setValue(gameModel);
             Snackbar.make(mLayout, getString(R.string.editor_insert_game_successful),
                     Snackbar.LENGTH_LONG).show();
         } else {
             // Otherwise this is an EXISTING game, so update the game
             // we want to modify.
 
-            FirebaseHelper.getGamesRef(placeId).child(currentGameDataSnapShot.getKey()).setValue(gameModel);
+            currentGameDataSnapShot.getRef().setValue(gameModel);
         }
         writeCalendarEvent(gameaddress, selectedGame, gameDescription, startDate, startTime, endTime, notesString);
     }
@@ -446,10 +451,26 @@ public class GameEditActivity extends AppCompatActivity {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save game to database
-                saveGames();
-                //Show snackbar and then finish activity
-                Toast.makeText(this, R.string.calendar_add_game, Toast.LENGTH_SHORT).show();
-                GameEditActivity.this.finish();
+                if (mNameEditText.getText().toString().length() < 1
+                        && mnotesEditText.getText().toString().length() < 1
+                        && mstartDate.getText().toString().length() < 1
+                        && mstartTime.getText().toString().length() < 1
+                        && mendTime.getText().toString().length() < 1
+                        && mnotesEditText.getText().toString().length() < 1)
+                {
+                    mNameEditText.setError("Please enter game name");
+                    mnotesEditText.setError("Please enter any description for the game");
+                    mstartDate.setError("Please choose your start date");
+                    mstartTime.setError("Please choose your start time");
+                    mendTime.setError("Please choose your end time");
+                    mnotesEditText.setError("Please enter some notes for the game");
+                } else {
+                    saveGames();
+                    //Show snackbar and then finish activity
+                    Toast.makeText(this, R.string.calendar_add_game, Toast.LENGTH_SHORT).show();
+                    GameEditActivity.this.finish();
+                }
+
                 // Exit activity
                 //finish();
                 return true;
@@ -581,7 +602,7 @@ public class GameEditActivity extends AppCompatActivity {
         // Create an AlertDialog.Builder and set the message, and click listeners
         // for the postivie and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.delete_dialog_msg);
+        builder.setMessage(R.string.delete_game_dialog_msg);
         builder.setPositiveButton(R.string.delete, new OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // UserModel clicked the "Delete" button, so delete the game.
@@ -610,7 +631,7 @@ public class GameEditActivity extends AppCompatActivity {
     private void deleteGame() {
         // Only perform the delete if this is an existing game.
         if (currentGameDataSnapShot != null) {
-            FirebaseHelper.getGamesRef(currentGameDataSnapShot.getKey()).removeValue();
+            currentGameDataSnapShot.getRef().removeValue();
         }
         // Close the activity
         finish();
@@ -620,5 +641,10 @@ public class GameEditActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         currentGameDataSnapShot = null;
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

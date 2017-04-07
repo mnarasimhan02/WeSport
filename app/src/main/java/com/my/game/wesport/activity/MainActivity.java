@@ -1,4 +1,4 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
 import android.Manifest.permission;
 import android.content.Context;
@@ -31,6 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.common.ConnectionResult;
@@ -45,13 +47,24 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.my.game.wesport.App;
+import com.my.game.wesport.R;
+import com.my.game.wesport.adapter.HomeGridAdapter;
+import com.my.game.wesport.adapter.UsersChatListAdapter;
+import com.my.game.wesport.event.ProfileUpdatedLocalEvent;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.GameHelper;
 import com.my.game.wesport.helper.NotificationHelper;
 import com.my.game.wesport.login.SigninActivity;
+import com.my.game.wesport.model.NotificationModel;
 import com.my.game.wesport.model.UserModel;
 import com.my.game.wesport.ui.ChatActivity;
-import com.my.game.wesport.userinvites.DeepLinkActivity;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static android.support.design.widget.Snackbar.make;
 
@@ -79,19 +92,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
-
-    // tags used to attach the fragments
-    private static final String TAG_HOME = "home";
-    private static final String TAG_PHOTOS = "photos";
-    public static String CURRENT_TAG = TAG_HOME;
-
     private boolean shouldLoadHomeFragOnBackPress = true;
 
-    private UserModel userModel;
-
-    // toolbar titles respected to selected nav menu item
-    private String[] activityTitles;
-    // --Commented out by Inspection (3/8/17, 4:16 PM):private FirebaseDatabase mFirebaseDatabase;
+    EventBus eventBus = EventBus.getDefault();
 
 
     @Override
@@ -101,10 +104,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         NotificationHelper.subscribe();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        userModel = App.getInstance().getUserModel();
-
-        updateProfilePic();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -160,10 +159,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         buildGoogleApiClient();
 
         loadNavHeader();
+
+//        location udpated in profile
+        /*FirebaseHelper.getCurrentUserRef().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (FirebaseHelper.getCurrentUser() != null) {
+                    UserModel user = dataSnapshot.getValue(UserModel.class);
+                    if (user != null) {
+                        App.getInstance().setUserModel(user);
+                        loadNavHeader();
+                        eventBus.post(new UserProfileUpdatedEvent());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
     }
 
     private void loadNavHeader() {
-        if(userModel == null) {
+        UserModel userModel = App.getInstance().getUserModel();
+        if (userModel == null) {
             return;
         }
         // Loading name and email
@@ -175,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             // Loading profile image
             Glide.with(this).load(userModel.getPhotoUri()).error(R.drawable.profile).into(imgProfile);
-            // updateProfilePic();
         } catch (Exception e) {
             Log.d(TAG, "loadNavHeader: " + e.getLocalizedMessage());
         }
@@ -192,23 +211,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     //Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_profile:
                         navItemIndex = 0;
-                        CURRENT_TAG = TAG_PHOTOS;
                         startActivity(new Intent(MainActivity.this, UserProfileActivity.class));
                         break;
                     case R.id.nav_invite_friends:
                         navItemIndex = 1;
-                        CURRENT_TAG = TAG_PHOTOS;
                         FirebaseHelper.inviteFriends(MainActivity.this, REQUEST_INVITE);
                         break;
-                    case R.id.nav_group:
+                    case R.id.nav_invites:
                         navItemIndex = 2;
-                        CURRENT_TAG = TAG_PHOTOS;
-                        startActivity(new Intent(MainActivity.this, GroupActivity.class));
+                        startActivity(new Intent(MainActivity.this, InvitesActivity.class));
                         break;
                     case R.id.nav_nearby_users:
                         navItemIndex = 3;
-                        CURRENT_TAG = TAG_PHOTOS;
                         startActivity(new Intent(MainActivity.this, NearbyUserActivity.class));
+                        break;
+                    case R.id.nav_dashboard:
+                        navItemIndex = 3;
+                        startActivity(TeamsActivity.newIntent(MainActivity.this));
                         break;
                     case R.id.nav_log_out:
                         // launch new intent instead of loading fragment
@@ -234,6 +253,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void signoutuser() {
         //FirebaseAuth.getInstance().signOut();
+        NotificationHelper.unSubscribeAndLogout();
+        mGoogleApiClient.disconnect();
+        FirebaseHelper.setUserConnectionStatus(FirebaseHelper.getCurrentUser().getUid(), UsersChatListAdapter.OFFLINE);
         AuthUI.getInstance()
                 .signOut(this)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -278,23 +300,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             // rather than home
             if (navItemIndex != 0) {
                 navItemIndex = 0;
-                CURRENT_TAG = TAG_HOME;
                 //loadHomeFragment();
                 return;
             }
         }
         super.onBackPressed();
-    }
-
-    private void updateProfilePic() {
-        ImageView imageView = (ImageView) findViewById(R.id.user_profile_image);
-        if (App.getInstance().getUserModel() != null) {
-            try {
-                Glide.with(this).load(App.getInstance().getUserModel().getPhotoUri()).error(R.drawable.profile).into(imageView);
-            } catch (Exception e) {
-                Log.d(TAG, "updateProfilePic: " + e.getLocalizedMessage());
-            }
-        }
     }
 
     @SuppressWarnings("UnusedAssignment")
@@ -367,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), permission.WRITE_EXTERNAL_STORAGE) +
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(getApplicationContext(), permission.WRITE_EXTERNAL_STORAGE) +
                 ContextCompat.checkSelfPermission(getApplicationContext(), permission.ACCESS_COARSE_LOCATION) +
                 (ContextCompat.checkSelfPermission(getApplicationContext(), permission.WRITE_CALENDAR))
                 != PackageManager.PERMISSION_GRANTED) {
@@ -443,6 +453,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         // New location has now been determined
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
+
+        GeoFire geoFire = new GeoFire(FirebaseHelper.getLocationRef());
+        geoFire.setLocation(FirebaseHelper.getCurrentUser().getUid(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+
         storeprefs(lat, lon);
         updateLocationtoFirebase(lat, lon);
     }
@@ -461,19 +475,27 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void parseNotifyMessageFromBundle(Intent intent) {
+        Log.d(TAG, "parseNotifyMessageFromBundle: ");
         // user clicked on notification
+
         Bundle bundle = intent.getExtras();
         if (bundle != null && bundle.containsKey(NotificationHelper.EXTRA_MESSAGE)) {
 //            dialogHelper.showProgressDialog("Please wait!", "Loading chat!", true);
-            final String potentialUserIdForChat = bundle.getString(NotificationHelper.EXTRA_MESSAGE);
-            FirebaseHelper.getUserRef().child(potentialUserIdForChat).addListenerForSingleValueEvent(new ValueEventListener() {
+            final String jsonMessage = bundle.getString(NotificationHelper.EXTRA_MESSAGE);
+            final NotificationModel notificationModel = NotificationHelper.parse(jsonMessage);
+            FirebaseHelper.getUserRef().child(notificationModel.getPotentialUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 //                    dialogHelper.dismiss();
                     if (dataSnapshot != null) {
                         UserModel profileModel = dataSnapshot.getValue(UserModel.class);
-                        profileModel.setRecipientId(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                        startActivity(ChatActivity.newIntent(MainActivity.this, profileModel));
+                        if (notificationModel.getType() == NotificationHelper.TYPE_EVENT) {
+                            startActivity(GroupActivity.newIntent(MainActivity.this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey()));
+                        } else if (notificationModel.getType() == NotificationHelper.TYPE_INVITATION) {
+                            startActivity(new Intent(MainActivity.this, InvitesActivity.class));
+                        } else {
+                            startActivity(ChatActivity.newIntent(MainActivity.this, profileModel, dataSnapshot.getKey()));
+                        }
                     }
                 }
 
@@ -500,4 +522,37 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         return true;
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onLocalProfileUpdated(ProfileUpdatedLocalEvent event) {
+        if (event.getImageType() == UserProfileActivity.EDIT_AVATAR) {
+            // Loading profile image
+            Glide.with(this).load(event.getImageUri()).error(R.drawable.profile).into(imgProfile);
+        } else if (event.getImageType() == UserProfileActivity.EDIT_COVER_IMAGE) {
+            // Loading header cover/background image
+            Glide.with(this).load(event.getImageUri()).into(imgNavHeaderCover);
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (eventBus.isRegistered(this)) {
+            eventBus.unregister(this);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!eventBus.isRegistered(this)) {
+            eventBus.register(this);
+        }
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 }

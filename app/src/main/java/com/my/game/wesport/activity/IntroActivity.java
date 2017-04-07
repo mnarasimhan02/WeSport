@@ -1,11 +1,15 @@
-package com.my.game.wesport;
+package com.my.game.wesport.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
+import com.my.game.wesport.R;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 @SuppressWarnings("ALL")
 public class IntroActivity extends AppIntro {
@@ -41,4 +45,8 @@ public class IntroActivity extends AppIntro {
         finish();
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 }
