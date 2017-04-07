@@ -69,10 +69,11 @@
             android:id="@+id/text_view_bio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
+            android:fontFamily="serif"
             android:text="@string/empty_view_subtitle_text"
             android:textAppearance="?android:textAppearanceSmall"
-            android:textColor="#A2AAB0" />
+            android:textSize="12sp"
+            android:textColor="#98a1a7" />
     </LinearLayout>
 
 </RelativeLayout>

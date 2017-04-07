@@ -33,7 +33,7 @@
                     android:id="@+id/user_profile_cover_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/profile"
+                    android:src="@drawable/image_placeholder_drawable"
                     app:layout_collapseMode="parallax" />
 
             </FrameLayout>
@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.my.game.wesport.UserProfileActivity"
+        tools:context="com.my.game.wesport.activity.UserProfileActivity"
         tools:showIn="@layout/activity_profile_user">
 
         <LinearLayout
@@ -120,6 +120,7 @@
                     android:textColor="#000" />
 
                 <EditText
+                    android:enabled="false"
                     android:hint="Your Name"
                     android:textSize="17sp"
                     android:textColor="#30d338"
@@ -148,6 +149,7 @@
                     android:textColor="#000" />
 
                 <EditText
+                    android:enabled="false"
                     android:hint="Your Bio"
                     android:textSize="17sp"
                     android:textColor="#30d338"

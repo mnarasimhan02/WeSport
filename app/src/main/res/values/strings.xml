@@ -92,6 +92,7 @@
 
     <!-- Toast message in editor when new game has been successfully inserted [CHAR LIMIT=NONE] -->
     <string name="editor_insert_game_successful">Game saved</string>
+    <string name="editor_insert_event_successful">Event saved</string>
 
     <!-- Toast message in editor when new game has failed to be inserted [CHAR LIMIT=NONE] -->
     <string name="editor_insert_game_failed">Error with saving Game</string>
@@ -116,7 +117,10 @@
     <string name="editor_delete_game_failed">Error with deleting Game</string>
 
     <!-- Dialog message to ask the userModel to confirm deleting the current game [CHAR LIMIT=NONE] -->
-    <string name="delete_dialog_msg">Delete this Game?</string>
+    <string name="delete_game_dialog_msg">Delete this Game?</string>
+    <string name="delete_event_dialog_msg">Delete this Event?</string>
+    <string name="delete_image_dialog_msg">Delete this image?</string>
+    <string name="delete_user_dialog_msg">Remove %1$s?</string>
 
     <!-- Dialog button text for the option to confirm deleting the current game [CHAR LIMIT=20] -->
     <string name="delete">Delete</string>
@@ -251,6 +255,11 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="error_permission_not_granted">Cancelling, required permissions are not granted</string>
+    <string name="profile">Profile</string>
+    <string name="team_members">Team Members</string>
+    <string name="add_upcoming_event">Add upcoming event</string>
+    <string name="add_an_image">Add an image</string>
+    <string name="delete_member">Delete member from group</string>
 </resources>
 
 

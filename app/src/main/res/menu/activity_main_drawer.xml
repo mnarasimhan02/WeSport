@@ -5,19 +5,24 @@
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/ic_account_circle_black_24dp"
-            android:title="Profile" />
+            android:title="@string/profile" />
         <item
             android:id="@+id/nav_invite_friends"
             android:icon="@drawable/ic_action_invite_friends"
-            android:title="Invite Friends" />
+            android:title="@string/invite_friends" />
         <item
-            android:id="@+id/nav_group"
+            android:id="@+id/nav_invites"
             android:icon="@drawable/ic_group_work_black_24dp"
-            android:title="Group" />
+            android:title="Invites" />
+
         <item
             android:id="@+id/nav_nearby_users"
             android:icon="@drawable/ic_person_nearby_user"
             android:title="Nearby Users" />
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="My Games" />
     </group>
 
     <group android:id="@+id/group2">

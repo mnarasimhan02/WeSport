@@ -54,11 +54,12 @@ dependencies {
     //Retrofit
 
 
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support:cardview-v7:25.2.0'
-    compile 'com.android.support:recyclerview-v7:25.2.0'
-    compile 'com.android.support:gridlayout-v7:25.2.0'
-    compile 'com.android.support:design:25.2.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:gridlayout-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.google.apis:google-api-services-people:v1-rev63-1.22.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.1'
     compile 'com.google.android.gms:play-services-maps:10.2.0'
@@ -83,8 +84,9 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.1'
-    compile 'com.android.support:support-v4:25.3.1'
     compile 'com.afollestad:drag-select-recyclerview:0.3.6'
+    compile 'com.firebase:geofire-android:2.1.1'
+    compile 'uk.co.chrisjenx:calligraphy:2.2.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 }

@@ -16,6 +16,8 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <uses-feature
         android:glEsVersion="0x00020000"
@@ -29,20 +31,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
+            <!--<intent-filter>
+                &lt;!&ndash;for notification&ndash;&gt;
                 <action android:name="OPEN_HOME_ACTIVITY" />
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://games” -->
-                <data
-                    android:host="games"
-                    android:scheme="http" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -61,7 +56,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".GameEditActivity"
+            android:name=".activity.GameEditActivity"
             android:label="@string/app_name" />
 
         <!--
@@ -72,31 +67,30 @@
         -->
 
         <activity
-            android:name=".IntroActivity"
+            android:name=".activity.IntroActivity"
             android:label="@string/app_intro" />
         <activity
             android:name=".login.SigninActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/GreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:launchMode="singleTop"
             android:name=".ui.ChatActivity"
             android:label="@string/title_activity_chat"
-            android:parentActivityName=".ui.MyGames"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".MapsActivity"
+            android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activity.MainActivity" />
 
         <receiver android:name="gameswidget.DetailWidgetProvider">
             <intent-filter>
-
                 <!--
     This widget provider receives broadcast with following action
     name or simply onUpdate of AppWidgetProvider is called
@@ -115,13 +109,9 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
-            android:name=".ui.MyGames"
+            android:name=".ui.MyGamesActivity"
             android:label="@string/title_activity_my_games"
-            android:theme="@style/MyMaterialTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.my.game.wesport.MapsActivity" />
-        </activity>
+            android:theme="@style/MyMaterialTheme" />
         <activity android:name=".userinvites.DeepLinkActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -138,7 +128,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".UserProfileActivity"
+            android:name=".activity.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
@@ -156,12 +146,20 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".NearbyUserActivity" />
+        <activity android:name=".activity.NearbyUserActivity" />
         <activity
-            android:name=".GroupActivity"
+            android:name=".activity.GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".EventEditActivity" />
-        <activity android:name=".activity.FullscreenImageActivity"/>
+        <activity android:name=".activity.EventEditActivity" />
+        <activity android:name=".activity.FullscreenImageActivity" />
+        <activity
+            android:name=".activity.InvitesActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.InviteUserActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.OtherUserProfileActivity" />
+        <activity android:name=".activity.TeamsActivity" />
     </application>
 
 </manifest>

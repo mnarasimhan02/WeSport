@@ -26,6 +26,7 @@
             android:textColor="#ff000000"
             android:textSize="14sp"
             android:textStyle="bold" />
+<!--
 
         <TextView
             android:id="@+id/nearby_user_email"
@@ -34,6 +35,7 @@
             android:layout_marginTop="5dp"
             android:textColor="#ff7f7f7f"
             android:textSize="14sp" />
+-->
 
        <!-- <TextView
             android:id="@+id/open_now"

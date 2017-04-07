@@ -1,75 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#e0f2d2"
     android:paddingLeft="5dp"
     android:paddingRight="5dp"
-    android:background="#e0f2d2"
     tools:context="com.my.game.wesport.ui.ChatActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/senderContainer"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:clipToPadding="false" />
 
     <RelativeLayout
         android:id="@+id/senderContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="1dp"
-        android:paddingLeft="2dp"
-        android:paddingRight="4dp"
-        android:paddingTop="8dp"
-        android:background="#e0f2d2"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:background="#e0f2d2">
 
         <EditText
             android:id="@+id/edit_text_message"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#555555"
-            android:textSize="18sp"
-            android:background="@drawable/backgroundmsg"
-            android:hint="Type your message"
-            android:gravity="fill_vertical"
-            android:layout_width="290dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_alignParentStart="true" />
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_toLeftOf="@+id/btn_send_message"
+            android:background="@drawable/backgroundmsg"
+            android:gravity="fill_vertical"
+            android:hint="Type your message"
+            android:paddingLeft="10dp"
+            android:textColor="#747474"
+            android:textSize="16sp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_send_message"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_send_black_24dp" />
 
     </RelativeLayout>
-    <RelativeLayout
+
+    <!--<RelativeLayout
         android:id="@+id/rl"
-        android:background="@drawable/send_round_background"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="11dp"
         android:layout_marginRight="10sp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true">
+        android:background="@drawable/send_round_background">
+
         <Button
             android:id="@+id/btn_send_message"
-            android:layout_marginEnd="10dp"
-            android:layout_width="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="14dp"
-            android:layout_height="25dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/ic_send_black_24dp" />
-    </RelativeLayout>
+    </RelativeLayout>-->
 
     <ProgressBar
         android:id="@+id/progress_for_chat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:visibility="gone"/>
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -77,8 +89,7 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="horizontal"
-        tools:ignore="UselessLeaf"
-        android:id="@+id/linearLayout">
+        tools:ignore="UselessLeaf">
 
     </LinearLayout>
 
