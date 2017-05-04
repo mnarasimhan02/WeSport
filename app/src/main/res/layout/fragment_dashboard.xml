@@ -2,15 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     tools:context="com.my.game.wesport.fragment.DashboardFragment">
 
 
     <android.support.v7.widget.RecyclerView
+        android:layout_margin="5dp"
         android:id="@+id/dashboard_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:padding="@dimen/game_list_item_space" />
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:id="@+id/empty_view"
@@ -47,4 +47,15 @@
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="#A2AAB0" />
     </RelativeLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom|center"
+        ads:adSize="FULL_BANNER"
+        ads:adUnitId="@string/admob_app_id">
+    </com.google.android.gms.ads.AdView>
 </RelativeLayout>

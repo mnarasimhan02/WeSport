@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="145dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="4sp"
+    android:background="#fff"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="145dp"
+        android:layout_height="135dp"
+        android:background="@drawable/my_games_new_shape"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/action_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_edit_24dp"
+            android:tint="@color/colorAccent"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/chatimage"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_gravity="center"
+            android:background="@drawable/my_new_game_shape"
+            android:contentDescription="@string/accessibility_chatbox"
+            android:padding="5dp"
+            android:src="@drawable/cricket"
+            android:tint="#6fb472" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15sp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:maxLines="2"
+            android:textColor="@color/colorAccent"
+            android:textSize="12sp"
+            tools:text="Cricket jkljdsf sakdlfj kasdlfjklasdjfkl asdjf klasdfjklasd flkasdjfklasdjflk" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="105dp"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="2sp"
+                    android:background="@drawable/ic_person_black_24dp" />
+
+                <TextView
+                    android:id="@+id/owner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4sp"
+                    android:layout_marginTop="3sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#344554"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="Abdul Qadir" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="2sp"
+                    android:background="@drawable/ic_place_black_24dp" />
+
+                <TextView
+                    android:id="@+id/address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:padding="2dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#6d8091"
+                    android:textSize="12sp"
+                    tools:text="at Abad nagar " />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginLeft="2sp"
+                    android:layout_marginTop="2sp"
+                    android:background="@drawable/ic_watch_later_black_24dp" />
+
+                <TextView
+                    android:id="@+id/startdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#2B3D4D"
+                    android:textSize="10sp"
+                    tools:text="23/04/2017" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3sp"
+                android:layout_marginLeft="10sp"
+                android:layout_marginTop="2sp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:maxLines="4"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/colorAccent"
+                android:textSize="10sp"
+                tools:text="Win  df kldfjkladfl  sdlf j kdsfj sdklfjlsdljdklfj skldjfklas jdklfjsdlfjklasd jfksjdklf jskld fjkls jdklf jskldj flksdjflk sjdfskldf jlskd fj" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:id="@+id/send_invite_btn"
+            android:background="@drawable/my_games_new_shape"
+            android:textColor="@color/white"
+            android:foreground="?android:selectableItemBackground"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:padding="8dp"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ask to Join" />
+    </LinearLayout>
+
+
+</LinearLayout>

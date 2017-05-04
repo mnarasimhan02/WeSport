@@ -1,8 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
 
-</LinearLayout>
+    <!--<com.google.android.gms.ads.AdView
+        android:id="@+id/adView_signIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_skip_layout"
+        ads:adSize="LARGE_BANNER"
+        ads:adUnitId="@string/ad_unit_id" />-->
+
+   <!-- <LinearLayout
+        android:id="@+id/bottom_skip_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:foreground="?android:selectableItemBackground"
+        android:gravity="center_vertical"
+        android:onClick="onSkipClick"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/skip_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:clickable="false"
+            android:text="SKIP"
+            android:textColor="#000"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/ic_navigate_next_black_24dp"
+            android:clickable="false" />
+
+    </LinearLayout>-->
+
+</RelativeLayout>

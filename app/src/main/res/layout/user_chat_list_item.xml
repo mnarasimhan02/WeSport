@@ -19,19 +19,20 @@
         tools:text="Online" />
 
     <TextView
-        android:layout_margin="5dp"
         android:id="@+id/text_unread_message_count"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         android:background="@drawable/online_counter_bg"
         android:gravity="center"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textStyle="bold"
         tools:ignore="RelativeOverlap,RtlSymmetry"
-        android:text="12" />
+        android:text="12"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_avatar"

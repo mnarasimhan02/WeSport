@@ -34,11 +34,15 @@
             android:name=".activity.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
-                &lt;!&ndash;for notification&ndash;&gt;
+            <intent-filter>
+
+                <!-- for notification -->
                 <action android:name="OPEN_HOME_ACTIVITY" />
-            </intent-filter>-->
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
+
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -79,34 +83,35 @@
             </intent-filter>
         </activity>
         <activity
-            android:launchMode="singleTop"
             android:name=".ui.ChatActivity"
             android:label="@string/title_activity_chat"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activity.MapsActivity"
             android:label="@string/title_activity_maps"
             android:parentActivityName=".activity.MainActivity" />
 
-        <receiver android:name="gameswidget.DetailWidgetProvider">
+        <!--<receiver android:name="gameswidget.DetailWidgetProvider">
             <intent-filter>
-                <!--
+
+                &lt;!&ndash;
     This widget provider receives broadcast with following action
     name or simply onUpdate of AppWidgetProvider is called
-                -->
+                &ndash;&gt;
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.example.android.wesport.app.ACTION_DATA_UPDATED" />
             </intent-filter>
-            <!-- linking up xml file of appwidget-provider to AppWidgetProvider -->
+            &lt;!&ndash; linking up xml file of appwidget-provider to AppWidgetProvider &ndash;&gt;
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widgetinfo" />
-        </receiver>
+        </receiver>-->
 
-        <service
+        <!--<service
             android:name="gameswidget.DetailWidgetRemoteViewsService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
+            android:permission="android.permission.BIND_REMOTEVIEWS" />-->
 
         <activity
             android:name=".ui.MyGamesActivity"
@@ -130,7 +135,7 @@
         <activity
             android:name=".activity.UserProfileActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            />
 
         <service android:name=".services.TokenService">
             <intent-filter>
@@ -150,6 +155,7 @@
         <activity
             android:name=".activity.GroupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity android:name=".activity.EventEditActivity" />
         <activity android:name=".activity.FullscreenImageActivity" />
         <activity
@@ -160,6 +166,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.OtherUserProfileActivity" />
         <activity android:name=".activity.TeamsActivity" />
+        <activity android:name=".activity.GamesGridActivity"></activity>
+        <meta-data
+            tools:replace="android:value"
+            android:name="io.fabric.ApiKey"
+            android:value="383cb317c71043976840b7bbf8c05ddb9d5db7d6" />
     </application>
 
 </manifest>

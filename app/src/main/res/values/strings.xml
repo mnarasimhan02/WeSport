@@ -64,6 +64,7 @@
         <item> Pingpong</item>
         <item> Soccer</item>
         <item> Volleyball</item>
+        <item> Other</item>
     </string-array>
 
 
@@ -72,7 +73,7 @@
     <!-- Label for overflow menu option that deletes all GameModel data in the app [CHAR LIMIT=20] -->
     <string name="action_delete_all_entries">Delete All Games</string>
 
-    <!-- Title text for the empty view, which describes the empty GameModel image [CHAR LIMIT=50] -->
+    <!-- Title text for the empty view, which describes the empty GameModel categoryId [CHAR LIMIT=50] -->
     <string name="empty_view_title_text" tools:ignore="TypographyEllipsis">Let\'s play together...</string>
 
     <!-- Subtitle text for the empty view that prompts the userModel to add a GameModel [CHAR LIMIT=50] -->
@@ -119,7 +120,7 @@
     <!-- Dialog message to ask the userModel to confirm deleting the current game [CHAR LIMIT=NONE] -->
     <string name="delete_game_dialog_msg">Delete this Game?</string>
     <string name="delete_event_dialog_msg">Delete this Event?</string>
-    <string name="delete_image_dialog_msg">Delete this image?</string>
+    <string name="delete_image_dialog_msg">Delete this category?</string>
     <string name="delete_user_dialog_msg">Remove %1$s?</string>
 
     <!-- Dialog button text for the option to confirm deleting the current game [CHAR LIMIT=20] -->
@@ -128,10 +129,10 @@
     <!-- Dialog button text for the option to cancel deletion of the current game [CHAR LIMIT=20] -->
     <string name="cancel">Cancel</string>
 
-    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
+    <!-- Label for overview categoryId of attributes in the editor [CHAR LIMIT=30] -->
     <string name="game_description">Game Description</string>
 
-    <!-- Label for overview category of attributes in the editor [CHAR LIMIT=30] -->
+    <!-- Label for overview categoryId of attributes in the editor [CHAR LIMIT=30] -->
     <string name="game_startdate">Date</string>
 
     <string name="game_starttime">Start Time</string>
@@ -181,14 +182,14 @@
     <!-- Log messages-->
 
     <string name="accessibility_grid">select games from grid</string>
-    <string name="accessibility_widget">widget image</string>
+    <string name="accessibility_widget">widget category</string>
     <string name="accessibility_emptygame">empty game</string>
-    <string name="accessibility_chatbox">image for chatroom</string>
+    <string name="accessibility_chatbox">category for chatroom</string>
     <string name="sensor_param">false</string>
     <string name="get_address">retrieving address</string>
     <string name="map_help">Tap any park to find out more information and then click info window/search to retrieve address</string>
     <string name="loc_not_enable">Turn on location settings</string>
-    <string name="accessibility_place">park image</string>
+    <string name="accessibility_place">park category</string>
 
 
     <!-- LogInActivity-->
@@ -258,8 +259,15 @@
     <string name="profile">Profile</string>
     <string name="team_members">Team Members</string>
     <string name="add_upcoming_event">Add upcoming event</string>
-    <string name="add_an_image">Add an image</string>
+    <string name="add_an_image">Add an category</string>
     <string name="delete_member">Delete member from group</string>
+    <string name="empty_user_list_text">No near-by users yet, please invite friends</string>
+
+
+    <string name="admob_app_id">ca-app-pub-9060826341226042~1568359014 </string>
+    <string name="ad_unit_id">ca-app-pub-9060826341226042/8279309811</string>
+    <string name="select_game">Select Game</string>
+    <string name="join_game_invitation_text">I want to join your game \"%1$s\". Please invite me.</string>
 </resources>
 
 
