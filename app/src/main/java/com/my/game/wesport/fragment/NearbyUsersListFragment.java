@@ -18,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
+import com.my.game.wesport.activity.OtherUserProfileActivity;
 import com.my.game.wesport.adapter.SimpleUserListAdapter;
 import com.my.game.wesport.adapter.UsersChatListAdapter;
 import com.my.game.wesport.helper.FirebaseHelper;
@@ -26,6 +27,7 @@ import com.my.game.wesport.helper.NotificationHelper;
 import com.my.game.wesport.model.GameInviteModel;
 import com.my.game.wesport.model.UserListItem;
 import com.my.game.wesport.model.UserModel;
+import com.my.game.wesport.ui.ChatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,7 @@ public class NearbyUsersListFragment extends Fragment implements UsersChatListAd
     private List<String> mUsersKeyList;
     List<String> gameInvitations = new ArrayList<>();
     String gameKey = "";
+    private String gameAuthorId = "";
 
     public static NearbyUsersListFragment newInstance(String gameKey) {
         Bundle args = new Bundle();
@@ -152,26 +155,10 @@ public class NearbyUsersListFragment extends Fragment implements UsersChatListAd
                 !gameInvitations.contains(snapshot.getKey()) && distance <= 50;
     }
 
-
-   /* private LatLng getLocationFromPref() {
-        try {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-            LatLng latLng = new LatLng(
-                    Double.parseDouble(prefs.getString("latitude", "0.0")),
-                    Double.parseDouble(prefs.getString("longtitude", "0.0"))
-            );
-
-            return latLng;
-        } catch (Exception e) {
-            Log.d(TAG, "getLocationFromPref: " + e.getLocalizedMessage());
-        }
-
-        return new LatLng(0.0, 0.0);
-    }
-*/
-
     @Override
     public void onUserItemClick(int position, UserListItem userListItem) {
+
+
     }
 
     @Override

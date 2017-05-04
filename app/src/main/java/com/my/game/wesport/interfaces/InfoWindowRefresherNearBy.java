@@ -30,6 +30,9 @@ public class InfoWindowRefresherNearBy implements RequestListener <Uri, GlideDra
         if (markerToRefresh != null && markerToRefresh.isInfoWindowShown()) {
             markerToRefresh.hideInfoWindow();
             markerToRefresh.showInfoWindow();
+
         }
-        return false;}
+        return false;
+    }
+
 }
