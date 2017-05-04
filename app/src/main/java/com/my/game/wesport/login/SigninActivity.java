@@ -13,9 +13,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -58,6 +61,7 @@ public class SigninActivity extends AppCompatActivity {
     public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN = 1;
     public static final int RC_SIGN_GOOGLE = 2;
+    boolean isNewUser = false;
 
 
     //private MessageAdapter mMessageAdapter;
@@ -86,6 +90,21 @@ public class SigninActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_signin);
 
+      /*  AdView mAdView = (AdView) findViewById(R.id.adView_signIn);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("8D55278B12588486D7D396079CB75B6B")
+                .build();
+        mAdView.loadAd(adRequest)*/;
+        skipSplashScreen();
+
+    }
+
+   /* public void onSkipClick(View view) {
+       // skipSplashScreen(view);
+    }*/
+
+    public void skipSplashScreen() {
         //  Declare a new thread to do a preference check. Library to invoke Intro slides
         Thread t = new Thread(new Runnable() {
             @Override
@@ -123,7 +142,12 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private void setAuthInstance() {
-        setupGoogleAdditionalDetailsLogin();
+        try {
+            setupGoogleAdditionalDetailsLogin();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "setAuthInstance: " + e.getMessage());
+        }
 
         mMessagesDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
@@ -163,6 +187,7 @@ public class SigninActivity extends AppCompatActivity {
     }
 
     private UserModel createNewUser(String userId) {
+        isNewUser = true;
         UserModel userModel = buildNewUser();
         userModel.setBio(profileAbout);
         userModel.setCoverUri(profileCover);
@@ -207,9 +232,11 @@ public class SigninActivity extends AppCompatActivity {
                 App.getInstance().setUserModel(userModel);
                 FirebaseHelper.setUserConnectionStatus(currentUser.getUid(), UsersChatListAdapter.ONLINE);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra(MainActivity.EXTRA_IS_FIRST_TIME_REGISTER, isNewUser);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -346,7 +373,7 @@ public class SigninActivity extends AppCompatActivity {
         }
     }
 
-    private void setupGoogleAdditionalDetailsLogin() {
+    private void setupGoogleAdditionalDetailsLogin() throws Exception {
         // Configure sign-in to request the user's ID, email address, and basic profile. ID and
         // basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -367,6 +394,7 @@ public class SigninActivity extends AppCompatActivity {
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
+
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
