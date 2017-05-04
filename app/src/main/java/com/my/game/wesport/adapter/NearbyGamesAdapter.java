@@ -42,13 +42,13 @@ public class NearbyGamesAdapter extends RecyclerView.Adapter<NearbyGamesAdapter.
     }
 
     @Override
-    public GameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new GameViewHolder(LayoutInflater.from(parent.getContext())
+    public NearbyGamesAdapter.GameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new NearbyGamesAdapter.GameViewHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.my_games_new_list_item, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(final GameViewHolder holder, final int position) {
+    public void onBindViewHolder(final NearbyGamesAdapter.GameViewHolder holder, final int position) {
         GameModel gameModel = dataSnapShotsWithFlag.get(position).getDataSnapshot().getValue(GameModel.class);
         if (gameModel == null) {
             return;
