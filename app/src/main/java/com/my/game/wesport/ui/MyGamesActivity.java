@@ -90,7 +90,7 @@ public class MyGamesActivity extends AppCompatActivity {
                 finish();
                 break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -140,9 +140,9 @@ public class MyGamesActivity extends AppCompatActivity {
                 case 1:
                     deleteAllGames = true;
                     return GameListFragment.newInstance(placeId, GameListFragment.TYPE_USER_GAMES);
-                case 2:
+               /* case 2:
                     deleteAllGames = false;
-                    return GameListFragment.newInstance(placeId, GameListFragment.TYPE_ALL_GAMES);
+                    return GameListFragment.newInstance(placeId, GameListFragment.TYPE_ALL_GAMES);*/
             }
             invalidateOptionsMenu();
             return null;
@@ -151,7 +151,7 @@ public class MyGamesActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
@@ -161,8 +161,8 @@ public class MyGamesActivity extends AppCompatActivity {
                     return "Chat";
                 case 1:
                     return "My Games";
-                case 2:
-                    return "Nearby Games";
+               /* case 2:
+                    return "Nearby Games";*/
             }
             return null;
         }

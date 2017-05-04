@@ -1,63 +1,37 @@
 package com.my.game.wesport.helper;
 
-import android.support.annotation.DrawableRes;
-
 import com.my.game.wesport.R;
+import com.my.game.wesport.model.GameCategoryModel;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Created by sabeeh on 27-Mar-17.
- */
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameHelper {
-    private static Map<String, Object> map = new HashMap<>();
-    private static int[] gridViewImageId = {
-            R.drawable.basketball, R.drawable.cricket, R.drawable.football, R.drawable.tennis,
-            R.drawable.frisbee, R.drawable.pingpong, R.drawable.soccer, R.drawable.volleyball
-    };
+    private static List<GameCategoryModel> gameCategoryList = new ArrayList<>();
 
     static {
-        map.put("basketball", R.drawable.basketball);
-        map.put("cricket", R.drawable.cricket);
-        map.put("football", R.drawable.football);
-        map.put("tennis", R.drawable.tennis);
-        map.put("frisbee", R.drawable.frisbee);
-        map.put("pingpong", R.drawable.pingpong);
-        map.put("volleyball", R.drawable.volleyball);
+        gameCategoryList.add(new GameCategoryModel("Basketball", 1, R.drawable.basketball));
+        gameCategoryList.add(new GameCategoryModel("Cricket",    2, R.drawable.cricket));
+        gameCategoryList.add(new GameCategoryModel("Football",   3, R.drawable.football));
+        gameCategoryList.add(new GameCategoryModel("Tennis",     4, R.drawable.tennis));
+        gameCategoryList.add(new GameCategoryModel("Frisbee",    5, R.drawable.frisbee));
+        gameCategoryList.add(new GameCategoryModel("Pingpong",   6, R.drawable.pingpong));
+        gameCategoryList.add(new GameCategoryModel("Soccer",     7, R.drawable.soccer));
+        gameCategoryList.add(new GameCategoryModel("Volleyball", 8, R.drawable.volleyball));
+        gameCategoryList.add(new GameCategoryModel("Other",      9, R.drawable.ic_sports));
     }
 
-    public static String getGameNameByIndex(int gameIndex) {
-        switch (gridViewImageId[gameIndex]) {
-            case R.drawable.basketball:
-                return "basketball";
-            case R.drawable.cricket:
-                return "cricket";
-            case R.drawable.football:
-                return "football";
-            case R.drawable.tennis:
-                return "tennis";
-            case R.drawable.frisbee:
-                return "frisbee";
-            case R.drawable.pingpong:
-                return "pingpong";
-            case R.drawable.volleyball:
-                return "volleyball";
-            default:
-                return "basketball";
+    public static GameCategoryModel getGameCategory(int id) {
+        for (GameCategoryModel gameCategoryModel : gameCategoryList) {
+            if (gameCategoryModel.getId() == id) {
+                return gameCategoryModel;
+            }
         }
+
+        return null;
     }
 
-    public static int[] getImages() {
-        return gridViewImageId;
-    }
-
-    public static int getGameImage(String key) {
-        if (map.containsKey(key)) {
-            return (int) map.get(key);
-        } else {
-            return R.drawable.basketball;
-        }
+    public static List<GameCategoryModel> getGameCategoryList() {
+        return gameCategoryList;
     }
 }

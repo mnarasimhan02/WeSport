@@ -3,6 +3,7 @@ package com.my.game.wesport.activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.ContentValues;
@@ -10,16 +11,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Events;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,19 +33,33 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
+import com.my.game.wesport.adapter.HomeGamesFragment;
+import com.my.game.wesport.adapter.SimpleGameCategoryAdapter;
 import com.my.game.wesport.data.GameContract.GameEntry;
 import com.my.game.wesport.helper.DateHelper;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.GameHelper;
+import com.my.game.wesport.model.GameCategoryModel;
 import com.my.game.wesport.model.GameModel;
 
 import java.text.ParseException;
@@ -61,14 +78,28 @@ import static com.my.game.wesport.R.id.start_time;
  * Allows user to create a new game or edit an existing one.
  */
 @SuppressWarnings("UnusedParameters")
-public class GameEditActivity extends AppCompatActivity {
+public class GameEditActivity extends AppCompatActivity implements PlaceSelectionListener {
 
     private EditText mstartDate;
     private EditText mstartTime;
     private EditText mendTime;
+    private ImageView mSelectedGameImageView;
+    private TextView mSelectedGameTextView;
+
     private final Calendar mDateAndTime = Calendar.getInstance();
     private View mLayout;
     private String placeId;
+    private double placeLatitude, placeLongitude;
+
+    private static String EXTRA_LATITUDE = "key_lat";
+    private static String EXTRA_LONGITUDE = "key_lon";
+    private static String EXTRA_GAME_ADDRESS = "game_address";
+
+    private static String EXTRA_PLACE_ID = "place_id";
+    private HomeGamesFragment homeGamesFragment;
+
+    public static final int REQUEST_CODE_ACTIVITY = 24;
+
     /**
      * GameModel for the existing game (null if it's a new game)
      */
@@ -98,15 +129,24 @@ public class GameEditActivity extends AppCompatActivity {
 
     /* String to retreive address, chosengame and username*/
 
-    private String gameaddress = "";
+    private String gameAddress = "";
+    private GameCategoryModel selectedGameCategory;
 
-    private String selectedGame = "";
-    private int selectedGamePosition;
+    private Dialog gameCategoryList;
+    private TextView mSelectedGameLocation;
+    private PlaceAutocompleteFragment autocompleteFragment;
 
     /*if gameDataSnapShot null then its mean create new game*/
-    public static Intent newIntent(Context context, DataSnapshot gameDataSnapShot) {
+    public static Intent newIntent(Context context, String placeId, DataSnapshot gameDataSnapShot, double lat, double lon, String gameAddress) {
         currentGameDataSnapShot = gameDataSnapShot;
-        return new Intent(context, GameEditActivity.class);
+        Intent intent = new Intent(context, GameEditActivity.class);
+        Bundle args = new Bundle();
+        args.putDouble(EXTRA_LATITUDE, lat);
+        args.putDouble(EXTRA_LONGITUDE, lon);
+        intent.putExtras(args);
+        intent.putExtra(EXTRA_PLACE_ID, placeId);
+        intent.putExtra(EXTRA_GAME_ADDRESS, gameAddress);
+        return intent;
     }
 
     /**
@@ -128,13 +168,12 @@ public class GameEditActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
         mLayout = findViewById(android.R.id.content);
 
-        //Get Location and Selected GameModel from sharedpreferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        placeId = getIntent().getStringExtra(EXTRA_PLACE_ID);
+        gameAddress = getIntent().getStringExtra(EXTRA_GAME_ADDRESS);
 
-        placeId = prefs.getString("place_id", "");
-        gameaddress = prefs.getString("games", "Your Location");
-        selectedGame = prefs.getString("chosenGame", "Other");
-        selectedGamePosition = prefs.getInt("chosenGame_pos", 0);
+        //getting lat and lon for the game
+        placeLatitude = getIntent().getDoubleExtra(EXTRA_LATITUDE, 0);
+        placeLongitude = getIntent().getDoubleExtra(EXTRA_LONGITUDE, 0);
 
         //Get Username from sharedpreferences
 //        SharedPreferences prefUser = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -143,7 +182,7 @@ public class GameEditActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Edit Game");
+            actionBar.setTitle("Create/Edit Game");
         }
 
         // Find all relevant views that we will need to read user input from
@@ -153,6 +192,10 @@ public class GameEditActivity extends AppCompatActivity {
         mstartDate = (EditText) findViewById(R.id.startdate);
         mstartTime = (EditText) findViewById(start_time);
         mendTime = (EditText) findViewById(R.id.end_time);
+        mSelectedGameImageView = (ImageView) findViewById(R.id.selected_game_ImageView);
+        mSelectedGameTextView = (TextView) findViewById(R.id.selected_game_textView);
+        //mSelectedGameLocation = (TextView) findViewById(R.id.edit_game_location);
+
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -164,6 +207,10 @@ public class GameEditActivity extends AppCompatActivity {
         mstartTime.setOnTouchListener(mTouchListener);
         mendTime.setOnTouchListener(mTouchListener);
 
+
+
+        // mSelectedGameImageView.setOnTouchListener((mTouchListener));
+
         // Examine the intent that was used to launch this activity,
         // in order to figure out if we're creating a new GameModel or editing an existing one.
         // If the intent DOES NOT contain a GameModel content URI, then we know that we are
@@ -174,20 +221,67 @@ public class GameEditActivity extends AppCompatActivity {
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
             invalidateOptionsMenu();
+
+//            if address already selected then hide address field
+            if (!TextUtils.isEmpty(gameAddress)) {
+                findViewById(R.id.address_field_layout).setVisibility(View.GONE);
+            }
         } else {
             // Otherwise this is an existing GameModel, so change app bar to say "Edit GameModel"
             setTitle(getString(R.string.editor_activity_title_edit_game));
 
             // and display the current values in the editor
             setExistingData();
+
+            findViewById(R.id.address_field_layout).setVisibility(View.GONE);
         }
 
         setupSpinner();
+        setupGameCategoryList();
+
+
+        // Retrieve the PlaceAutocompleteFragment.
+        autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setHint(getString(R.string.autocomplete_hint));
+
+        // Register a listener to receive callbacks when a place has been selected or an error has
+        // occurred and set Filter to retreive only places with precise address
+        autocompleteFragment.setOnPlaceSelectedListener(this);
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
+
+        EditText placeAutoCompleteEt = (EditText) autocompleteFragment.getView().findViewById(R.id.place_autocomplete_search_input);
+        placeAutoCompleteEt.setTextSize(14.0f);
+        placeAutoCompleteEt.setHint("Select place");
+    }
+
+    public void onChooseGameClick(View view) {
+        if (currentGameDataSnapShot == null) {
+            showGameCategorySelectionSheet();
+        }
+    }
+
+    /*public void onChooseLocationClick(View view){
+        if (currentGameDataSnapShot == null){
+            Intent intent = new Intent(GameEditActivity.this, MapsActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_ACTIVITY);
+        }
+    }*/
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
     }
 
 
     public void onDateClicked(View v) {
-
         OnDateSetListener mDateListener = new OnDateSetListener() {
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
@@ -319,7 +413,13 @@ public class GameEditActivity extends AppCompatActivity {
     /**
      * Get user input from editor and save game into database.
      */
-    private void saveGames() {
+    private boolean saveGames() {
+
+        if (selectedGameCategory == null) {
+            Toast.makeText(this, "Please select game category!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         String startTime;
         String endTime;
 
@@ -340,7 +440,7 @@ public class GameEditActivity extends AppCompatActivity {
             // No need to create ContentValues and no need to do any ContentProvider operations.
             Snackbar.make(mLayout, getString(R.string.editor_insert_game_params),
                     Snackbar.LENGTH_LONG).show();
-            return;
+            return false;
         }
 
         // Create a ContentValues object where column names are the keys,
@@ -353,8 +453,8 @@ public class GameEditActivity extends AppCompatActivity {
                 mSkill,
                 notesString,
                 placeId,
-                gameaddress,
-                GameHelper.getGameNameByIndex(selectedGamePosition),
+                gameAddress,
+                selectedGameCategory.getId(),
                 FirebaseAuth.getInstance().getCurrentUser().getUid(),
                 App.getInstance().getUserModel().getDisplayName()
         );
@@ -362,17 +462,29 @@ public class GameEditActivity extends AppCompatActivity {
 
         // Determine if this is a new or existing game by checking if currentGameKey is null or not
         if (currentGameDataSnapShot == null) {
+            if (TextUtils.isEmpty(gameAddress)) {
+                Toast.makeText(this, "Please select place!", Toast.LENGTH_SHORT).show();
+                return false;
+            }
             // This is a NEW game, so insert a new game,
-            FirebaseHelper.getGamesRef(FirebaseHelper.getCurrentUser().getUid()).push().setValue(gameModel);
+            DatabaseReference gamePush = FirebaseHelper.getGamesRef(FirebaseHelper.getCurrentUser().getUid()).push();
+            gamePush.setValue(gameModel);
+
+            FirebaseHelper.getGameAuthorRef(gamePush.getKey()).setValue(FirebaseHelper.getCurrentUser().getUid());
+            GeoFire geoFire = new GeoFire(FirebaseHelper.getGameLocationRef());
+            geoFire.setLocation(gamePush.getKey(), new GeoLocation(placeLatitude, placeLongitude));
             Snackbar.make(mLayout, getString(R.string.editor_insert_game_successful),
                     Snackbar.LENGTH_LONG).show();
         } else {
             // Otherwise this is an EXISTING game, so update the game
             // we want to modify.
-
+            GameModel existingGameModel = currentGameDataSnapShot.getValue(GameModel.class);
+            gameModel.setAddress(existingGameModel.getAddress());
+            gameModel.setParkId(existingGameModel.getParkId());
             currentGameDataSnapShot.getRef().setValue(gameModel);
         }
-        writeCalendarEvent(gameaddress, selectedGame, gameDescription, startDate, startTime, endTime, notesString);
+        writeCalendarEvent(gameAddress, selectedGameCategory.getTitle(), gameDescription, startDate, startTime, endTime, notesString);
+        return true;
     }
 
     private void writeCalendarEvent(String gameaddress, String selectedGame, String nameString, String sdString,
@@ -451,24 +563,30 @@ public class GameEditActivity extends AppCompatActivity {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
                 // Save game to database
-                if (mNameEditText.getText().toString().length() < 1
-                        && mnotesEditText.getText().toString().length() < 1
-                        && mstartDate.getText().toString().length() < 1
-                        && mstartTime.getText().toString().length() < 1
-                        && mendTime.getText().toString().length() < 1
-                        && mnotesEditText.getText().toString().length() < 1)
-                {
-                    mNameEditText.setError("Please enter game name");
-                    mnotesEditText.setError("Please enter any description for the game");
-                    mstartDate.setError("Please choose your start date");
-                    mstartTime.setError("Please choose your start time");
-                    mendTime.setError("Please choose your end time");
-                    mnotesEditText.setError("Please enter some notes for the game");
+                if (mNameEditText.getText().toString().isEmpty()
+                        || mstartDate.getText().toString().isEmpty()
+                        || mSelectedGameTextView.getText().toString().isEmpty()) {
+
+                    if (mNameEditText.getText().toString().isEmpty()) {
+                        mNameEditText.setError("Please enter game name");
+                    }
+
+                    if (mstartDate.getText().toString().isEmpty()) {
+                        mstartDate.setError("Please enter Start Date for the game");
+                    }
+
+                    if (mSelectedGameImageView.getDrawable() == null) {
+                        mSelectedGameTextView.setError("Please select a game");
+                    }
+
                 } else {
-                    saveGames();
-                    //Show snackbar and then finish activity
-                    Toast.makeText(this, R.string.calendar_add_game, Toast.LENGTH_SHORT).show();
-                    GameEditActivity.this.finish();
+                    if (saveGames()) {
+                        //Show snackbar and then finish activityInvitesActivity activity = (InvitesActivity) getActivity();
+
+                        Toast.makeText(this, R.string.calendar_add_game, Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
+                    }
                 }
 
                 // Exit activity
@@ -542,6 +660,7 @@ public class GameEditActivity extends AppCompatActivity {
         String ettime = gameModel.getEndTime();
         int skill = gameModel.getSkillLevel();
         String notes = gameModel.getNotes();
+        String location = gameModel.getAddress();
 
         // Update the views on the screen with the values from the database
         mNameEditText.setText(desc);
@@ -549,6 +668,14 @@ public class GameEditActivity extends AppCompatActivity {
         mstartDate.setText(stdate);
         mstartTime.setText(sttime);
         mendTime.setText(ettime);
+
+        selectedGameCategory = GameHelper.getGameCategory(gameModel.getCategoryId());
+        if (selectedGameCategory != null) {
+            mSelectedGameImageView.setVisibility(View.VISIBLE);
+            mSelectedGameImageView.setImageResource(selectedGameCategory.getImage());
+            mSelectedGameTextView.setText(selectedGameCategory.getTitle());
+        }
+
 
         // Skill is a dropdown spinner, so map the constant value from the database
         // Then call setSelection() so that option is displayed on screen as the current selection.
@@ -632,6 +759,7 @@ public class GameEditActivity extends AppCompatActivity {
         // Only perform the delete if this is an existing game.
         if (currentGameDataSnapShot != null) {
             currentGameDataSnapShot.getRef().removeValue();
+            FirebaseHelper.deleteGameReferences(currentGameDataSnapShot.getKey());
         }
         // Close the activity
         finish();
@@ -646,5 +774,59 @@ public class GameEditActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+
+    public void setupGameCategoryList() {
+        View userListView = LayoutInflater.from(this).inflate(R.layout.game_list_layout, null);
+        userListView.findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gameCategoryList.dismiss();
+            }
+        });
+
+
+        gameCategoryList = new Dialog(this, R.style.MaterialDialogSheetAnim);
+        gameCategoryList.setContentView(userListView); // your custom view.
+        gameCategoryList.setCancelable(true);
+        gameCategoryList.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        gameCategoryList.getWindow().setGravity(Gravity.TOP);
+
+        RecyclerView recyclerView = (RecyclerView) userListView.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        SimpleGameCategoryAdapter simpleGameCategoryAdapter = new SimpleGameCategoryAdapter(this, GameHelper.getGameCategoryList(), new SimpleGameCategoryAdapter.SimpleGameCategoryListListener() {
+            @Override
+            public void onGameCategoryClick(int position, GameCategoryModel gameCategoryModel) {
+                selectedGameCategory = GameHelper.getGameCategoryList().get(position);
+                mSelectedGameImageView.setVisibility(View.VISIBLE);
+                mSelectedGameImageView.setImageResource(selectedGameCategory.getImage());
+                mSelectedGameTextView.setText(selectedGameCategory.getTitle());
+                gameCategoryList.dismiss();
+            }
+        });
+        recyclerView.setAdapter(simpleGameCategoryAdapter);
+    }
+
+
+    public void showGameCategorySelectionSheet() {
+        if (gameCategoryList != null) {
+            gameCategoryList.show();
+        }
+    }
+
+    @Override
+    public void onPlaceSelected(Place place) {
+        LatLng latLng = place.getLatLng();
+        placeLatitude = latLng.latitude;
+        placeLongitude = latLng.longitude;
+        // Either address from marker or address from autocomplete should be the location.
+        gameAddress = (String) place.getName();
+    }
+
+    @Override
+    public void onError(Status status) {
+        Toast.makeText(GameEditActivity.this, mLayout + " " + getString(R.string.place_error)
+                + status.getStatusMessage(), Toast.LENGTH_LONG).show();
     }
 }

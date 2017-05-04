@@ -28,14 +28,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder> {
+public class NewMyGamesAdapter extends RecyclerView.Adapter<NewMyGamesAdapter.GameViewHolder>{
     private final List<DataSnapWithFlag> dataSnapShotsWithFlag;
     private final Context mContext;
     private GameAdapterListener listener;
     private String TAG = GameAdapter.class.getSimpleName();
     private boolean showEditAction = false;
+    //private boolean isNotTablet;
 
-    public GameAdapter(Context mContext, GameAdapterListener listener, List<DataSnapWithFlag> dataSnapShotsWithFlag, boolean showEditAction) {
+    public NewMyGamesAdapter(Context mContext, GameAdapterListener listener, List<DataSnapWithFlag> dataSnapShotsWithFlag, boolean showEditAction) {
         this.mContext = mContext;
         this.dataSnapShotsWithFlag = dataSnapShotsWithFlag;
         this.listener = listener;
@@ -45,7 +46,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     @Override
     public GameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new GameViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.game_list_item_new, parent, false));
+                .inflate(R.layout.my_games_new_list_item, parent, false));
     }
 
     @Override
@@ -54,6 +55,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         if (gameModel == null) {
             return;
         }
+
         // Set display name
         holder.getGameTitle().setText(gameModel.getGameDescription());
 
@@ -62,8 +64,13 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         holder.address.setText("at " + gameModel.getAddress());
         String ownerName = gameModel.getAuthorName();
 
-        if (FirebaseHelper.getCurrentUser().getUid().equals(gameModel.getAuthor())) {
-            ownerName = App.getInstance().getUserModel().getDisplayName();
+        try{
+
+            if (FirebaseHelper.getCurrentUser().getUid().equals(gameModel.getAuthor())) {
+                ownerName = App.getInstance().getUserModel().getDisplayName();
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "onBindViewHolder: " + e.getMessage());
         }
 
         holder.owner.setText(ownerName);
@@ -74,8 +81,14 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             Glide.with(mContext)
                     .load(categoryModel.getImage())
                     .asBitmap()
-                    .into(holder.gameImageView);
+                    .into(holder.image);
         }
+
+        // getting user image
+       /* Glide.with(mContext)
+                .load(userModel.getPhotoUri())
+                .asBitmap()
+                .into(holder.avatarImage);*/
 
         //get Start Date
         String date;
@@ -96,7 +109,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             }
         });
 
-        String titleColor = "#2B3D4D";
+        String titleColor = "#FFFFFF";
         if (dataSnapShotsWithFlag.get(position).isFlag()) {
             titleColor = "#FF0000";
         }
@@ -104,12 +117,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         holder.getGameTitle().setTextColor(Color.parseColor(titleColor));
 
         boolean enableEditing = gameModel.getAuthor().equals(FirebaseHelper.getCurrentUser().getUid()) && showEditAction;
-        holder.editAction.setVisibility(enableEditing ? View.VISIBLE : View.GONE);
+        holder.editAction.setVisibility(enableEditing ? View.VISIBLE : View.INVISIBLE);
         holder.editAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
-                    listener.onGameEditClick(position, dataSnapShotsWithFlag.get(position));
+                    listener.onGameEditClick(holder.getAdapterPosition(), dataSnapShotsWithFlag.get(holder.getAdapterPosition()));
                 }
             }
         });
@@ -121,9 +134,6 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
     }
 
     public void add(DataSnapWithFlag value, boolean refreshFlags) {
-        if (value.getDataSnapshot().getValue(GameModel.class) == null){
-            return;
-        }
         dataSnapShotsWithFlag.add(value);
         notifyItemInserted(dataSnapShotsWithFlag.size() - 1);
         if (refreshFlags) {
@@ -188,15 +198,17 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         return index;
     }
 
+
     public class GameViewHolder extends RecyclerView.ViewHolder {
         private TextView nameTextView;
         private TextView startdate;
         private TextView starttime;
         private TextView summaryTextView;
-        private ImageView gameImageView;
+        private ImageView image;
         private TextView owner;
         private TextView address;
         private ImageView editAction;
+        //private ImageView avatarImage;
 
         public GameViewHolder(View itemView) {
             super(itemView);
@@ -204,10 +216,12 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
             startdate = (TextView) itemView.findViewById(R.id.startdate);
             starttime = (TextView) itemView.findViewById(R.id.start_time);
             summaryTextView = (TextView) itemView.findViewById(R.id.summary);
-            gameImageView = (ImageView) itemView.findViewById(R.id.chatimage);
+            image = (ImageView) itemView.findViewById(R.id.chatimage);
             editAction = (ImageView) itemView.findViewById(R.id.action_edit);
             owner = (TextView) itemView.findViewById(R.id.owner);
             address = (TextView) itemView.findViewById(R.id.address);
+
+           // avatarImage = (ImageView) itemView.findViewById(R.id.my_games_user_profile_image);
         }
 
         public TextView getGameTitle() {
@@ -227,7 +241,7 @@ public class GameAdapter extends RecyclerView.Adapter<GameAdapter.GameViewHolder
         }
 
         public ImageView getChatImage() {
-            return gameImageView;
+            return image;
         }
 
 

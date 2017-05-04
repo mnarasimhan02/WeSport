@@ -55,6 +55,8 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
 
     //    this is for all games
     private static List<DataSnapshot> allGameSnapshots = new ArrayList<>();
+    private double lat;
+    private double lon;
 
     public static GameListFragment newInstance(String placeId, int type) {
         Bundle args = new Bundle();
@@ -89,6 +91,9 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
         });
 
         fab.setVisibility(listType == TYPE_USER_GAMES ? View.VISIBLE : View.GONE);
+        if (listType == TYPE_USER_GAMES) {
+            setHasOptionsMenu(true);
+        }
 
         // Find the ListView which will be populated with the game data
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.game_recyclerView);
@@ -99,8 +104,6 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
         // Setup an Adapter to create a list item for each row of game data in the Cursor.
         // There is no game data yet (until the loader finishes) so pass in null for the Cursor.
         setUserRecyclerView();
-
-        setHasOptionsMenu(true);
 
         if (listType == TYPE_ACCEPTED_GAMES) {
             emptyView.setVisibility(View.GONE);
@@ -123,16 +126,7 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
                 public void onChildAdded(DataSnapshot inviteSnapShot, String s) {
                     GameInviteModel invite = inviteSnapShot.getValue(GameInviteModel.class);
                     if (invite.isAccepted()) {
-                        FirebaseHelper.getGamesRef(invite.getAuthorUid()).child(invite.getGameKey()).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot gameSnapshot) {
-                                adapter.add(new DataSnapWithFlag(gameSnapshot, false), false);
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
+                        addInvitedGameToAdapter(invite);
                     }
                 }
 
@@ -141,7 +135,10 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
                     GameInviteModel invite = inviteSnapShot.getValue(GameInviteModel.class);
                     if (!invite.isAccepted()) {
                         adapter.remove(invite.getGameKey(), false);
+                    } else if (invite.isAccepted()) {
+                        addInvitedGameToAdapter(invite);
                     }
+                    updateEmptyView();
                 }
 
                 @Override
@@ -151,6 +148,7 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
                         @Override
                         public void onDataChange(DataSnapshot gameSnapshot) {
                             adapter.remove(new DataSnapWithFlag(gameSnapshot, false), false);
+                            updateEmptyView();
                         }
 
                         @Override
@@ -174,6 +172,31 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
         }
     }
 
+    private void updateEmptyView() {
+        if (adapter.getItemCount() > 0) {
+            emptyView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void addInvitedGameToAdapter(GameInviteModel invite) {
+        FirebaseHelper.getGamesRef(invite.getAuthorUid()).child(invite.getGameKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot gameSnapshot) {
+//                add only if not already exists
+                if (adapter.indexOf(gameSnapshot.getKey()) == -1) {
+                    adapter.add(new DataSnapWithFlag(gameSnapshot, false), false);
+                    updateEmptyView();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
     @NonNull
     private ChildEventListener getGamesChildEventListener() {
         return new ChildEventListener() {
@@ -191,12 +214,13 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
                 } else {
                     adapter.add(new DataSnapWithFlag(dataSnapshot, false), listType == TYPE_ALL_GAMES);
                 }
-                emptyView.setVisibility(View.GONE);
                 if (listType == TYPE_ALL_GAMES) {
                     allGameSnapshots.add(dataSnapshot);
                 } else {
                     adapter.refreshFlags(allGameSnapshots);
                 }
+
+                updateEmptyView();
             }
 
             @Override
@@ -254,7 +278,6 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
                 return true;
             }
         }
-
         return false;
     }
 
@@ -315,7 +338,7 @@ public class GameListFragment extends Fragment implements GameAdapter.GameAdapte
     @Override
     public void onGameEditClick(int position, DataSnapWithFlag snapshot) {
         if (snapshot.getDataSnapshot().getValue(GameModel.class).getAuthor().equals(FirebaseHelper.getCurrentUser().getUid())) {
-            startActivity(GameEditActivity.newIntent(getActivity(), snapshot.getDataSnapshot()));
+            startActivity(GameEditActivity.newIntent(getActivity(), null, snapshot.getDataSnapshot(), lat, lon, null));
         }
     }
 

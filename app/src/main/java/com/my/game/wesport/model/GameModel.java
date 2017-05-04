@@ -10,14 +10,14 @@ public class GameModel {
     private String notes;
     private String parkId;
     private String address;
-    private String image;
+    private int categoryId;
     private String author;
     private String authorName;
 
     public GameModel() {
     }
 
-    public GameModel(String gameDescription, String gameDate, String startTime, String endTime, int skillLevel, String notes, String parkId, String address, String image, String author, String authorName) {
+    public GameModel(String gameDescription, String gameDate, String startTime, String endTime, int skillLevel, String notes, String parkId, String address, int categoryId, String author, String authorName) {
 
         this.gameDescription = gameDescription;
         this.gameDate = gameDate;
@@ -27,7 +27,7 @@ public class GameModel {
         this.notes = notes;
         this.parkId = parkId;
         this.address = address;
-        this.image = image;
+        this.categoryId = categoryId;
         this.author = author;
         this.authorName = authorName;
     }
@@ -73,8 +73,8 @@ public class GameModel {
         return address;
     }
 
-    public String getImage() {
-        return image;
+    public int getCategoryId() {
+        return categoryId;
     }
 
     public String getAuthor() {
@@ -85,8 +85,8 @@ public class GameModel {
         this.author = author;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public String getAuthorName() {
@@ -95,5 +95,33 @@ public class GameModel {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public void setGameDate(String gameDate) {
+        this.gameDate = gameDate;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public void setSkillLevel(int skillLevel) {
+        this.skillLevel = skillLevel;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public void setParkId(String parkId) {
+        this.parkId = parkId;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
