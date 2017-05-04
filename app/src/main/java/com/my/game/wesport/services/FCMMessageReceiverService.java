@@ -11,16 +11,15 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.my.game.wesport.activity.GroupActivity;
-import com.my.game.wesport.activity.MainActivity;
 import com.my.game.wesport.R;
+import com.my.game.wesport.activity.GroupActivity;
 import com.my.game.wesport.activity.InvitesActivity;
+import com.my.game.wesport.activity.MainActivity;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.NotificationHelper;
 import com.my.game.wesport.model.NotificationModel;
@@ -35,8 +34,7 @@ public class FCMMessageReceiverService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-
-        Log.w("fcm", "received notification");
+        Log.d(TAG, "onMessageReceived: ");
 //        sendNotification(remoteMessage.getNotification().getTitle());
         handleMessage(remoteMessage);
     }
@@ -73,15 +71,17 @@ public class FCMMessageReceiverService extends FirebaseMessagingService {
                     return;
                 }
 
-                FirebaseHelper.getUserRef().child(notificationModel.getPotentialUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                FirebaseHelper.getUserRef().child(notificationModel.getSenderId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot != null) {
-                            UserModel publicProfile = dataSnapshot.getValue(UserModel.class);
-                            int notiType = notificationModel.getType();
-                            if (notiType == NotificationHelper.TYPE_INVITATION || notiType == NotificationHelper.TYPE_EVENT) {
+                        UserModel publicProfile = dataSnapshot.getValue(UserModel.class);
+                        if (publicProfile != null) {
+                            int notifyType = notificationModel.getType();
+                            if (notifyType == NotificationHelper.TYPE_INVITATION || notifyType == NotificationHelper.TYPE_EVENT) {
                                 sendNotification(notification, publicProfile, notificationModel);
-                            } else if (TextUtils.isEmpty(ChatActivity.activeUserUid) || !ChatActivity.activeUserUid.equals(dataSnapshot.getKey())) {
+                            } else if (notifyType == NotificationHelper.TYPE_CHAT && (TextUtils.isEmpty(ChatActivity.activeUserUid) || !ChatActivity.activeUserUid.equals(dataSnapshot.getKey()))) {
+                                sendNotification(notification, publicProfile, notificationModel);
+                            } else if (notifyType == NotificationHelper.TYPE_GROUP_CHAT && (TextUtils.isEmpty(GroupActivity.activeGroupGameKey) || !GroupActivity.activeGroupGameKey.equals(notificationModel.getGameKey()) || GroupActivity.activePageIndex != GroupActivity.PAGE_GROUP_CHAT)) {
                                 sendNotification(notification, publicProfile, notificationModel);
                             }
                         }
@@ -97,13 +97,15 @@ public class FCMMessageReceiverService extends FirebaseMessagingService {
     }
 
     private void sendNotification(RemoteMessage.Notification notification, UserModel profile, NotificationModel notificationModel) {
-        Intent intent;
+        Intent intent = new Intent(this, MainActivity.class);
         if (notificationModel.getType() == NotificationHelper.TYPE_EVENT) {
-            intent = GroupActivity.newIntent(this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey());
+            intent = GroupActivity.newIntent(this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey(), GroupActivity.PAGE_EVENTS);
         } else if (notificationModel.getType() == NotificationHelper.TYPE_INVITATION) {
             intent = new Intent(this, InvitesActivity.class);
-        } else {
-            intent = ChatActivity.newIntent(this, profile, notificationModel.getPotentialUserId());
+        } else if (notificationModel.getType() == NotificationHelper.TYPE_CHAT) {
+            intent = ChatActivity.newIntent(this, profile, notificationModel.getSenderId());
+        } else if (notificationModel.getType() == NotificationHelper.TYPE_GROUP_CHAT) {
+            intent = GroupActivity.newIntent(this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey(), GroupActivity.PAGE_GROUP_CHAT);
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

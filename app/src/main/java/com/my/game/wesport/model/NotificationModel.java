@@ -16,7 +16,7 @@ public class NotificationModel {
     @SerializedName("user_uid")
     @Expose
     private
-    String potentialUserId;
+    String senderId;
 
     @SerializedName("game_key")
     @Expose
@@ -28,12 +28,12 @@ public class NotificationModel {
     private
     String gameAuthorKey;
 
-    public String getPotentialUserId() {
-        return potentialUserId;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setPotentialUserId(String potentialUserId) {
-        this.potentialUserId = potentialUserId;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public String getGameKey() {

@@ -25,10 +25,11 @@ public class NotificationHelper {
     public static final int TYPE_CHAT = 1;
     public static final int TYPE_INVITATION = 2;
     public static final int TYPE_EVENT = 3;
+    public static final int TYPE_GROUP_CHAT = 4;
 
     private static final String FCM_MESSAGE_URL = "https://fcm.googleapis.com/fcm/send";
     private static final String TAG = NotificationHelper.class.getSimpleName();
-    public static final String EXTRA_MESSAGE = "sender";
+    public static final String EXTRA_MESSAGE = "message";
     public static final String SERVER_KEY = "AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE";
     private static OkHttpClient mClient = new OkHttpClient();
 
@@ -46,7 +47,7 @@ public class NotificationHelper {
                     JSONObject notification = new JSONObject();
                     notification.put("body", body);
                     notification.put("title", title);
-//                    notification.put("sound", "notification");
+                    notification.put("sound", "notification");
                     notification.put("click_action", "OPEN_HOME_ACTIVITY");
                     if (!TextUtils.isEmpty(icon)) {
                         notification.put("icon", icon);
@@ -118,23 +119,32 @@ public class NotificationHelper {
 
     public static String getChatMessage(String potentialUserId) {
         NotificationModel model = new NotificationModel();
-        model.setPotentialUserId(potentialUserId);
+        model.setSenderId(potentialUserId);
         model.setType(TYPE_CHAT);
         return new Gson().toJson(model);
     }
 
     public static String getEventMessage(String potentialUserId, String gameKey, String gameAuthorId) {
         NotificationModel model = new NotificationModel();
-        model.setPotentialUserId(potentialUserId);
+        model.setSenderId(potentialUserId);
         model.setGameKey(gameKey);
         model.setGameAuthorKey(gameAuthorId);
         model.setType(TYPE_EVENT);
         return new Gson().toJson(model);
     }
 
+    public static String getGroupChat(String gameKey, String gameAuthor, String senderId) {
+        NotificationModel model = new NotificationModel();
+        model.setSenderId(senderId);
+        model.setGameKey(gameKey);
+        model.setGameAuthorKey(gameAuthor);
+        model.setType(TYPE_GROUP_CHAT);
+        return new Gson().toJson(model);
+    }
+
     public static String getInvitationMessage(String potentialUserId) {
         NotificationModel model = new NotificationModel();
-        model.setPotentialUserId(potentialUserId);
+        model.setSenderId(potentialUserId);
         model.setType(TYPE_INVITATION);
         return new Gson().toJson(model);
     }
@@ -147,4 +157,5 @@ public class NotificationHelper {
         }
         return null;
     }
+
 }
