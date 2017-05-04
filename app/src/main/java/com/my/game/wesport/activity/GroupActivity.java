@@ -2,6 +2,7 @@ package com.my.game.wesport.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -12,9 +13,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.my.game.wesport.fragment.EventListFragment;
 import com.my.game.wesport.R;
+import com.my.game.wesport.fragment.EventListFragment;
 import com.my.game.wesport.fragment.GalleryGridFragment;
+import com.my.game.wesport.fragment.GroupChatFragment;
 import com.my.game.wesport.fragment.UserChatListFragment;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -22,6 +24,16 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class GroupActivity extends AppCompatActivity {
     private static final String EXTRA_KEY_GAME = "key_game";
     private static final String EXTRA_GAME_AUTHOR = "game_author";
+    private static String EXTRA_PAGE_INDEX = "page_index";
+    private Drawable icon;
+
+    public static final int PAGE_EVENTS = -1;
+    public static final int PAGE_USERS = 0;
+    public static final int PAGE_GROUP_CHAT = 2;
+    public static final int PAGE_GALLERY = 1;
+    public static String activeGroupGameKey;
+    public static int activePageIndex;
+
     private TabLayout tabLayout;
 //    EventBus eventBus = EventBus.getDefault();
 
@@ -29,7 +41,15 @@ public class GroupActivity extends AppCompatActivity {
     String gameAuthorId;
     private EventListFragment eventListFragment;
     private UserChatListFragment userChatListFragment;
+    private GalleryGridFragment galleryGridFragment;
+    private GroupChatFragment groupChatFragment;
+    private Drawable myIcon;
 
+
+    public static Intent newIntent(Context context, String gameKey, String gameAuthorId, int pageIndex) {
+        Intent intent = newIntent(context, gameKey, gameAuthorId);
+        return intent.putExtra(EXTRA_PAGE_INDEX, pageIndex);
+    }
 
     public static Intent newIntent(Context context, String gameKey, String gameAuthorId) {
         Intent intent = new Intent(context, GroupActivity.class);
@@ -38,12 +58,13 @@ public class GroupActivity extends AppCompatActivity {
         return intent;
     }
 
+
     private int[] tabIcons = {
             R.drawable.ic_group_black_24dp,
-            R.drawable.ic_event_black_24dp,
-            R.drawable.ic_image_black_24dp
+            // R.drawable.ic_event_black_24dp,
+            R.drawable.ic_image_black_24dp,
+            R.drawable.ic_group_chat
     };
-    private GalleryGridFragment galleryGridFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +82,10 @@ public class GroupActivity extends AppCompatActivity {
 
         gameKey = getIntent().getStringExtra(EXTRA_KEY_GAME);
         gameAuthorId = getIntent().getStringExtra(EXTRA_GAME_AUTHOR);
+        int pageIndex = getIntent().getIntExtra(EXTRA_PAGE_INDEX, 0);
+        activePageIndex = pageIndex;
+
+        activeGroupGameKey = gameKey;
 
         GroupSectionsPagerAdapter mSectionsPagerAdapter =
                 new GroupSectionsPagerAdapter(getSupportFragmentManager());
@@ -70,7 +95,26 @@ public class GroupActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.group_activity_tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        mViewPager.setCurrentItem(pageIndex);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                activePageIndex = i;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
         galleryGridFragment = GalleryGridFragment.newInstance(gameKey, gameAuthorId);
+        groupChatFragment = GroupChatFragment.newInstance(gameKey, gameAuthorId);
         userChatListFragment = UserChatListFragment.newInstance(true, gameKey, gameAuthorId);
         eventListFragment = EventListFragment.newInstance(gameKey, gameAuthorId);
 
@@ -79,6 +123,7 @@ public class GroupActivity extends AppCompatActivity {
 
     private void setupTabIcons() {
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        // tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
         tabLayout.getTabAt(2).setIcon(tabIcons[2]);
     }
@@ -100,10 +145,12 @@ public class GroupActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     return userChatListFragment;
+                /*case 1:
+                    return eventListFragment;*/
                 case 1:
-                    return eventListFragment;
-                case 2:
                     return galleryGridFragment;
+                case 2:
+                    return groupChatFragment;
             }
             return null;
         }
@@ -152,12 +199,19 @@ public class GroupActivity extends AppCompatActivity {
         /*if (!eventBus.isRegistered(this)) {
             eventBus.register(this);
         }*/
+        activeGroupGameKey = gameKey;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 //        eventBus.unregister(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        activeGroupGameKey = "";
     }
 
     @Override
