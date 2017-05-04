@@ -113,7 +113,7 @@ public class EventEditActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_GAME_KEY)) {
             gameKey = intent.getStringExtra(EXTRA_GAME_KEY);
-            gameKey = intent.getStringExtra(EXTRA_GAME_AUTHOR_ID);
+            gameAuthorId = intent.getStringExtra(EXTRA_GAME_AUTHOR_ID);
         } else {
             Toast.makeText(this, "Invalid game!", Toast.LENGTH_SHORT).show();
         }
@@ -411,7 +411,7 @@ public class EventEditActivity extends AppCompatActivity {
 
 
     /**
-     * Prompt the user to confirm that they want to delete this event.
+     * Prompt the user to confirm that they want grouto delete this event.
      */
     private void showDeleteConfirmationDialog() {
         // Create an AlertDialog.Builder and set the message, and click listeners
