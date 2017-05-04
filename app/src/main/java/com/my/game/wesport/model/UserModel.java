@@ -1,8 +1,5 @@
 package com.my.game.wesport.model;
 
-import com.google.firebase.database.Exclude;
-
-
 public class UserModel {
 
     private String displayName;
@@ -16,7 +13,6 @@ public class UserModel {
     private String longitude;
     private String distance;
     private String Bio;
-
 
     public UserModel() {
     }
@@ -34,23 +30,25 @@ public class UserModel {
         this.Bio = Bio;
     }
 
-     @SuppressWarnings("UnusedAssignment")
-     public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail){
-        String uniqueChatRef="";
-        if(createdAtCurrentUser > getCreatedAt()){
-            uniqueChatRef = cleanEmailAddress(currentUserEmail)+"-"+cleanEmailAddress(getUserEmail());
-        }else {
-            uniqueChatRef=cleanEmailAddress(getUserEmail())+"-"+cleanEmailAddress(currentUserEmail);
+    @SuppressWarnings("UnusedAssignment")
+    public String createUniqueChatRef(long createdAtCurrentUser, String currentUserEmail) {
+        String uniqueChatRef = "";
+        if (createdAtCurrentUser > getCreatedAt()) {
+            uniqueChatRef = cleanEmailAddress(currentUserEmail) + "-" + cleanEmailAddress(getUserEmail());
+        } else {
+            uniqueChatRef = cleanEmailAddress(getUserEmail()) + "-" + cleanEmailAddress(currentUserEmail);
         }
         return uniqueChatRef;
     }
 
-    private String cleanEmailAddress(String email){
+    private String cleanEmailAddress(String email) {
         //replace dot with comma since firebase does not allow dot
-        return email.replace(".","-");
+        return email.replace(".", "-");
     }
 
-    private String getUserEmail() {return email;}
+    private String getUserEmail() {
+        return email;
+    }
 
     public String getDisplayName() {
         return displayName;

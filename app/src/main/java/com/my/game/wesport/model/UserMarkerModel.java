@@ -3,9 +3,6 @@ package com.my.game.wesport.model;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.DataSnapshot;
 
-/**
- * Created by sabeeh on 31-Mar-17.
- */
 
 public class UserMarkerModel {
     DataSnapshot dataSnapshot;
