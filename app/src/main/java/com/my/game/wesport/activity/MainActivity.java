@@ -5,27 +5,31 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,13 +53,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
-import com.my.game.wesport.adapter.HomeGridAdapter;
+import com.my.game.wesport.adapter.HomeGamesFragment;
 import com.my.game.wesport.adapter.UsersChatListAdapter;
+import com.my.game.wesport.event.EventLocationUpdated;
 import com.my.game.wesport.event.ProfileUpdatedLocalEvent;
+import com.my.game.wesport.fragment.MapsFragment;
+import com.my.game.wesport.fragment.UserChatListFragment;
 import com.my.game.wesport.helper.FirebaseHelper;
-import com.my.game.wesport.helper.GameHelper;
 import com.my.game.wesport.helper.NotificationHelper;
+import com.my.game.wesport.helper.PermissionHelper;
 import com.my.game.wesport.login.SigninActivity;
+import com.my.game.wesport.model.GameInviteModel;
 import com.my.game.wesport.model.NotificationModel;
 import com.my.game.wesport.model.UserModel;
 import com.my.game.wesport.ui.ChatActivity;
@@ -66,12 +74,11 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import static android.support.design.widget.Snackbar.make;
-
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, NavigationView.OnNavigationItemSelectedListener {
     private static final int REQUEST_INVITE = 23;
     private final int PERMISSION_MULTIPLE = 1;
+    public static final String EXTRA_IS_FIRST_TIME_REGISTER = "first_time_register";
 
     private NavigationView navigationView;
     private DrawerLayout drawer;
@@ -79,10 +86,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private TextView emailText;
     private Toolbar toolbar;
     private ImageView imgNavHeaderCover, imgProfile;
+    private TextView invites;
+    private ImageView inviteImage;
 
     private String lat;
     private String lon;
-    private String[] gridViewString;
+    //private String[] gridViewString;
 
     private GoogleApiClient mGoogleApiClient;
     private View mLayout;
@@ -90,21 +99,66 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private String chosenGame;
     private String TAG = MainActivity.class.getSimpleName();
 
+    private static String EXTRA_KEY_GAME = "key_game";
+    private static String EXTRA_PLACE_ID = "place_id";
+
+    boolean deleteAllGames = false;
+    String placeId;
+    String gameKey;
+
+    boolean isNewUser = false;
+
     // index to identify current nav menu item
     public static int navItemIndex = 0;
     private boolean shouldLoadHomeFragOnBackPress = true;
 
     EventBus eventBus = EventBus.getDefault();
+    //private NearbyUserFragment nearbyUserFragment = NearbyUserFragment.newInstance();
+    private HomeGamesFragment homeGamesFragment;
+    private MapsFragment mapsFragment = MapsFragment.newInstance();
+    private UserChatListFragment userChatListFragment;
+    private ViewPager mViewPager;
+
+    boolean showMapToast = true;
+
+    public static Intent newIntent(Context context, String gameKey, String placeId) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(EXTRA_KEY_GAME, gameKey);
+        intent.putExtra(EXTRA_PLACE_ID, placeId);
+        return intent;
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (FirebaseHelper.getCurrentUser() == null) {
+            startActivity(new Intent(this, SigninActivity.class));
+            finish();
+            return;
+        }
+
+        if (getIntent() != null && getIntent().hasExtra(EXTRA_IS_FIRST_TIME_REGISTER)) {
+            isNewUser = getIntent().getBooleanExtra(EXTRA_IS_FIRST_TIME_REGISTER, false);
+        }
+
+        if (isNewUser) {
+            startActivity(new Intent(this, UserProfileActivity.class));
+        }
+
+        FirebaseHelper.syncUserConnectionStatus();
+        //Notification
         NotificationHelper.subscribe();
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        placeId = getIntent().getStringExtra(EXTRA_PLACE_ID);
+        gameKey = getIntent().getStringExtra(EXTRA_KEY_GAME);
+
+        //Setting up Navigation drawer and Navigation view
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar,
@@ -116,7 +170,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Navigation view header
+        invites = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_invites));
+        inviteImage = (ImageView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_invite_friends));
+        inviteImage.setImageResource(R.drawable.ic_small_launcher);
+
+        //Navigation view headerg
         navHeader = navigationView.getHeaderView(0);
         txtName = (TextView) navHeader.findViewById(R.id.nav_drawer_name);
         imgNavHeaderCover = (ImageView) navHeader.findViewById(R.id.img_header_cover);
@@ -126,10 +184,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         // initializing navigation menu
         setUpNavigationView();
 
-        gridViewString = getResources().getStringArray(R.array.games_array);
+        //gridViewString = getResources().getStringArray(R.array.games_array);
         mLayout = findViewById(android.R.id.content);
 
-        HomeGridAdapter adapterViewAndroid = new HomeGridAdapter(MainActivity.this, gridViewString, GameHelper.getImages());
+        //setting tabs and view pager
+        MainActivity.SectionsPagerAdapter mSectionsPagerAdapter = new MainActivity.SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setOffscreenPageLimit(3);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
+
+       /* HomeGridAdapter adapterViewAndroid = new HomeGridAdapter(MainActivity.this, gridViewString, GameHelper.getImages());
         GridView androidGridView = (GridView) findViewById(R.id.grid_view_image_text);
         androidGridView.setAdapter(adapterViewAndroid);
         adapterViewAndroid.setListener(new HomeGridAdapter.HomeGridListener() {
@@ -154,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
         //setup GoogleApiclient
         buildGoogleApiClient();
 
@@ -179,6 +248,42 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             }
         });*/
+        parseNotifyMessageFromBundle(getIntent());
+
+        homeGamesFragment = HomeGamesFragment.newInstance(placeId, HomeGamesFragment.TYPE_USER_GAMES, HomeGamesFragment.TYPE_NEARBY_GAMES);
+        userChatListFragment = UserChatListFragment.newInstance(false, null, null);
+        //mapsFragment = new MapsFragment();
+
+        FirebaseHelper.getInvitesRef(FirebaseHelper.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int pendingInvitesCounter = 0;
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    GameInviteModel inviteModel = snapshot.getValue(GameInviteModel.class);
+                    if (inviteModel != null && TextUtils.isEmpty(inviteModel.getStatus())) {
+                        Log.d(TAG, "onDataChange: " + inviteModel);
+                        pendingInvitesCounter++;
+                    }
+                }
+                initializeCountDrawer(String.valueOf(pendingInvitesCounter));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void initializeCountDrawer(String count) {
+        //Gravity property aligns the text
+        if (invites != null) {
+            invites.setGravity(Gravity.CENTER_VERTICAL);
+            invites.setTypeface(null, Typeface.BOLD);
+            invites.setTextColor(getResources().getColor(R.color.colorAccent));
+            invites.setText(count);
+        }
     }
 
     private void loadNavHeader() {
@@ -226,8 +331,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         startActivity(new Intent(MainActivity.this, NearbyUserActivity.class));
                         break;
                     case R.id.nav_dashboard:
-                        navItemIndex = 3;
-                        startActivity(TeamsActivity.newIntent(MainActivity.this));
+                        navItemIndex = 4;
+                        mViewPager.setCurrentItem(1, true);
+                        drawer.closeDrawers();
+//                        startActivity(TeamsActivity.newIntent(MainActivity.this));
                         break;
                     case R.id.nav_log_out:
                         // launch new intent instead of loading fragment
@@ -307,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onBackPressed();
     }
 
-    @SuppressWarnings("UnusedAssignment")
+    /*@SuppressWarnings("UnusedAssignment")
     private static boolean isLocationEnabled(Context context) {
         int locationMode = 0;
         String locationProviders;
@@ -327,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
             return !TextUtils.isEmpty(locationProviders);
         }
-    }
+    }*/
 
     //This method will be called when the user will tap on allow or deny
     @Override
@@ -377,54 +484,65 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(getApplicationContext(), permission.WRITE_EXTERNAL_STORAGE) +
-                ContextCompat.checkSelfPermission(getApplicationContext(), permission.ACCESS_COARSE_LOCATION) +
-                (ContextCompat.checkSelfPermission(getApplicationContext(), permission.WRITE_CALENDAR))
-                != PackageManager.PERMISSION_GRANTED) {
-            if (
-                    ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission.WRITE_EXTERNAL_STORAGE)
-                            || ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission.ACCESS_COARSE_LOCATION)
-                            || ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission.WRITE_CALENDAR)) {
-                make(mLayout, R.string.permissions_not_granted,
-                        Snackbar.LENGTH_SHORT).setAction("ENABLE",
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                ActivityCompat.requestPermissions(MainActivity.this,
-                                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, permission.WRITE_CALENDAR, permission.WRITE_EXTERNAL_STORAGE},
-                                        PERMISSION_MULTIPLE);
-                            }
-                        }).show();
-            } else {
-                ActivityCompat.requestPermissions(MainActivity.this,
-                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, permission.WRITE_CALENDAR, permission.WRITE_EXTERNAL_STORAGE},
-                        PERMISSION_MULTIPLE);
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !PermissionHelper.check(MainActivity.this, new String[]{
+                permission.ACCESS_COARSE_LOCATION,
+                permission.WRITE_CALENDAR,
+                permission.WRITE_EXTERNAL_STORAGE,
+                permission.ACCESS_COARSE_LOCATION,
+                permission.WRITE_CALENDAR
+        }, PERMISSION_MULTIPLE)) {
+            Snackbar.make(mLayout, R.string.permissions_not_granted,
+                    Snackbar.LENGTH_SHORT).setAction("ENABLE",
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, permission.WRITE_CALENDAR, permission.WRITE_EXTERNAL_STORAGE},
+                                    PERMISSION_MULTIPLE);
+                        }
+                    }).show();
         } else {
             startLocationServices();
         }
     }
 
+
     private void startLocationServices() {
+        Location mLastLocation = null;
         try {
             LocationRequest mLocationRequest = LocationRequest.create();
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-            if (mLastLocation == null) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            } else {
-                lat = String.valueOf(mLastLocation.getLatitude());
-                lon = String.valueOf(mLastLocation.getLongitude());
+            if (!PermissionHelper.check(this, new String[]{permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION}, PERMISSION_MULTIPLE)) {
+                return;
             }
+            if (ActivityCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Log.d(TAG, "startLocationServices: " + mLastLocation);
+
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(10000); // Update location every 10 mins
+            mLocationRequest.setInterval(10000); // Update location every 10 sec
             mLocationRequest.setFastestInterval(1000);
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        } catch (SecurityException exception) {
+        } catch (Exception exception) {
             exception.printStackTrace();
+            Log.d(TAG, "startLocationServices: " + exception.getMessage());
         }
-        storeprefs(lat, lon);
-        updateLocationtoFirebase(lat, lon);
+
+        if (mLastLocation != null) {
+            lat = String.valueOf(mLastLocation.getLatitude());
+            lon = String.valueOf(mLastLocation.getLongitude());
+            storeprefs(lat, lon);
+            updateLocationtoFirebase(lat, lon);
+            EventBus.getDefault().post(new EventLocationUpdated(mLastLocation));
+        }
     }
 
     @SuppressWarnings("UnusedAssignment")
@@ -446,19 +564,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG, "onConnectionFailed: " + connectionResult.getErrorMessage());
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(TAG, "onLocationChanged: ");
         // New location has now been determined
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
 
-        GeoFire geoFire = new GeoFire(FirebaseHelper.getLocationRef());
+        Log.d(TAG, "onLocationChanged: lat: " + lat + ", long: " + lon);
+
+        GeoFire geoFire = new GeoFire(FirebaseHelper.getUserLocationRef());
         geoFire.setLocation(FirebaseHelper.getCurrentUser().getUid(), new GeoLocation(location.getLatitude(), location.getLongitude()));
 
         storeprefs(lat, lon);
         updateLocationtoFirebase(lat, lon);
+        EventBus.getDefault().post(new EventLocationUpdated(location));
     }
 
     private void storeprefs(String lat, String lon) {
@@ -482,8 +605,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (bundle != null && bundle.containsKey(NotificationHelper.EXTRA_MESSAGE)) {
 //            dialogHelper.showProgressDialog("Please wait!", "Loading chat!", true);
             final String jsonMessage = bundle.getString(NotificationHelper.EXTRA_MESSAGE);
+            intent.removeExtra(NotificationHelper.EXTRA_MESSAGE);
             final NotificationModel notificationModel = NotificationHelper.parse(jsonMessage);
-            FirebaseHelper.getUserRef().child(notificationModel.getPotentialUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            FirebaseHelper.getUserRef().child(notificationModel.getSenderId()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 //                    dialogHelper.dismiss();
@@ -493,8 +617,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             startActivity(GroupActivity.newIntent(MainActivity.this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey()));
                         } else if (notificationModel.getType() == NotificationHelper.TYPE_INVITATION) {
                             startActivity(new Intent(MainActivity.this, InvitesActivity.class));
-                        } else {
+                        } else if (notificationModel.getType() == NotificationHelper.TYPE_CHAT) {
                             startActivity(ChatActivity.newIntent(MainActivity.this, profileModel, dataSnapshot.getKey()));
+                        } else if (notificationModel.getType() == NotificationHelper.TYPE_GROUP_CHAT) {
+                            startActivity(GroupActivity.newIntent(MainActivity.this, gameKey, notificationModel.getGameAuthorKey()));
                         }
                     }
                 }
@@ -533,6 +659,58 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            switch (position) {
+                case 0:
+                    return mapsFragment;
+                case 1:
+                    return homeGamesFragment;
+                case 2:
+                    return userChatListFragment;
+            }
+            // invalidateOptionsMenu();
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 3;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Maps";
+                case 1:
+                    return "Games";
+                case 2:
+                    return "Chat";
+            }
+            return null;
+        }
+    }
+
+    public void switchPage(int pos) {
+        if (mViewPager != null) {
+            mViewPager.setCurrentItem(pos, true);
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -554,5 +732,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    public boolean isShowMapToast() {
+        return showMapToast;
+    }
+
+    public void setShowMapToast(boolean showMapToast) {
+        this.showMapToast = showMapToast;
     }
 }

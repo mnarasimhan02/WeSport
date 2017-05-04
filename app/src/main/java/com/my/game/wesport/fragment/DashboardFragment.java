@@ -1,40 +1,34 @@
 package com.my.game.wesport.fragment;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.my.game.wesport.POJO.Example;
+import com.google.firebase.database.ValueEventListener;
 import com.my.game.wesport.POJO.ParkModel;
 import com.my.game.wesport.R;
 import com.my.game.wesport.activity.GameEditActivity;
 import com.my.game.wesport.activity.GroupActivity;
 import com.my.game.wesport.adapter.GameAdapter;
-import com.my.game.wesport.api.RetrofitMaps;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.model.DataSnapWithFlag;
+import com.my.game.wesport.model.GameInviteModel;
 import com.my.game.wesport.model.GameModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
 
 
 public class DashboardFragment extends android.app.Fragment implements GameAdapter.GameAdapterListener {
@@ -56,7 +50,7 @@ public class DashboardFragment extends android.app.Fragment implements GameAdapt
     private GameAdapter adapter;
     private DatabaseReference gamesRef;
     private ChildEventListener gamesChildEventListener;
-
+    private double lat, lon;
 
     public static DashboardFragment newInstance() {
         Bundle args = new Bundle();
@@ -64,7 +58,6 @@ public class DashboardFragment extends android.app.Fragment implements GameAdapt
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,6 +73,14 @@ public class DashboardFragment extends android.app.Fragment implements GameAdapt
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         emptyView = rootView.findViewById(R.id.empty_view);
+
+        //Initialising adMob
+        MobileAds.initialize(getActivity().getApplicationContext(), String.valueOf(R.string.admob_app_id));
+        AdView mAdView = (AdView) rootView.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                //.addTestDevice("")
+                .build();
+        mAdView.loadAd(adRequest);
 
 //        getAllNearbyPlaces();
 
@@ -97,7 +98,70 @@ public class DashboardFragment extends android.app.Fragment implements GameAdapt
         mRecyclerView.setAdapter(adapter);
 
         gamesChildEventListener = getGamesChildEventListener();
+        FirebaseHelper.getInvitesRef(FirebaseHelper.getCurrentUser().getUid()).addChildEventListener(getInvitedGamesChildEventListener());
         gamesRef.addChildEventListener(gamesChildEventListener);
+    }
+
+    @NonNull
+    private ChildEventListener getInvitedGamesChildEventListener() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot inviteSnapShot, String s) {
+                GameInviteModel invite = inviteSnapShot.getValue(GameInviteModel.class);
+                if (invite.isAccepted()) {
+                    addInvitedGameToAdapter(invite);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot inviteSnapShot, String s) {
+                GameInviteModel invite = inviteSnapShot.getValue(GameInviteModel.class);
+                if (!invite.isAccepted()) {
+                    adapter.remove(invite.getGameKey(), false);
+                } else if (invite.isAccepted()) {
+                    addInvitedGameToAdapter(invite);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot inviteSnapShot) {
+                GameInviteModel invite = inviteSnapShot.getValue(GameInviteModel.class);
+                FirebaseHelper.getGamesRef(invite.getAuthorUid()).child(invite.getGameKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot gameSnapshot) {
+                        adapter.remove(new DataSnapWithFlag(gameSnapshot, false), false);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+    }
+
+    private void addInvitedGameToAdapter(GameInviteModel invite) {
+        FirebaseHelper.getGamesRef(invite.getAuthorUid()).child(invite.getGameKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot gameSnapshot) {
+//                add only if not already exists
+                if (adapter.indexOf(gameSnapshot.getKey()) == -1) {
+                    adapter.add(new DataSnapWithFlag(gameSnapshot, false), false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
     @NonNull
@@ -160,50 +224,15 @@ public class DashboardFragment extends android.app.Fragment implements GameAdapt
 
     @Override
     public void onGameEditClick(int position, DataSnapWithFlag snapshot) {
-        if (snapshot.getDataSnapshot().getValue(GameModel.class).getAuthor().equals(FirebaseHelper.getCurrentUser().getUid())) {
-            startActivity(GameEditActivity.newIntent(getActivity(), snapshot.getDataSnapshot()));
+        GameModel gameModel = snapshot.getDataSnapshot().getValue(GameModel.class);
+        if (gameModel.getAuthor().equals(FirebaseHelper.getCurrentUser().getUid())) {
+            startActivity(GameEditActivity.newIntent(getActivity(), null, snapshot.getDataSnapshot(), lat, lon, null));
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    private void getAllNearbyPlaces() {
-        //Instiantiate background task to download places list and address list for respective locations
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        Double mLat = Double.parseDouble(preferences.getString("latitude", ""));
-        Double mLon = Double.parseDouble(preferences.getString("longtitude", ""));
-        build_retrofit_and_get_response(getString((R.string.type_param)), mLat, mLon);
-    }
-
-    //          get all nearby places
-    private void build_retrofit_and_get_response(String type, double mLat, double mLon) {
-        String url = "https://maps.googleapis.com/maps/";
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        RetrofitMaps service = retrofit.create(RetrofitMaps.class);
-        Call<Example> call = service.getNearbyPlaces(type, mLat + "," + mLon, PROXIMITY_RADIUS, OPEN_NOW);
-        call.enqueue(new Callback<Example>() {
-            @Override
-            public void onResponse(Response<Example> response, Retrofit retrofit) {
-                try {
-                    // This loop will go through all the parkModels and add marker on each location.
-                    nearbyParkModels = response.body().getParkModels();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "onResponse: " + e.getMessage());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.d(TAG, "onFailure: " + t.getLocalizedMessage());
-            }
-        });
     }
 
     @Override

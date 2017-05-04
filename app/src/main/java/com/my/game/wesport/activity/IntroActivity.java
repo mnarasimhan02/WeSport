@@ -13,6 +13,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 @SuppressWarnings("ALL")
 public class IntroActivity extends AppIntro {
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -10,33 +10,36 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.my.game.wesport.R;
+import com.my.game.wesport.activity.GameEditActivity;
+import com.my.game.wesport.model.GameCategoryModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeGridAdapter extends BaseAdapter {
-
-    private final String[] gridViewString;
-    private final int[] gridViewImageId;
     private final Context mContext;
+    private List<GameCategoryModel> gameCategoryList = new ArrayList<>();
     HomeGridListener listener;
 
-    public HomeGridAdapter(Context context, String[] gridViewString, int[] gridViewImageId) {
+    public HomeGridAdapter(Context context, List<GameCategoryModel> gameCategoryList) {
         mContext = context;
-        this.gridViewImageId = gridViewImageId;
-        this.gridViewString = gridViewString;
+        this.gameCategoryList = gameCategoryList;
     }
+
 
     @Override
     public int getCount() {
-        return gridViewString.length;
+        return gameCategoryList.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return gameCategoryList.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return 0;
+        return gameCategoryList.get(i).getId();
     }
 
     @SuppressLint("InflateParams")
@@ -50,8 +53,8 @@ public class HomeGridAdapter extends BaseAdapter {
             gridViewAndroid = inflater.inflate(R.layout.gridview_list_item, null);
             TextView textViewAndroid = (TextView) gridViewAndroid.findViewById(R.id.android_gridview_text);
             ImageView imageViewAndroid = (ImageView) gridViewAndroid.findViewById(R.id.android_gridview_image);
-            textViewAndroid.setText(gridViewString[position]);
-            imageViewAndroid.setImageResource(gridViewImageId[position]);
+            textViewAndroid.setText(gameCategoryList.get(position).getTitle());
+            imageViewAndroid.setImageResource(gameCategoryList.get(position).getImage());
         } else {
             gridViewAndroid = convertView;
         }
