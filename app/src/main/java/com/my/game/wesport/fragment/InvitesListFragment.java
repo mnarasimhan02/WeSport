@@ -1,6 +1,7 @@
 package com.my.game.wesport.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,9 +17,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.my.game.wesport.R;
+import com.my.game.wesport.activity.GroupActivity;
+import com.my.game.wesport.activity.InvitesActivity;
 import com.my.game.wesport.adapter.InvitesAdapter;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.model.GameInviteModel;
+import com.my.game.wesport.model.GameModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,10 +33,7 @@ public class InvitesListFragment extends Fragment implements InvitesAdapter.Game
     private View emptyView;
 
     public static InvitesListFragment newInstance() {
-
         Bundle args = new Bundle();
-
-
         InvitesListFragment fragment = new InvitesListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -71,8 +72,8 @@ public class InvitesListFragment extends Fragment implements InvitesAdapter.Game
                 FirebaseHelper.getGamesRef(invite.getAuthorUid()).child(invite.getGameKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        emptyView.setVisibility(View.GONE);
                         invitesAdapter.add(dataSnapshot);
+                        updateEmptyView();
                     }
 
                     @Override
@@ -87,11 +88,7 @@ public class InvitesListFragment extends Fragment implements InvitesAdapter.Game
                 GameInviteModel invite = dataSnapshot.getValue(GameInviteModel.class);
                 if (invite.isRejected() || invite.isAccepted()) {
                     invitesAdapter.remove(invite.getGameKey());
-                    if (invitesAdapter.getItemCount() > 0) {
-                        emptyView.setVisibility(View.GONE);
-                    } else {
-                        emptyView.setVisibility(View.VISIBLE);
-                    }
+                    updateEmptyView();
                 } else {
                     FirebaseHelper.getGamesRef(invite.getAuthorUid()).child(invite.getGameKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -114,6 +111,7 @@ public class InvitesListFragment extends Fragment implements InvitesAdapter.Game
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         invitesAdapter.remove(dataSnapshot.getKey());
+                        updateEmptyView();
                     }
 
                     @Override
@@ -135,6 +133,14 @@ public class InvitesListFragment extends Fragment implements InvitesAdapter.Game
         });
     }
 
+    private void updateEmptyView() {
+        if (invitesAdapter.getItemCount() > 0) {
+            emptyView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void setupRecyclerView(RecyclerView recyclerView) {
         invitesAdapter = new InvitesAdapter(getActivity(), this);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -149,6 +155,12 @@ public class InvitesListFragment extends Fragment implements InvitesAdapter.Game
     @Override
     public void onAcceptClick(int position, DataSnapshot snapshot) {
         FirebaseHelper.acceptGameInvitation(snapshot.getKey());
+        GameModel gameModel = snapshot.getValue(GameModel.class);
+        /*InvitesActivity activity = (InvitesActivity) getActivity();
+        if (activity != null) {
+            activity.switchPage(0);
+        }*/
+        startActivity(new Intent(GroupActivity.newIntent(getActivity(), snapshot.getKey(),  gameModel.getAuthor())));
     }
 
     @Override

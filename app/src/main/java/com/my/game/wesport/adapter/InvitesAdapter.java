@@ -10,20 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.gson.Gson;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
 import com.my.game.wesport.helper.DateHelper;
 import com.my.game.wesport.helper.FirebaseHelper;
-import com.my.game.wesport.helper.GameHelper;
 import com.my.game.wesport.model.GameModel;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +37,7 @@ public class InvitesAdapter extends RecyclerView.Adapter<InvitesAdapter.GameView
     @Override
     public GameViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new GameViewHolder(LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.game_invite_item, parent, false));
+                .inflate(R.layout.invite_list_item, parent, false));
     }
 
     @Override
@@ -63,20 +59,8 @@ public class InvitesAdapter extends RecyclerView.Adapter<InvitesAdapter.GameView
             ownerName = App.getInstance().getUserModel().getDisplayName();
         }
 
-        holder.owner.setText("by " + ownerName);
+        holder.owner.setText("Hosted by " + ownerName);
 
-        if (TextUtils.isEmpty(gameModel.getImage())) {
-            Drawable gameDrawable = null;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                gameDrawable = mContext.getDrawable(R.drawable.basketball);
-            }
-            holder.chatView.setImageDrawable(gameDrawable);
-        } else {
-            Glide.with(mContext)
-                    .load(GameHelper.getGameImage(gameModel.getImage()))
-                    .asBitmap()
-                    .into(holder.chatView);
-        }
         //get Start Date
         String date;
         try {
@@ -146,6 +130,9 @@ public class InvitesAdapter extends RecyclerView.Adapter<InvitesAdapter.GameView
     }
 
     public void add(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue(GameModel.class) == null){
+            return;
+        }
         dataSnapShots.add(dataSnapshot);
         notifyItemInserted(dataSnapShots.size() - 1);
     }
@@ -154,7 +141,6 @@ public class InvitesAdapter extends RecyclerView.Adapter<InvitesAdapter.GameView
         private TextView nameTextView;
         private TextView startdate;
         private TextView summaryTextView;
-        private ImageView chatView;
         private TextView owner;
         private TextView address;
         private Button actionAccept;
@@ -165,7 +151,6 @@ public class InvitesAdapter extends RecyclerView.Adapter<InvitesAdapter.GameView
             nameTextView = (TextView) itemView.findViewById(R.id.name);
             startdate = (TextView) itemView.findViewById(R.id.startdate);
             summaryTextView = (TextView) itemView.findViewById(R.id.summary);
-            chatView = (ImageView) itemView.findViewById(R.id.chatimage);
             owner = (TextView) itemView.findViewById(R.id.owner);
             address = (TextView) itemView.findViewById(R.id.address);
             actionAccept = (Button) itemView.findViewById(R.id.accept_btn);

@@ -11,13 +11,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.my.game.wesport.fragment.GameListFragment;
 import com.my.game.wesport.R;
+import com.my.game.wesport.fragment.GameListFragment;
 import com.my.game.wesport.fragment.InvitesListFragment;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class InvitesActivity extends AppCompatActivity {
+    private static final int TYPE_NO_GAME = 3;
+    private ViewPager viewpager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +31,7 @@ public class InvitesActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        ViewPager viewpager = (ViewPager) findViewById(R.id.viewpager);
+        viewpager = (ViewPager) findViewById(R.id.viewpager);
         viewpager.setAdapter(new SectionsPagerAdapter(getSupportFragmentManager()));
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewpager);
@@ -56,9 +59,9 @@ public class InvitesActivity extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return InvitesListFragment.newInstance();
-                case 1:
                     return GameListFragment.newInstance(null, GameListFragment.TYPE_ACCEPTED_GAMES);
+                case 1:
+                    return InvitesListFragment.newInstance();
             }
             invalidateOptionsMenu();
             return null;
@@ -66,7 +69,7 @@ public class InvitesActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
+            // Show 2 total pages.
             return 2;
         }
 
@@ -74,9 +77,9 @@ public class InvitesActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Pending";
-                case 1:
                     return "Accepted";
+                case 1:
+                    return "Pending";
             }
             return null;
         }
@@ -85,5 +88,11 @@ public class InvitesActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    public void switchPage(int pos) {
+        if (viewpager != null) {
+            viewpager.setCurrentItem(pos, true);
+        }
     }
 }
