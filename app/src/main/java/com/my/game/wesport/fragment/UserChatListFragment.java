@@ -15,22 +15,20 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
-import com.google.android.gms.appinvite.AppInviteInvitationResult;
-import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,13 +36,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.my.game.wesport.App;
 import com.my.game.wesport.R;
-import com.my.game.wesport.activity.InviteUserActivity;
 import com.my.game.wesport.activity.OtherUserProfileActivity;
+import com.my.game.wesport.adapter.SimpleUserListAdapter;
 import com.my.game.wesport.adapter.UsersChatListAdapter;
 import com.my.game.wesport.helper.FirebaseHelper;
 import com.my.game.wesport.helper.LocationHelper;
 import com.my.game.wesport.helper.NotificationHelper;
 import com.my.game.wesport.login.SigninActivity;
+import com.my.game.wesport.model.GameInviteModel;
 import com.my.game.wesport.model.UserListItem;
 import com.my.game.wesport.model.UserModel;
 import com.my.game.wesport.ui.ChatActivity;
@@ -59,19 +58,18 @@ import static android.app.Activity.RESULT_OK;
 
 public class UserChatListFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener, UsersChatListAdapter.ChatListInterface {
     private static final int REQUEST_INVITE = 0;
+    public static final boolean IS_CURRENT_USER = true;
     public static final String EXTRA_IS_GROUP = "is_group";
     public static final String EXTRA_GAME_KEY = "game_key";
+
     private static String TAG = UserChatListFragment.class.getSimpleName();
     private static String EXTRA_GAME_AUTHOR = "game_author";
-//    SimpleUserListAdapter simpleUserListAdapter;
+    SimpleUserListAdapter simpleUserListAdapter;
 
 
     @BindView(R.id.recycler_view_users)
     RecyclerView mUsersRecyclerView;
 
-    private List<String> mUsersKeyList;
-
-    private FirebaseAuth mAuth;
     private ChildEventListener mChildEventListener;
     private UsersChatListAdapter mUsersChatListAdapter;
     private GoogleApiClient mGoogleApiClient;
@@ -85,6 +83,7 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
 
     List<String> gameInvitations = new ArrayList<>();
     private DatabaseReference databaseReference;
+    private View nearbyUserSelectListEmptyView = null;
 
     public static UserChatListFragment newInstance(boolean isFromGroup, String gameKey, String gameAuthorId) {
         Bundle args = new Bundle();
@@ -112,13 +111,6 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
         }
 
         mUsersRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view_users);
-        setAuthInstance();
-        setUserRecyclerView();
-        setUsersKeyList();
-        setAuthListener();
-        setHasOptionsMenu(true);
-
-        emptyView = rootView.findViewById(R.id.empty_view_team_members);
 
         if (mGoogleApiClient == null) {
             // Create an auto-managed GoogleApiClient with access to App Invites.
@@ -128,7 +120,15 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
                     .build();
         }
 
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, getActivity(), true)
+        setUserRecyclerView();
+        setAuthListener();
+        setHasOptionsMenu(true);
+
+        emptyView = rootView.findViewById(R.id.empty_view_team_members);
+        TextView emptyTitleText = (TextView) rootView.findViewById(R.id.empty_title_text);
+
+
+        /*AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, getActivity(), true)
                 .setResultCallback(
                         new ResultCallback<AppInviteInvitationResult>() {
                             @Override
@@ -141,34 +141,28 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
 
                                 }
                             }
-                        });
+                        });*/
+
 
         // Setup FAB to open GameEditActivity
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        emptyView.setVisibility(View.VISIBLE);
         if (isFromGroup) {
-            emptyView.setVisibility(View.VISIBLE);
             setupGameInvitations();
-//            setupUserSelectionList();
+            setupUserSelectionList();
             fab.setImageResource(R.drawable.ic_add_24dp);
+            fab.setVisibility(View.VISIBLE);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO:  User Invite Activity
-                    //showUserSelectionSheet();
-                    startActivity(InviteUserActivity.newIntent(getActivity(), gameKey));
+                    showUserSelectionSheet();
+//                    startActivity(InviteUserActivity.newIntent(getActivity(), gameKey));
                 }
             });
         } else {
-            emptyView.setVisibility(View.GONE);
-            fab.setImageResource(R.drawable.share);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onInviteClicked();
-                }
-            });
+            emptyTitleText.setText(R.string.empty_user_list_text);
+            fab.setVisibility(View.GONE);
         }
-
         return rootView;
     }
 
@@ -205,20 +199,11 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
         showMessage(getString(R.string.google_play_services_error));
     }
 
-    private void setAuthInstance() {
-        mAuth = FirebaseAuth.getInstance();
-    }
-
     private void setUserRecyclerView() {
         //to be updated
         mUsersChatListAdapter = new UsersChatListAdapter(getActivity(), new ArrayList<UserListItem>(), this);
         mUsersRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mUsersRecyclerView.setHasFixedSize(true);
         mUsersRecyclerView.setAdapter(mUsersChatListAdapter);
-    }
-
-    private void setUsersKeyList() {
-        mUsersKeyList = new ArrayList<String>();
     }
 
     private void setAuthListener() {
@@ -231,12 +216,16 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
     }
 
     private void queryAllUsers() {
+        if (mChildEventListener != null && databaseReference != null) {
+            databaseReference.removeEventListener(mChildEventListener);
+        }
+
         if (isFromGroup) {
             mChildEventListener = getGameUserListChildEventListener();
             databaseReference = FirebaseHelper.getGameUsersRef(gameKey);
         } else {
             mChildEventListener = getUserListChildEventListener();
-            databaseReference = FirebaseHelper.getUserRef().limitToFirst(50).getRef();
+            databaseReference = FirebaseHelper.getUserRef().getRef();
         }
 
         databaseReference.addChildEventListener(mChildEventListener);
@@ -292,11 +281,6 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         clearCurrentUsers();
@@ -307,30 +291,6 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
 
     private void clearCurrentUsers() {
         mUsersChatListAdapter.clear();
-        mUsersKeyList.clear();
-    }
-
-    private void logout() {
-        setUserOffline();
-        mAuth.signOut();
-        AuthUI.getInstance()
-                .signOut(getActivity())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    public void onComplete(@NonNull Task<Void> task) {
-                        NotificationHelper.unSubscribeAndLogout();
-                        // user is now signed out
-                        startActivity(new Intent(getActivity(), SigninActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-                        getActivity().finish();
-                    }
-                });
-    }
-
-    private void setUserOffline() {
-        if (mAuth.getCurrentUser() != null) {
-            String userId = mAuth.getCurrentUser().getUid();
-            FirebaseHelper.getUserRef().child(userId).child("connection").setValue(UsersChatListAdapter.OFFLINE);
-        }
     }
 
     /*@Override
@@ -387,8 +347,8 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
                             FirebaseHelper.getChatListItem(userUid, recipient, new FirebaseHelper.ChatListItemListener() {
                                 @Override
                                 public void onGetChatListItem(UserListItem chatListItem) {
-                                    mUsersKeyList.add(chatListItem.getUserUid());
-                                    mUsersChatListAdapter.refill(chatListItem);
+                                    emptyView.setVisibility(View.GONE);
+                                    mUsersChatListAdapter.add(chatListItem);
                                 }
                             });
                         }
@@ -406,7 +366,7 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
                         final String userUid = dataSnapshot.getKey();
                         if (!userUid.equals(FirebaseHelper.getCurrentUser().getUid())) {
                             final UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                            final int index = mUsersKeyList.indexOf(userUid);
+                            final int index = mUsersChatListAdapter.indexOf(userUid);
                             if (index > -1) {
                                 LatLng currentLatLng = getLocationFromPref();
                                 if (Float.parseFloat(LocationHelper.getDistance(currentLatLng.latitude, currentLatLng.longitude, userModel.getLatitude(), userModel.getLongitude())) <= 50) {
@@ -418,6 +378,7 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
                                     });
                                 } else {
                                     mUsersChatListAdapter.removeUser(index);
+                                    updateUserChatListEmptyView();
                                 }
                             }
                         }
@@ -444,36 +405,26 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
         };
     }
 
+    private void updateUserChatListEmptyView() {
+        if (mUsersChatListAdapter.getItemCount() > 0) {
+            emptyView.setVisibility(View.GONE);
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
     private ChildEventListener getGameUserListChildEventListener() {
+        mUsersChatListAdapter.setGameAuthorKey(gameAuthorId);
+        addGameUser(gameAuthorId);
         return new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 try {
                     final String userUid = dataSnapshot.getKey();
-//                    ignore game author and user him self
-                    if (!userUid.equals(FirebaseHelper.getCurrentUser().getUid()) && !userUid.equals(gameAuthorId)) {
-                        FirebaseHelper.getUserRef().child(userUid).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                final UserModel recipient = dataSnapshot.getValue(UserModel.class);
-                                FirebaseHelper.getChatListItem(userUid, recipient, new FirebaseHelper.ChatListItemListener() {
-                                    @Override
-                                    public void onGetChatListItem(UserListItem chatListItem) {
-                                        chatListItem.setCounter(0);
-                                        emptyView.setVisibility(View.GONE);
-                                        mUsersKeyList.add(chatListItem.getUserUid());
-                                        mUsersChatListAdapter.refill(chatListItem);
-                                    }
-                                });
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
+//                    ignore user him self
+                    /*if (!userUid.equals(FirebaseHelper.getCurrentUser().getUid())) {
+                    }*/
+                    addGameUser(userUid);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -487,7 +438,7 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
                         final String userUid = dataSnapshot.getKey();
                         if (!userUid.equals(FirebaseHelper.getCurrentUser().getUid())) {
                             final UserModel userModel = dataSnapshot.getValue(UserModel.class);
-                            final int index = mUsersKeyList.indexOf(userUid);
+                            final int index = mUsersChatListAdapter.indexOf(userUid);
                             if (index > -1) {
                                 LatLng currentLatLng = getLocationFromPref();
                                 if (Float.parseFloat(LocationHelper.getDistance(currentLatLng.latitude, currentLatLng.longitude, userModel.getLatitude(), userModel.getLongitude())) <= 50) {
@@ -511,11 +462,7 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 mUsersChatListAdapter.removeUser(mUsersChatListAdapter.indexOf(dataSnapshot.getKey()));
-                if (mUsersChatListAdapter.getItemCount() > 0) {
-                    emptyView.setVisibility(View.GONE);
-                } else {
-                    emptyView.setVisibility(View.VISIBLE);
-                }
+                updateUserChatListEmptyView();
             }
 
             @Override
@@ -528,6 +475,27 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
 
             }
         };
+    }
+
+    private void addGameUser(final String userUid) {
+        FirebaseHelper.getUserRef().child(userUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final UserModel recipient = dataSnapshot.getValue(UserModel.class);
+                FirebaseHelper.getChatListItem(userUid, recipient, new FirebaseHelper.ChatListItemListener() {
+                    @Override
+                    public void onGetChatListItem(UserListItem chatListItem) {
+                        chatListItem.setCounter(0);
+                        mUsersChatListAdapter.add(chatListItem);
+                        updateUserChatListEmptyView();
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
     }
 
 
@@ -570,23 +538,27 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
         Snackbar.make(container, msg, Snackbar.LENGTH_SHORT).show();
     }
 
-    /*public void setupUserSelectionList() {
-        View settingsView = LayoutInflater.from(getContext()).inflate(R.layout.user_list_layout, null);
-        settingsView.findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
+
+    public void setupUserSelectionList() {
+        View userListView = LayoutInflater.from(getContext()).inflate(R.layout.user_list_layout, null);
+        userListView.findViewById(R.id.back_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 userSelectionListDialog.dismiss();
             }
         });
 
+        nearbyUserSelectListEmptyView = userListView.findViewById(R.id.empty_view_nearby_users);
+
         userSelectionListDialog = new Dialog(getActivity(), R.style.MaterialDialogSheetAnim);
-        userSelectionListDialog.setContentView(settingsView); // your custom view.
+        userSelectionListDialog.setContentView(userListView); // your custom view.
         userSelectionListDialog.setCancelable(true);
         userSelectionListDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         userSelectionListDialog.getWindow().setGravity(Gravity.TOP);
 
-        RecyclerView recyclerView = (RecyclerView) settingsView.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) userListView.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         simpleUserListAdapter = new SimpleUserListAdapter(getContext(), new SimpleUserListAdapter.SimpleUserListListener() {
             @Override
             public void onUserClick(int position, UserListItem userListItem) {
@@ -601,9 +573,9 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
         });
         recyclerView.setAdapter(simpleUserListAdapter);
         loadDataInUserSelectionListAdapter();
-    }*/
+    }
 
-    /*private void loadDataInUserSelectionListAdapter() {
+    private void loadDataInUserSelectionListAdapter() {
         FirebaseHelper.getUserRef().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -616,7 +588,9 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
                         }
                     }
                 }
+
                 simpleUserListAdapter.updateList(users);
+                updateUserSelectListEmptyView();
             }
 
             @Override
@@ -624,25 +598,29 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
 
             }
         });
-    }*/
+    }
 
-    /*private boolean isUserValidForSelectionList(DataSnapshot snapshot) {
+    private boolean isUserValidForSelectionList(DataSnapshot snapshot) {
+        UserModel userModel = snapshot.getValue(UserModel.class);
+        LatLng location = LocationHelper.getLocationFromPref();
+        Float distance = Float.parseFloat(LocationHelper.getDistance(location.latitude, location.longitude, userModel.getLatitude(), userModel.getLongitude()));
         return !snapshot.getKey().equals(FirebaseHelper.getCurrentUser().getUid()) &&
                 !mUsersChatListAdapter.contains(snapshot.getKey()) &&
-                !gameInvitations.contains(snapshot.getKey());
-    }*/
+                !gameInvitations.contains(snapshot.getKey()) && distance <= 50 &&
+                !snapshot.getKey().equals(gameAuthorId);
+    }
 
-    /*public void showUserSelectionSheet() {
+    public void showUserSelectionSheet() {
         if (userSelectionListDialog != null) {
             loadDataInUserSelectionListAdapter();
             userSelectionListDialog.show();
         }
-    }*/
+    }
 
     @Override
     public void onUserItemClick(int position, UserListItem userListItem) {
         if (isFromGroup) {
-            startActivity(OtherUserProfileActivity.newIntent(getActivity(), userListItem.getUserUid(), gameKey));
+            startActivity(OtherUserProfileActivity.newIntent(getActivity(), userListItem.getUserUid(), gameKey, gameAuthorId));
         } else {
             try {
                 startActivity(ChatActivity.newIntent(getActivity(), userListItem.getUser(), userListItem.getUserUid()));
@@ -684,6 +662,16 @@ public class UserChatListFragment extends Fragment implements GoogleApiClient.On
     }
 
     private void removeUserFromGameList(String potentialUserId) {
-        FirebaseHelper.removeFromGame(gameKey, potentialUserId);
+        FirebaseHelper.removeUserFromGame(gameKey, potentialUserId);
+    }
+
+    private void updateUserSelectListEmptyView() {
+        if (simpleUserListAdapter != null && nearbyUserSelectListEmptyView != null) {
+            if (simpleUserListAdapter.getItemCount() > 0) {
+                nearbyUserSelectListEmptyView.setVisibility(View.GONE);
+            } else {
+                nearbyUserSelectListEmptyView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 }

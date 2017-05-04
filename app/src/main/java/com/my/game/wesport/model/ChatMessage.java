@@ -4,12 +4,18 @@ import com.google.firebase.database.Exclude;
 
 @SuppressWarnings("unused")
 public class ChatMessage {
+    public static final int TYPE_MESSAGE = 0;
+    public static final int TYPE_ATTACHMENT = 1;
+    public static final String STATUS_SENDING = "sending";
+    public static final String STATUS_SENT = "sending";
+    public static final String STATUS_FAIL = "fail";
 
     private String message;
     private String recipient;
     private String sender;
+    private String status;
     private String photoUrl;
-    private int mRecipientOrSenderStatus;
+    private int type = TYPE_MESSAGE;
     private boolean seen = true;
 
     public ChatMessage() {
@@ -20,10 +26,6 @@ public class ChatMessage {
         this.sender = sender;
         this.recipient = recipient;
         this.photoUrl = photoUrl;
-    }
-
-    public void setRecipientOrSenderStatus(int recipientOrSenderStatus) {
-        this.mRecipientOrSenderStatus = recipientOrSenderStatus;
     }
 
 
@@ -67,8 +69,24 @@ public class ChatMessage {
         this.seen = seen;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     @Exclude
-    public int getRecipientOrSenderStatus() {
-        return mRecipientOrSenderStatus;
+    public boolean isAttachment() {
+        return type == TYPE_ATTACHMENT;
     }
 }

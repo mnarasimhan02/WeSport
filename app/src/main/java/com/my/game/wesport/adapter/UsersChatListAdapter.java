@@ -13,11 +13,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
 import com.my.game.wesport.R;
 import com.my.game.wesport.helper.LocationHelper;
 import com.my.game.wesport.model.UserListItem;
 import com.my.game.wesport.model.UserModel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.List;
 
 public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdapter.ViewHolderUsers> {
 
+    private final List<DataSnapshot> dataSnapshots = new ArrayList<>();
     public static final String ONLINE = "online";
     public static final String OFFLINE = "offline";
     private final List<UserListItem> chatListItems;
@@ -32,6 +35,7 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
     private double mLat;
     private double mLon;
     private ChatListInterface listener;
+    private String gameAuthorKey = "";
     private String TAG = UsersChatListAdapter.class.getSimpleName();
 
     public UsersChatListAdapter(Context context, List<UserListItem> fireChatUserModels, ChatListInterface listener) {
@@ -51,6 +55,7 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
 
         final UserListItem chatListItem = chatListItems.get(position);
         UserModel fireChatUserModel = chatListItem.getUser();
+
         if (chatListItem.getCounter() > 0) {
             holder.chatCounter.setVisibility(View.VISIBLE);
             holder.chatCounter.setText(String.valueOf(chatListItem.getCounter()));
@@ -73,10 +78,18 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
 
 
         // Set Location to distance
-        holder.getUserLocation().setText(
-                LocationHelper.getDistance(mLat, mLon, fireChatUserModel.getLatitude(),
-                        fireChatUserModel.getLongitude())
-                        + " " + mContext.getString(R.string.miles_away));
+        if (chatListItem.getUserUid().equals(gameAuthorKey)) {
+            String titleColor = "#795548";
+            holder.getUserLocation().setText("Organizer");
+            holder.getUserLocation().setTextColor(Color.parseColor(titleColor));
+        } else {
+            holder.getUserLocation().setText(
+                    LocationHelper.getDistance(mLat, mLon, fireChatUserModel.getLatitude(),
+                            fireChatUserModel.getLongitude())
+                            + " " + mContext.getString(R.string.miles_away));
+        }
+
+
         holder.bioTextView.setText(fireChatUserModel.getBio());
         // Set presence status
         holder.getStatusConnection().setText(fireChatUserModel.getConnection());
@@ -147,9 +160,9 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
         return chatListItems.size();
     }
 
-    public void refill(UserListItem chatListItem) {
+    public void add(UserListItem chatListItem) {
 //        if item already exists then ignore
-        if (indexOf(chatListItem.getUserUid()) != -1) {
+        if (indexOf(chatListItem.getUserUid()) != -1 || chatListItem.getUser() == null) {
             return;
         }
         chatListItems.add(chatListItem);
@@ -160,7 +173,7 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
             mLon = Double.parseDouble(preferences.getString("longtitude", ""));
             compareDistance(chatListItems, mLat, mLon);
         } catch (Exception e) {
-            Log.d(TAG, "refill: " + e.getMessage());
+            Log.d(TAG, "add: " + e.getMessage());
         }
         notifyDataSetChanged();
     }
@@ -176,6 +189,11 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
             chatListItems.set(index, chatListItem);
             notifyItemChanged(index);
         }
+    }
+    public void addAtFirst(DataSnapshot value){
+        dataSnapshots.add(0, value);
+        notifyItemInserted(0);
+
     }
 
     public UserListItem getItem(String userUid) {
@@ -210,6 +228,10 @@ public class UsersChatListAdapter extends RecyclerView.Adapter<UsersChatListAdap
 
     public boolean contains(String userKey) {
         return indexOf(userKey) != -1;
+    }
+
+    public void setGameAuthorKey(String gameAuthorKey) {
+        this.gameAuthorKey = gameAuthorKey;
     }
 
     /* ViewHolder for RecyclerView */
