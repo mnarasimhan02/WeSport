@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.android.wesport", appContext.getPackageName());
+        assertEquals("com.my.game.wesport", appContext.getPackageName());
     }
 }
