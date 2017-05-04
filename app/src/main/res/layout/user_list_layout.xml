@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:title=""
+        app:contentInsetStart="0dp"
+        app:elevation="0dp"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/back_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:tint="@color/white"
+                android:src="@drawable/ic_arrow_back_24dp" />
+
+            <TextView
+                android:id="@+id/toolbar_title_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="Nearby Users"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/toolbar"
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    <RelativeLayout
+        android:id="@+id/empty_view_nearby_users"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/empty_shelter_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/accessibility_emptygame"
+            android:src="@drawable/ic_team_members" />
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/empty_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/empty_shelter_image"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/empty_user_list_text"
+            android:textAppearance="?android:textAppearanceMedium" />
+    </RelativeLayout>
+</RelativeLayout>

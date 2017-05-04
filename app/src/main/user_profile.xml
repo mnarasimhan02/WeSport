@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><!--suppress ALL, XmlUnboundNsPrefix, XmlHighlighting, XmlHighlighting -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:layout_marginBottom="4dp"
+    android:background="#FFFFFF" android:orientation="vertical">
+
+    <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/img_avatar"
+        android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="10dp"
+        tools:src="@drawable/headshot_7" />
+
+    <TextView android:id="@+id/text_view_display_name" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_alignBottom="@+id/img_avatar" android:layout_marginBottom="26dp"
+        android:layout_toEndOf="@+id/img_avatar" android:textColor="@color/text_color_icon"
+        android:textStyle="bold" tools:text="Marcelino" />
+
+    <TextView android:id="@+id/text_view_connection_status" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/img_avatar"
+        android:paddingEnd="@dimen/connection_status_padding"
+        tools:text="Online" />
+
+</RelativeLayout>

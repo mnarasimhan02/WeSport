@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout for the editor -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    tools:context=".activity.GameEditActivity">
+
+    <!-- Overview Games -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:layout_gravity="center_vertical"
+            style="@style/CategoryStyle"
+            android:text="Event Title"/>
+        <!-- Input fields -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:orientation="vertical">
+            <!-- Name field -->
+            <EditText
+                android:id="@+id/edit_event_title"
+                style="@style/EditorFieldStyle"
+                android:hint="Event Title"
+                android:inputType="textCapWords" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:layout_gravity="center_vertical"
+            style="@style/CategoryStyle"
+            android:text="@string/event_description" />
+
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edit_event_description"
+                style="@style/EditorFieldStyle"
+                android:layout_width="match_parent"
+                android:hint="@string/event_description"
+                android:inputType="text"
+                android:labelFor="@+id/startdate" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            android:layout_gravity="center_vertical"
+            style="@style/CategoryStyle"
+            android:text="Event Date"/>
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edit_event_date"
+                android:layout_width="match_parent"
+                style="@style/EditorFieldStyle"
+                android:onClick="onDateClicked"
+                android:focusable="false"
+                android:inputType="text"
+                android:labelFor="@+id/start_time"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <!-- Label -->
+        <TextView
+            android:layout_gravity="center_vertical"
+            style="@style/CategoryStyle"
+            android:text="Event Time"/>
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/edit_event_time"
+                android:layout_width="match_parent"
+                style="@style/EditorFieldStyle"
+                android:onClick="timePicker"
+                android:focusable="false"
+                android:inputType="text"
+                android:labelFor="@+id/end_time"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

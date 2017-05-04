@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="90dp"
+    android:background="@color/white"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    tools:ignore="Overdraw">
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="5dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="5dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="Haji pura road sialkot"
+            android:textColor="#ff000000"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <RatingBar
+            android:layout_marginTop="5dp"
+            android:id="@+id/place_rating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:isIndicator="false"
+            android:numStars="5"
+            android:rating="0" />
+
+        <TextView
+            android:id="@+id/snippet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="#ff7f7f7f"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/open_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/material_green_500"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_margin="5dp"
+            android:id="@+id/place_image"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_weight="0.4"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/accessibility_place"
+            android:scaleType="center"
+            tools:src="@drawable/profile" />
+    </LinearLayout>
+
+</LinearLayout>

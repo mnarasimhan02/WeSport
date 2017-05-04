@@ -1,0 +1,41 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    card_view:contentPadding="8dp"
+    card_view:cardUseCompatPadding="true"
+    android:clickable="true"
+    android:foreground="?android:selectableItemBackground">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            tools:src="@drawable/ic_allsports"
+            android:id="@+id/android_gridview_image"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="5dp"
+            android:contentDescription="@string/accessibility_grid" />
+
+        <TextView
+            android:layout_marginTop="10sp"
+            tools:text="Football"
+            android:textColor="@color/colorAccent"
+            android:id="@+id/android_gridview_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-light"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/widget_list_item"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:background="@drawable/touch_selector">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/abc_list_item_padding_horizontal_material"
+        android:paddingRight="@dimen/abc_list_item_padding_horizontal_material"
+        android:orientation="horizontal"
+        tools:ignore="PrivateResource">
+
+        <ImageView
+            android:id="@+id/widget_icon"
+            android:layout_gravity="center"
+            android:layout_width="@dimen/list_icon"
+            android:layout_height="@dimen/list_icon"
+            android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"
+            tools:src="@drawable/basketball"
+            android:contentDescription="@string/accessibility_widget"
+            tools:ignore="PrivateResource"/>
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="@color/primary_text"
+                android:text="Today, May 21"
+                tools:ignore="HardcodedText"/>
+
+            <TextView
+                android:id="@+id/widget_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@color/secondary_text"
+                tools:text="6 vs 6 Soccer Match"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_start_time"
+            android:layout_width="@dimen/forecast_widget_text_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="end"
+            android:layout_marginEnd="@dimen/forecast_temperature_space"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/forecast_widget_text_size"
+            tools:text="5:00 AM"
+            tools:ignore="SpUsage"/>
+
+        <TextView
+            android:id="@+id/widget_end_time"
+            android:layout_width="@dimen/forecast_widget_text_width"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="end"
+            android:fontFamily="sans-serif-light"
+            android:textColor="@color/game_notes_text"
+            android:textSize="@dimen/forecast_widget_text_size"
+            tools:text="7:00 AM"
+            tools:ignore="SpUsage"/>
+
+    </LinearLayout>
+</FrameLayout>

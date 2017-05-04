@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    tools:ignore="Overdraw">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="5dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="15dp">
+
+        <TextView
+            android:id="@+id/nearby_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="Haji pura road sialkot"
+            android:textColor="#ff000000"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+<!--
+
+        <TextView
+            android:id="@+id/nearby_user_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textColor="#ff7f7f7f"
+            android:textSize="14sp" />
+-->
+
+       <!-- <TextView
+            android:id="@+id/open_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/material_green_500"
+            android:textStyle="bold" />-->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/nearby_user_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_weight="0.4"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/accessibility_place"
+            android:scaleType="center"
+            tools:src="@drawable/profile" />
+    </LinearLayout>
+
+</LinearLayout>

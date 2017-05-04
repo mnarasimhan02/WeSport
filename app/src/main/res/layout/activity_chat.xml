@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splash_image"
+    tools:context="com.my.game.wesport.ui.ChatActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_chat_activity"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?attr/colorPrimary"
+        app:contentInsetEnd="0dp"
+        app:contentInsetLeft="0dp"
+        app:contentInsetRight="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/user_profile_image_chat_activity"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                android:clickable="true"
+                android:onClick="onActionBarImageCLick"
+                android:src="@drawable/profile"
+                app:civ_border_color="#FFFFFFFF"
+                app:civ_border_width="1dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="7dp"
+                android:layout_toEndOf="@+id/user_profile_image_chat_activity"
+                android:layout_toRightOf="@+id/user_profile_image_chat_activity"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:fontFamily="sans-serif-light"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    tools:text="Abdul Qadir Tahir" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar_chat_activity"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/ad_unit_id" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/senderContainer"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ad_view"
+        android:clipToPadding="false" />
+
+    <RelativeLayout
+        android:id="@+id/senderContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true">
+
+        <EditText
+            android:id="@+id/edit_text_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_toLeftOf="@+id/btn_send_message"
+            android:background="@drawable/backgroundmsg"
+            android:gravity="fill_vertical"
+            android:hint="Type your message"
+            android:paddingLeft="38dp"
+            android:textColor="#747474"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/attachment_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:foreground="?android:selectableItemBackground"
+            android:onClick="onAttachmentClick"
+            android:padding="8dp"
+            android:src="@drawable/ic_camera_alt_black_24dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_send_message"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_send_black_24dp" />
+
+    </RelativeLayout>
+
+    <!--<RelativeLayout
+        android:id="@+id/rl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="11dp"
+        android:layout_marginRight="10sp"
+        android:background="@drawable/send_round_background">
+
+        <Button
+            android:id="@+id/btn_send_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="14dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/ic_send_black_24dp" />
+    </RelativeLayout>-->
+
+    <ProgressBar
+        android:id="@+id/progress_for_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="horizontal"
+        tools:ignore="UselessLeaf">
+
+    </LinearLayout>
+
+</RelativeLayout>

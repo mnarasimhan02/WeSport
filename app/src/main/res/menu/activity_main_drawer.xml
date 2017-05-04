@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:id="@+id/group1" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_account_circle_black_24dp"
+            android:title="@string/profile" />
+
+        <item
+            android:id="@+id/nav_invites"
+            android:icon="@drawable/ic_group_work_black_24dp"
+            app:actionViewClass="android.widget.TextView"
+            android:title="Game Invites" />
+
+        <item
+            android:id="@+id/nav_nearby_users"
+            android:icon="@drawable/ic_person_nearby_user"
+            android:title="Nearby Users" />
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="My Games" />
+
+        <item
+            android:id="@+id/nav_invite_friends"
+            android:icon="@drawable/ic_action_invite_friends"
+            android:title="Invite Friends to App"
+            app:actionViewClass="android.widget.ImageView"
+            />
+    </group>
+
+    <group android:id="@+id/group2">
+        <item
+            android:id="@+id/nav_log_out"
+            android:title="@string/logout" />
+    </group>
+
+</menu>

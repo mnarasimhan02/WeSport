@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "1096682850687",
+    "firebase_url": "https://wesport-d7a20.firebaseio.com",
+    "project_id": "wesport-d7a20",
+    "storage_bucket": "wesport-d7a20.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096682850687:android:01837c1bb8f95d92",
+        "android_client_info": {
+          "package_name": "com.my.game.wesport"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096682850687-il386lp4cmprppmidarfmgbosstc6btf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.my.game.wesport",
+            "certificate_hash": "0ED09802BE73F247B54C4F0708E61660C8CDB8D0"
+          }
+        },
+        {
+          "client_id": "1096682850687-r4jcp9ol2l9d5ar6b2rbarvb5h7dhkp3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.my.game.wesport",
+            "certificate_hash": "0A2B3E602EF680FB540AB8CC0E208CA486CD2110"
+          }
+        },
+        {
+          "client_id": "1096682850687-u8hltmopqtadgmj7m9nqh7l3sb30cr3j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBh7uyEqtMhRyWbYixWEJFiP-VpbR5sElo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096682850687-u8hltmopqtadgmj7m9nqh7l3sb30cr3j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

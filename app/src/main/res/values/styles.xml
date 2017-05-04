@@ -1,0 +1,127 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+    </style>
+
+
+    <style name="GreenTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/material_green_500</item>
+        <item name="colorPrimaryDark">@color/material_green_700</item>
+        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@drawable/bg_login</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="colorControlHighlight">@color/colorAccent</item>
+    </style>
+
+    <style name="FirebaseUI.Button" parent="@style/GreenTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_gravity">right</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+
+
+    </style>
+
+    <!-- Theme of the editor -->
+    <style name="EditorTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/editorColorPrimary</item>
+        <item name="colorPrimaryDark">@color/editorColorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Style for a categoryId in the editor -->
+    <style name="CategoryStyle">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAppearance">?android:textAppearanceSmall</item>
+    </style>
+
+    <!-- Style for an EditText field in the editor -->
+    <style name="EditorFieldStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textAppearance">?android:textAppearanceMedium</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
+
+    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="FirebaseUI.Text.TextInputLayout" parent="@style/FirebaseUI.EditText" />
+
+    <style name="FirebaseUI.Text.HintText" parent="@style/FirebaseUI.EditText" />
+
+    <style name="FirebaseUI.ImageView.VisibilityToggle" parent="@style/FirebaseUI.EditText">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="FirebaseUI.Text.Link" parent="FirebaseUI.EditText" />
+
+    <style name="FirebaseUI.Text.BodyText" parent="FirebaseUI.EditText" />
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MyMaterialTheme" parent="MyMaterialTheme.Base">
+
+    </style>
+
+    <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+
+    <style name="MaterialDialogSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_hide</item>
+    </style>
+
+    <style name="MaterialDialogSheetAnim" parent="@android:style/Theme.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowAnimationStyle">@style/MaterialDialogSheetAnimation</item>
+    </style>
+
+    <style name="MaterialDialogSheet" parent="@android:style/Theme.Dialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+</resources>

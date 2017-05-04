@@ -1,0 +1,281 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">WeSport</string>
+
+    <string name="app_intro">Introduction</string>
+
+    <string name="title_activity_maps">Map</string>
+    <string name="sign_out">Sign Out</string>
+
+    <!-- GridView selection items-->
+
+    <string name="chosen_game">Chosen game:  </string>
+
+
+    <!-- Menu items-->
+
+    <!-- Autocomplete hint-->
+
+    <string name="autocomplete_hint">find play places</string>
+    <string name="usermarker_title">my location</string>
+
+    <!-- Intro slides headings-->
+
+    <string name="first_screen">Welcome to WeSport</string>
+    <string name="second_screen">View near by park details</string>
+    <string name="third_screen">Create Game\'s </string>
+    <string name="fourth_screen">Send Invites</string>
+    <string name="fourtha_screen">Near-by Games</string>
+    <string name="five_screen">View all near-by users and their interests</string>
+    <string name="six_screen">Game Talk</string>
+    <string name="seven_screen">Game Images</string>
+    <string name="eighta_screen">Get Notified</string>
+    <string name="nine_screen">User Map</string>
+
+
+    <!-- Intro slides descriptions-->
+    <string name="scr1_desc">WeSport allows people to connect with each other to play games and stay active</string>
+    <string name="scr2_desc">Recommends play places around user\'s location</string>
+    <string name="scr3_desc">Create Games at near-by location by selecting existing parks or search by address.</string>
+    <string name="scr4_desc">Invite nearby users to your game</string>
+    <string name="scr4a_desc">View games other users have created near-by your location and ask to join those games.</string>
+    <string name="scr5_desc">Find nearby by users, know their interests , chat and invite them for your games.</string>
+    <string name="scr6_desc">Discuss with your invited players in the Game talk room</string>
+    <string name="scr7_desc">Add images of the game</string>
+    <string name="scr8a_desc">Get push notifications for user chat, team talk and for game invites</string>
+    <string name="scr9_desc">Whats more, view all near by users in the map, tap and chat with them</string>
+
+
+    <!-- Locations permissions strings-->
+
+    <string name="permision_available_location">Location permission granted.</string>
+    <string name="permissions_not_granted">Permissions were not granted.</string>
+    <string name="close_app">Location and Calendar permissions required to run app. App will now close</string>
+
+    <!-- Label for Google API Web-services and Google Maps key-->
+    <string name="type_param">park</string>
+    <!--<string name="google_maps_key">AIzaSyA6VmyUcYdESQJJbATsA316c7S854W6a8U</string>
+    <string name="places_api_key">AIzaSyBmEpSt0jy6YbuUXnwJT6GzgabYNeOjqJE</string>-->
+
+    <string name="google_maps_key">AIzaSyAupE3BWQpqy8P3SyiECZYVPmrbYBKJM8c</string>
+    <string name="places_api_key">AIzaSyAupE3BWQpqy8P3SyiECZYVPmrbYBKJM8c</string>
+
+    <!-- Games array-->
+
+    <string-array name="games_array">
+        <item> Basketball</item>
+        <item> Cricket</item>
+        <item> Football</item>
+        <item> Tennis</item>
+        <item> Frisbee</item>
+        <item> Pingpong</item>
+        <item> Soccer</item>
+        <item> Volleyball</item>
+        <item> Other</item>
+    </string-array>
+
+
+    <!-- Label for overflow menu option that inserts fake GameModel data into the app [CHAR LIMIT=20] -->
+
+    <!-- Label for overflow menu option that deletes all GameModel data in the app [CHAR LIMIT=20] -->
+    <string name="action_delete_all_entries">Delete All Games</string>
+
+    <!-- Title text for the empty view, which describes the empty GameModel categoryId [CHAR LIMIT=50] -->
+    <string name="empty_view_title_text" tools:ignore="TypographyEllipsis">Let\'s play together...</string>
+
+    <!-- Subtitle text for the empty view that prompts the userModel to add a GameModel [CHAR LIMIT=50] -->
+    <string name="empty_view_subtitle_text">Get started by adding a new Game</string>
+
+    <!-- Title for the activity to add a new GameModel [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_new_game">Add a Game</string>
+
+    <!-- Title for the activity to edit an existing game [CHAR LIMIT=20] -->
+    <string name="editor_activity_title_edit_game">Edit Game</string>
+
+    <!-- Label for editor menu option to save game and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- Label for editor overflow menu option that deletes the current game [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+    <!-- Toast message in editor when new game has been successfully inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_game_successful">Game saved</string>
+    <string name="editor_insert_event_successful">Event saved</string>
+
+    <!-- Toast message in editor when new game has failed to be inserted [CHAR LIMIT=NONE] -->
+    <string name="editor_insert_game_failed">Error with saving Game</string>
+
+    <!-- Toast message in editor when current game was successfully updated [CHAR LIMIT=NONE] -->
+
+    <!-- Toast message in editor when current game has failed to be updated [CHAR LIMIT=NONE] -->
+    <string name="editor_update_game_failed">Error with updating Game</string>
+
+    <!-- Dialog message when userModel is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+
+    <!-- Dialog button text for the option to discard a userModel's changes [CHAR LIMIT=20] -->
+    <string name="discard">Discard</string>
+
+    <!-- Dialog button text for the option to keep editing the current game [CHAR LIMIT=20] -->
+    <string name="keep_editing">Keep Editing</string>
+
+    <!-- Toast message in editor when current game was successfully deleted [CHAR LIMIT=NONE] -->
+
+    <!-- Toast message in editor when current game has failed to be deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_game_failed">Error with deleting Game</string>
+
+    <!-- Dialog message to ask the userModel to confirm deleting the current game [CHAR LIMIT=NONE] -->
+    <string name="delete_game_dialog_msg">Delete this Game?</string>
+    <string name="delete_event_dialog_msg">Delete this Event?</string>
+    <string name="delete_image_dialog_msg">Delete this category?</string>
+    <string name="delete_user_dialog_msg">Remove %1$s?</string>
+
+    <!-- Dialog button text for the option to confirm deleting the current game [CHAR LIMIT=20] -->
+    <string name="delete">Delete</string>
+
+    <!-- Dialog button text for the option to cancel deletion of the current game [CHAR LIMIT=20] -->
+    <string name="cancel">Cancel</string>
+
+    <!-- Label for overview categoryId of attributes in the editor [CHAR LIMIT=30] -->
+    <string name="game_description">Game Description</string>
+
+    <!-- Label for overview categoryId of attributes in the editor [CHAR LIMIT=30] -->
+    <string name="game_startdate">Date</string>
+
+    <string name="game_starttime">Start Time</string>
+
+    <string name="game_endtime">End Time</string>
+
+    <string name="category_skilllevel">Skill Level</string>
+
+    <!-- Label for measurement information in the editor [CHAR LIMIT=30] -->
+    <string name="category_notes">Notes</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_game_name">Game Description</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_game_notes">Notes for the Game</string>
+
+    <string name="game_rookie">Rookies</string>
+
+    <string name="game_vet">Veterans</string>
+
+    <string name="game_pro">Pro</string>
+    <!-- Text hint for Autocomplete textview -->
+
+    <string name="empty_game_list">No Game Information Available</string>
+
+
+    <!-- chat activity strings-->
+
+    <string name="signin_string">Signed in! </string>
+    <string name="signin_cancel">Sign in canceled</string>
+    <string name="email_user">Email userModel</string>
+    <string name="email_sign">Email Sign</string>
+    <string name="email_signout">Signout</string>
+
+
+    <string name="editor_insert_game_params">Game description and Start date both are required</string>
+    <string name="editor_insert_event_params">Event title, date and time are required</string>
+
+    <!-- accessibility strings-->
+
+    <string name="place_error"> Zero parkModels. Please type exact address </string>
+    <string name="save_game"> game at  </string>
+    <string name="save_game_text"> saved  </string>
+
+
+    <!-- Log messages-->
+
+    <string name="accessibility_grid">select games from grid</string>
+    <string name="accessibility_widget">widget category</string>
+    <string name="accessibility_emptygame">empty game</string>
+    <string name="accessibility_chatbox">category for chatroom</string>
+    <string name="sensor_param">false</string>
+    <string name="get_address">retrieving address</string>
+    <string name="map_help">Tap any park to find out more information and then click info window/search to retrieve address</string>
+    <string name="loc_not_enable">Turn on location settings</string>
+    <string name="accessibility_place">park category</string>
+
+
+    <!-- LogInActivity-->
+    <string name="title_activity_chat">Chat</string>
+
+    <!-- Calendar-->
+    <string name="calendar_add_game">Game Added to Calendar</string>
+    <string name="calendar_add_event">Event Added</string>
+    <string name="title_activity_my_games">MyGames</string>
+    <string name="miles_away">mile(s) away</string>
+
+    <!-- Firebase Invites-->
+
+    <string name="deep_link_default">Deep link not set</string>
+    <string name="invitation_id_default">Invitation ID not set</string>
+
+    <string name="invitation_title">WeSport is great, give it a try</string>
+    <string name="invitation_message">Download WeSport, find near by parks, play buddies. Review and rate the app</string>
+    <string name="invitation_cta">Install!</string>
+
+    <string name="deep_link_fmt" formatted="false" tools:ignore="StringFormatInvalid">Deep Link: %s</string>
+    <string name="invitation_id_fmt" formatted="false" tools:ignore="StringFormatInvalid">Invitation ID: %s</string>
+
+    <string name="send_failed">Sending invitations failed</string>
+    <string name="invite_dialog_title">You got an invitation!</string>
+
+    <string name="google_play_services_error">Google Play Services Error</string>
+    <string name="invite_friends">Invite friends</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="openDrawer">open_drawer</string>
+    <string name="closeDrawer">close_drawer</string>
+
+    <!-- Navigation Drawer menu labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_photos">Photos</string>
+    <string name="nav_movies">Movies</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about_us">About Us</string>
+
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string-array name="nav_item_activity_titles">
+        <item>Home</item>
+        <item>Photos</item>
+        <item>Movies</item>
+        <item>Notifications</item>
+        <item>Settings</item>
+    </string-array>
+
+    <string name="activity_title_about_us">About Us</string>
+    <string name="activity_title_privacy_policy">Privacy Policy</string>
+    <string name="action_clear_all">Clear All</string>
+    <string name="action_logout">Logout</string>
+    <string name="action_mark_all_read">Mark All as Read</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="cancelling_required_permissions_denied">Cancelling Required Permission Denied</string>
+    <string name="logout">Logout</string>
+    <string name="invitations">Invitations</string>
+    <string name="event_description">Event Description</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_permission_not_granted">Cancelling, required permissions are not granted</string>
+    <string name="profile">Profile</string>
+    <string name="team_members">Team Members</string>
+    <string name="add_upcoming_event">Add upcoming event</string>
+    <string name="add_an_image">Add an category</string>
+    <string name="delete_member">Delete member from group</string>
+    <string name="empty_user_list_text">No near-by users yet, please invite friends</string>
+
+
+    <string name="admob_app_id">ca-app-pub-9060826341226042~1568359014 </string>
+    <string name="ad_unit_id">ca-app-pub-9060826341226042/8279309811</string>
+    <string name="select_game">Select Game</string>
+    <string name="join_game_invitation_text">I want to join your game \"%1$s\". Please invite me.</string>
+</resources>
+
+
+
+

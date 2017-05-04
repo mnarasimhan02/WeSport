@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4CAF50</color>
+    <color name="colorPrimaryDark">#388E3C</color>
+    <color name="colorPrimaryLight">#C8E6C9</color>
+    <color name="colorAccent">#977254</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    
+    <!-- Primary color for the editor -->
+    <color name="editorColorPrimary">#2D3640</color>
+
+    <!-- Primary dark color for the editor -->
+    <color name="editorColorPrimaryDark">#394450</color>
+    <color name="material_green_500">#4CAF50</color>
+    <color name="material_green_700">#388E3C</color>
+
+    <!-- Primary widget colors -->
+
+    <color name="white">#FFFFFF</color>
+
+    <!-- the activated state color -->
+    <color name="activated">#E0E0E0</color>
+
+    <color name="game_notes_text">#607D8B</color>
+
+    <!-- the userModel chat state color -->
+
+    <color name="bg_user_message">#ffffff</color>
+    <color name="divider">#B6B6B6</color>
+    <color name="text_color_icon">#212121</color>
+    <color name="transparent">#00000000</color>
+    <color name="black">#000000</color>
+    <color name="tabUnSelectedIconColor">#c2c9d7</color>
+    <color name="tabSelectedIconColor">#46a6ea</color>
+
+
+</resources>
+
+

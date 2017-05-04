@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:selectableItemBackground"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12sp"
+            android:orientation="vertical">
+
+            <!--<ImageView
+           android:id="@+id/chatimage"
+           android:layout_width="30dp"
+           android:layout_height="30dp"
+           android:layout_alignParentLeft="true"
+           android:layout_marginTop="8dp"
+           android:adjustViewBounds="false"
+           android:contentDescription="@string/accessibility_chatbox"
+           android:src="@drawable/cricket"
+           tools:ignore="RtlHardcoded" />-->
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                tools:text="Cricket" />
+
+            <TextView
+                android:id="@+id/summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3sp"
+                android:fontFamily="sans-serif"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="#000"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="Description" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#a2a2a2" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_watch_later_black_24dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="Day and Time of Event"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/startdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginTop="4sp"
+                    android:fontFamily="sans-serif"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    tools:text="23/04/2017" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_place_black_24dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:text="Upside"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_marginTop="4sp"
+                    android:fontFamily="sans-serif"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    tools:text="at Abad nagar haji pura" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_person_black_24dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/owner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:fontFamily="serif"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#000"
+                    tools:text="Hosted by Sabeeh Ul Hussnain" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#a2a2a2" />
+
+        <LinearLayout
+            android:id="@+id/buttons_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/accept_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:selectableItemBackground"
+                android:text="Accept"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/reject_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?android:selectableItemBackground"
+                android:text="Reject"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>

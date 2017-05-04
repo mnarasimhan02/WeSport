@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
+    android:clickable="true"
+    android:foreground="?android:selectableItemBackground"
+    android:orientation="vertical">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/profile" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/img_avatar"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_view_display_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_color_icon"
+            android:textStyle="bold"
+            tools:text="WeSport Admin" />
+
+        <TextView
+            android:id="@+id/text_view_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:text="mr.hussnain.it@gmail.com"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:textSize="12sp"
+            android:textColor="#98a1a7" />
+    </LinearLayout>
+
+</RelativeLayout>
