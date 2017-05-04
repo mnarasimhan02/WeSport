@@ -83,16 +83,12 @@ public class GalleryGridFragment extends Fragment implements GridRecyclerViewAda
         emptyView = view.findViewById(R.id.empty_view);
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.add_fab);
-        if (gameAuthorKey.equals(FirebaseHelper.getCurrentUser().getUid())) {
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    requestCameraImage();
-                }
-            });
-        } else {
-            fab.setVisibility(View.GONE);
-        }
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestCameraImage();
+            }
+        });
 
         setupGridImages();
         return view;
