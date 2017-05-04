@@ -2,6 +2,7 @@ package com.my.game.wesport.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -9,12 +10,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,16 +46,17 @@ import org.greenrobot.eventbus.ThreadMode;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 
-public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserProfileActivity extends AppCompatActivity {
     private static final String TAG = "TAG";
     //private static final int REQUEST_SELECT_IMAGE = 100;
 
-    private EditText nameText, bioText;
+    private TextView nameText, bioText;
     private TextView emailText;
     private ImageView userProfileImage, userProfileCoverImage;
     private Toolbar toolbar;
 
-    private boolean isEditable = false;
+
+    //private boolean isEditable = false;
     private Uri mCropImageUri;
 
     private UserModel userModelProfile;
@@ -70,37 +77,40 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         userRef = FirebaseDatabase.getInstance().getReference().child("users")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        nameText = (EditText) findViewById(R.id.edit_user_profile_name);
-        bioText = (EditText) findViewById(R.id.user_bio);
+        nameText = (TextView) findViewById(R.id.edit_user_profile_name);
+        bioText = (TextView) findViewById(R.id.user_bio);
         emailText = (TextView) findViewById(R.id.email_user_profile);
         userProfileImage = (ImageView) findViewById(R.id.user_profile_image);
         userProfileCoverImage = (ImageView) findViewById(R.id.user_profile_cover_image);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("");
         }
 
-        userProfileImage.setOnClickListener(this);
+
         userModelProfile = App.getInstance().getUserModel();
+        if (userModelProfile == null) {
+            Toast.makeText(this, "Invalid profile!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         updateViews(userModelProfile);
     }
 
-    @Override
-    public void onClick(View view) {
-        if (!isEditable) {
-            return;
-        }
+
+
+    public void onProfileImageClick(View view){
         avatarEdit();
     }
 
     public void onCoverImageClick(View view) {
-        if (!isEditable) {
+        /*if (!isEditable) {
             return;
-        }
+        }*/
         coverImageEdit();
     }
 
@@ -153,8 +163,10 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 eventBus.post(new ProfileImageUpdateEvent(resultUri, editImageType));
                 eventBus.post(new ProfileUpdatedLocalEvent(resultUri, editImageType));
                 if (editImageType == EDIT_COVER_IMAGE) {
+                    App.getInstance().getUserModel().setCoverUri(resultUri.toString());
                     Glide.with(this).load(resultUri).into(userProfileCoverImage);
                 } else {
+                    App.getInstance().getUserModel().setPhotoUri(resultUri.toString());
                     Glide.with(this).load(resultUri).into(userProfileImage);
                 }
             }
@@ -216,18 +228,18 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 .into(userProfileCoverImage);
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_activity_profile, menu);
         MenuItem item = menu.findItem(R.id.action_edit);
-        if (isEditable) {
+
             item.setIcon(R.drawable.ic_done);
-        } else {
+        *//*} else {
             item.setIcon(R.drawable.ic_create_24dp);
-        }
+        }*//*
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -235,37 +247,37 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             case android.R.id.home:
                 finish();
                 break;
-            case R.id.action_edit:
-                changeState(!isEditable);
+            /*case R.id.action_edit:
+                changeState();
                 invalidateOptionsMenu();
                 break;
             case R.id.sign_out_menu:
-                break;
+                break;*/
         }
         return true;
     }
 
-    private void changeState(boolean state) {
-        isEditable = state;
+    private void changeState() {
+        /*isEditable = state;
         if (state) {
             nameText.setEnabled(true);
-            bioText.setEnabled(true);
-        } else {
+            //bioText.setEnabled(true);
+        } else {*/
             userModelProfile.setBio(bioText.getText().toString());
             userModelProfile.setDisplayName(nameText.getText().toString());
             userRef.setValue(userModelProfile);
-
+/*
             nameText.setEnabled(false);
-            bioText.setEnabled(false);
-        }
+           // bioText.setEnabled(false);
+        }*/
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onUserProfileUpdated(UserProfileUpdatedEvent event) {
-        if (!isEditable) {
+       /* if (!isEditable) {
             userModelProfile = App.getInstance().getUserModel();
             updateViews(userModelProfile);
-        }
+        }*/
     }
 
     @Override
@@ -287,5 +299,90 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
+
+    public void onClickChangeUserName(View view) {
+        changeNameDialog();
+    }
+
+    public void onClickChangeProfileBio(View view) {
+        changeBioDialog();
+    }
+
+    public void changeNameDialog(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        //final EditText edittext = new EditText(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.custom_dialog, null);
+        alert.setView(dialogView);
+
+        final EditText edittext = (EditText) dialogView.findViewById(R.id.edittext);
+        edittext.setText(userModelProfile.getDisplayName());
+
+        alert.setTitle("Change Your Name");
+        alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //What ever you want to do with the value
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
+
+                String YouEditTextValue = edittext.getText().toString();
+                nameText.setText(YouEditTextValue);
+                userModelProfile.setDisplayName(YouEditTextValue);
+                userRef.setValue(userModelProfile);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
+               dialog.dismiss();
+            }
+        });
+       // AlertDialog b = dialogBuilder.create();
+        alert.show();
+        edittext.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    public void changeBioDialog(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.custom_dialog, null);
+        alert.setView(dialogView);
+        final EditText edittext = (EditText) dialogView.findViewById(R.id.edittext);
+        edittext.setMaxLines(3);
+
+        edittext.setText(userModelProfile.getBio());
+
+        alert.setTitle("Change Your Bio");
+        alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
+
+                String YouEditTextValue = edittext.getText().toString();
+                bioText.setText(YouEditTextValue);
+                userModelProfile.setBio(YouEditTextValue);
+                userRef.setValue(userModelProfile);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
+                dialog.dismiss();
+            }
+        });
+        alert.show();
+        edittext.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 }

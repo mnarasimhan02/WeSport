@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,16 +28,19 @@ public class OtherUserProfileActivity extends AppCompatActivity {
 
     private static String EXTRA_USER_ID = "user_id";
     private static String EXTRA_GAME_KEY = "game_key";
+    private static String EXTRA_GAME_AUTHOR = "game_author";
     private ImageView coverImage, avatarImage;
     private TextView nameText, emailText, bioText;
     private UserModel userModel;
     private String userUid;
     private String gameKey;
+    private String gameAuthor;
 
-    public static Intent newIntent(Context context, String userUid, String gameKey) {
+    public static Intent newIntent(Context context, String userUid, String gameKey, String gameAuthor) {
         Intent chatIntent = new Intent(context, OtherUserProfileActivity.class);
         chatIntent.putExtra(EXTRA_USER_ID, userUid);
         chatIntent.putExtra(EXTRA_GAME_KEY, gameKey);
+        chatIntent.putExtra(EXTRA_GAME_AUTHOR, gameAuthor);
         return chatIntent;
     }
 
@@ -59,6 +63,13 @@ public class OtherUserProfileActivity extends AppCompatActivity {
 
         userUid = getIntent().getStringExtra(EXTRA_USER_ID);
         gameKey = getIntent().getStringExtra(EXTRA_GAME_KEY);
+        gameAuthor = getIntent().getStringExtra(EXTRA_GAME_AUTHOR);
+
+//        if it is game author and gameKey is empty then hide delete button
+        if (TextUtils.isEmpty(gameKey) || userUid.equals(gameAuthor)) {
+            findViewById(R.id.delete_other_user_from_group).setVisibility(View.GONE);
+        }
+
         FirebaseHelper.getUserRef().child(userUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -132,7 +143,7 @@ public class OtherUserProfileActivity extends AppCompatActivity {
     }
 
     private void removeUserFromGameList(String potentialUserId) {
-        FirebaseHelper.removeFromGame(gameKey, potentialUserId);
+        FirebaseHelper.removeUserFromGame(gameKey, potentialUserId);
     }
 
 
