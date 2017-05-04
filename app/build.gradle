@@ -83,7 +83,7 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.afollestad:drag-select-recyclerview:0.3.6'
     compile 'com.firebase:geofire-android:2.1.1'
     compile 'uk.co.chrisjenx:calligraphy:2.2.0'
