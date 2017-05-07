@@ -625,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         } else if (notificationModel.getType() == NotificationHelper.TYPE_CHAT) {
                             startActivity(ChatActivity.newIntent(MainActivity.this, profileModel, dataSnapshot.getKey()));
                         } else if (notificationModel.getType() == NotificationHelper.TYPE_GROUP_CHAT) {
-                            startActivity(GroupActivity.newIntent(MainActivity.this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey()));
+                            startActivity(GroupActivity.newIntent(MainActivity.this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey(), GroupActivity.PAGE_GROUP_CHAT));
                         }
                     }
                 }
