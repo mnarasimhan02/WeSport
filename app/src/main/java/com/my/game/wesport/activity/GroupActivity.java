@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.my.game.wesport.R;
@@ -25,6 +26,7 @@ public class GroupActivity extends AppCompatActivity {
     private static final String EXTRA_KEY_GAME = "key_game";
     private static final String EXTRA_GAME_AUTHOR = "game_author";
     private static String EXTRA_PAGE_INDEX = "page_index";
+    private static String TAG = GroupActivity.class.getSimpleName();
     private Drawable icon;
 
     public static final int PAGE_EVENTS = -1;
@@ -52,6 +54,7 @@ public class GroupActivity extends AppCompatActivity {
     }
 
     public static Intent newIntent(Context context, String gameKey, String gameAuthorId) {
+        Log.d(TAG, "newIntent() called with: gameKey = [" + gameKey + "], gameAuthorId = [" + gameAuthorId + "]");
         Intent intent = new Intent(context, GroupActivity.class);
         intent.putExtra(EXTRA_KEY_GAME, gameKey);
         intent.putExtra(EXTRA_GAME_AUTHOR, gameAuthorId);
