@@ -445,8 +445,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             // Received permission result for location permission.
             // Check if the only required permission has been granted
 
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+            boolean isGranted = true;
+            for (int grantResult : grantResults) {
+                isGranted = isGranted && grantResult == PackageManager.PERMISSION_GRANTED;
+            }
+
+            if (isGranted) {
                 // Location permission has been granted, preview can be displayed
                 Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_SHORT).show();
@@ -605,6 +609,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (bundle != null && bundle.containsKey(NotificationHelper.EXTRA_MESSAGE)) {
 //            dialogHelper.showProgressDialog("Please wait!", "Loading chat!", true);
             final String jsonMessage = bundle.getString(NotificationHelper.EXTRA_MESSAGE);
+            Log.d(TAG, "parseNotifyMessageFromBundle: " + jsonMessage);
             intent.removeExtra(NotificationHelper.EXTRA_MESSAGE);
             final NotificationModel notificationModel = NotificationHelper.parse(jsonMessage);
             FirebaseHelper.getUserRef().child(notificationModel.getSenderId()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -620,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         } else if (notificationModel.getType() == NotificationHelper.TYPE_CHAT) {
                             startActivity(ChatActivity.newIntent(MainActivity.this, profileModel, dataSnapshot.getKey()));
                         } else if (notificationModel.getType() == NotificationHelper.TYPE_GROUP_CHAT) {
-                            startActivity(GroupActivity.newIntent(MainActivity.this, gameKey, notificationModel.getGameAuthorKey()));
+                            startActivity(GroupActivity.newIntent(MainActivity.this, notificationModel.getGameKey(), notificationModel.getGameAuthorKey()));
                         }
                     }
                 }
