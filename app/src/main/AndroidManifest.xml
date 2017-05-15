@@ -24,6 +24,7 @@
         android:required="true" />
 
     <application
+        android:largeHeap="true"
         android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
